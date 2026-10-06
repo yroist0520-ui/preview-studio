@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
 <title>Preview Studio · 作品预览图生成器</title>
-<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Snell+Roundhand&family=Apple+Chancery&family=Inter:wght@300;400;500;600;700;800&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Snell+Roundhand&family=Apple+Chancery&family=Inter:wght@300;400;500;600;700;800&family=Cormorant+Garamond:wght@300;400;500;600&family=Playfair+Display:wght@400;600;700&family=Dancing+Script:wght@400;600&family=Caveat:wght@400;600&family=Montserrat:wght@300;400;600&family=ZCOOL+XiaoWei&family=ZCOOL+QingKe+HuangYou&family=Ma+Shan+Zheng&family=Long+Cang&family=Liu+Jian+Mao+Cao&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -204,6 +204,17 @@ input[type=file]{font-size:11px}
       <aside class="panel">
         <h3 class="tool-h">① 画布尺寸</h3>
         <select id="size">
+          <optgroup label="苹果锁屏 iPhone">
+            <option value="1170,2532">iPhone 锁屏 1170×2532 (12/13/14)</option>
+            <option value="1179,2556">iPhone 锁屏 1179×2556 (14 Pro/15)</option>
+            <option value="1290,2796">iPhone 锁屏 1290×2796 (15 Pro Max)</option>
+          </optgroup>
+          <optgroup label="苹果锁屏 iPad">
+            <option value="1668,2388">iPad 锁屏竖 1668×2388 (11")</option>
+            <option value="2048,2732">iPad 锁屏竖 2048×2732 (12.9")</option>
+            <option value="2388,1668">iPad 锁屏横 2388×1668 (11")</option>
+            <option value="2732,2048">iPad 锁屏横 2732×2048 (12.9")</option>
+          </optgroup>
           <optgroup label="iPhone 壁纸">
             <option value="1080,1920">iPhone 1080×1920</option>
             <option value="1179,2556">iPhone 1179×2556</option>
@@ -333,22 +344,50 @@ input[type=file]{font-size:11px}
         <input type="range" id="tornAmount" min="5" max="40" value="15" oninput="document.getElementById('tornVal').textContent=this.value;draw()">
 
         <h3 class="tool-h">⑦ 文字</h3>
-        <label>英文标题（手写体）</label>
+        <label>英文标题</label>
         <input type="text" id="textEN" value="Preview" oninput="draw()">
-        <label>中文内容（楷体，可多行）</label>
-        <textarea id="textCN" rows="3" oninput="draw()">营业时间 9:00-18:00
-版权所有 © 2026</textarea>
+        <label>英文字体</label>
+        <select id="fontEN" onchange="draw()">
+          <option value="'Great Vibes',cursive" selected>Great Vibes 手写</option>
+          <option value="'Snell Roundhand','Apple Chancery',cursive">Snell 圆体</option>
+          <option value="'Dancing Script',cursive">Dancing Script 手写</option>
+          <option value="'Caveat',cursive">Caveat 随性</option>
+          <option value="'Cormorant Garamond',serif">Cormorant 衬线</option>
+          <option value="'Playfair Display',serif">Playfair 衬线</option>
+          <option value="'Montserrat',sans-serif">Montserrat 无衬线</option>
+        </select>
         <label>英文颜色</label>
         <input type="color" id="colorEN" value="#5a4a3a" onchange="draw()">
+        <label>英文大小: <span id="textENSizeVal">9</span>%</label>
+        <input type="range" id="textENSize" min="2" max="30" value="9" oninput="document.getElementById('textENSizeVal').textContent=this.value;draw()">
+        <div class="row-2">
+          <div><label>X: <span id="textENXVal">50</span>%</label><input type="range" id="textENX" min="0" max="100" value="50" oninput="document.getElementById('textENXVal').textContent=this.value;draw()"></div>
+          <div><label>Y: <span id="textENYVal">12</span>%</label><input type="range" id="textENY" min="0" max="100" value="12" oninput="document.getElementById('textENYVal').textContent=this.value;draw()"></div>
+        </div>
+        <label>中文内容（可多行）</label>
+        <textarea id="textCN" rows="3" oninput="draw()">营业时间 9:00-18:00
+版权所有 © 2026</textarea>
+        <label>中文字体</label>
+        <select id="fontCN" onchange="draw()">
+          <option value="'KaiTi','Kaiti SC','STKaiti',serif" selected>楷体</option>
+          <option value="'Ma Shan Zheng',cursive">马善政毛笔</option>
+          <option value="'Long Cang',cursive">龙藏手写</option>
+          <option value="'Liu Jian Mao Cao',cursive">刘建毛草</option>
+          <option value="'ZCOOL XiaoWei',serif">站酷小薇</option>
+          <option value="'ZCOOL QingKe HuangYou',sans-serif">站酷庆科黄油</option>
+          <option value="'Noto Serif SC',serif">思源宋体</option>
+          <option value="'FangSong','STFangsong',serif">仿宋</option>
+          <option value="'PingFang SC','Microsoft YaHei',sans-serif">苹方黑体</option>
+        </select>
         <label>中文颜色</label>
         <input type="color" id="colorCN" value="#4a3a2a" onchange="draw()">
-        <label>文字位置</label>
-        <select id="textPos" onchange="draw()">
-          <option value="tb" selected>顶英 / 底中</option>
-          <option value="bt">顶中 / 底英</option>
-          <option value="cc">全部居中</option>
-          <option value="bc">全部底部</option>
-        </select>
+        <label>中文大小: <span id="textCNSizeVal">3.4</span>%</label>
+        <input type="range" id="textCNSize" min="1" max="15" value="3.4" step="0.1" oninput="document.getElementById('textCNSizeVal').textContent=this.value;draw()">
+        <div class="row-2">
+          <div><label>X: <span id="textCNXVal">50</span>%</label><input type="range" id="textCNX" min="0" max="100" value="50" oninput="document.getElementById('textCNXVal').textContent=this.value;draw()"></div>
+          <div><label>Y: <span id="textCNYVal">88</span>%</label><input type="range" id="textCNY" min="0" max="100" value="88" oninput="document.getElementById('textCNYVal').textContent=this.value;draw()"></div>
+        </div>
+        <div class="hint">💡 也可直接拖动画布上的文字移动位置</div>
 
         <h3 class="tool-h">⑧ 装饰</h3>
         <label>外框颜色</label>
@@ -389,17 +428,52 @@ love
         <label>背景图模糊强度: <span id="msBlurVal">12</span>px</label>
         <input type="range" id="msBlur" min="0" max="40" value="12" oninput="document.getElementById('msBlurVal').textContent=this.value;draw()">
 
-        <h3 class="tool-h" style="margin-top:14px">⑨½ 元素大小调节</h3>
+        <h3 class="tool-h" style="margin-top:14px">⑨½ 元素大小与位置调节</h3>
         <label>主文字字号: <span id="msMainSizeVal">55</span>‰</label>
         <input type="range" id="msMainSize" min="20" max="100" value="55" oninput="document.getElementById('msMainSizeVal').textContent=this.value;draw()">
+        <label>主文字字体</label>
+        <select id="msMainFont" onchange="draw()">
+          <option value="'KaiTi','Kaiti SC','STKaiti',serif" selected>楷体</option>
+          <option value="'Ma Shan Zheng',cursive">马善政毛笔</option>
+          <option value="'Long Cang',cursive">龙藏手写</option>
+          <option value="'Liu Jian Mao Cao',cursive">刘建毛草</option>
+          <option value="'ZCOOL XiaoWei',serif">站酷小薇</option>
+          <option value="'ZCOOL QingKe HuangYou',sans-serif">站酷庆科黄油</option>
+          <option value="'Noto Serif SC',serif">思源宋体</option>
+          <option value="'PingFang SC','Microsoft YaHei',sans-serif">苹方黑体</option>
+        </select>
+        <div class="row-2">
+          <div><label>主文字 X: <span id="msMainXVal">50</span>%</label><input type="range" id="msMainX" min="0" max="100" value="50" oninput="document.getElementById('msMainXVal').textContent=this.value;draw()"></div>
+          <div><label>主文字 Y: <span id="msMainYVal">60</span>%</label><input type="range" id="msMainY" min="0" max="100" value="60" oninput="document.getElementById('msMainYVal').textContent=this.value;draw()"></div>
+        </div>
         <label>Preview 花体字号: <span id="msPreviewSizeVal">45</span>‰</label>
         <input type="range" id="msPreviewSize" min="20" max="80" value="45" oninput="document.getElementById('msPreviewSizeVal').textContent=this.value;draw()">
+        <label>Preview 字体</label>
+        <select id="msPreviewFont" onchange="draw()">
+          <option value="'Great Vibes',cursive" selected>Great Vibes 手写</option>
+          <option value="'Snell Roundhand','Apple Chancery',cursive">Snell 圆体</option>
+          <option value="'Dancing Script',cursive">Dancing Script</option>
+          <option value="'Caveat',cursive">Caveat</option>
+          <option value="'Playfair Display',serif">Playfair</option>
+        </select>
+        <div class="row-2">
+          <div><label>Preview X: <span id="msPreviewXVal">82</span>%</label><input type="range" id="msPreviewX" min="0" max="100" value="82" oninput="document.getElementById('msPreviewXVal').textContent=this.value;draw()"></div>
+          <div><label>Preview Y: <span id="msPreviewYVal">12</span>%</label><input type="range" id="msPreviewY" min="0" max="100" value="12" oninput="document.getElementById('msPreviewYVal').textContent=this.value;draw()"></div>
+        </div>
         <label>头像大小: <span id="msAvatarSizeVal">32</span>%</label>
         <input type="range" id="msAvatarSize" min="10" max="50" value="32" oninput="document.getElementById('msAvatarSizeVal').textContent=this.value;draw()">
         <label>散落小字字号: <span id="msScatterSizeVal">16</span>‰</label>
         <input type="range" id="msScatterSize" min="8" max="30" value="16" oninput="document.getElementById('msScatterSizeVal').textContent=this.value;draw()">
+        <div class="row-2">
+          <div><label>散落小字 X: <span id="msScatterXVal">92</span>%</label><input type="range" id="msScatterX" min="0" max="100" value="92" oninput="document.getElementById('msScatterXVal').textContent=this.value;draw()"></div>
+          <div><label>散落小字 Y: <span id="msScatterYVal">45</span>%</label><input type="range" id="msScatterY" min="0" max="100" value="45" oninput="document.getElementById('msScatterYVal').textContent=this.value;draw()"></div>
+        </div>
         <label>署名字号: <span id="msAuthorSizeVal">28</span>‰</label>
         <input type="range" id="msAuthorSize" min="12" max="50" value="28" oninput="document.getElementById('msAuthorSizeVal').textContent=this.value;draw()">
+        <div class="row-2">
+          <div><label>署名 X: <span id="msAuthorXVal">8</span>%</label><input type="range" id="msAuthorX" min="0" max="100" value="8" oninput="document.getElementById('msAuthorXVal').textContent=this.value;draw()"></div>
+          <div><label>署名 Y: <span id="msAuthorYVal">88</span>%</label><input type="range" id="msAuthorY" min="0" max="100" value="88" oninput="document.getElementById('msAuthorYVal').textContent=this.value;draw()"></div>
+        </div>
         <label>✦ 装饰大小: <span id="msStarSizeVal">25</span>‰</label>
         <input type="range" id="msStarSize" min="10" max="50" value="25" oninput="document.getElementById('msStarSizeVal').textContent=this.value;draw()">
         <label>信息栏高度: <span id="msBarHVal">22</span>%</label>
@@ -407,7 +481,24 @@ love
         <label>✦ 装饰数量: <span id="msStarCountVal">7</span></label>
         <input type="range" id="msStarCount" min="0" max="20" value="7" oninput="document.getElementById('msStarCountVal').textContent=this.value;draw()">
 
-        <h3 class="tool-h" style="margin-top:14px">⑨¾ 吸管取色</h3>
+        <h3 class="tool-h" style="margin-top:14px">⑩ 苹果锁屏预览</h3>
+        <div class="checkbox-row"><input type="checkbox" id="lockScreen" onchange="draw()"><span>显示锁屏 UI（时间/日期/按钮）</span></div>
+        <label>时间文字</label>
+        <input type="text" id="lockTime" value="9:41" oninput="draw()">
+        <label>日期文字</label>
+        <input type="text" id="lockDate" value="10月6日 星期一" oninput="draw()">
+        <label>时间字号: <span id="lockTimeSizeVal">18</span>%</label>
+        <input type="range" id="lockTimeSize" min="5" max="35" value="18" oninput="document.getElementById('lockTimeSizeVal').textContent=this.value;draw()">
+        <div class="row-2">
+          <div><label>时间 X: <span id="lockTimeXVal">50</span>%</label><input type="range" id="lockTimeX" min="0" max="100" value="50" oninput="document.getElementById('lockTimeXVal').textContent=this.value;draw()"></div>
+          <div><label>时间 Y: <span id="lockTimeYVal">20</span>%</label><input type="range" id="lockTimeY" min="0" max="100" value="20" oninput="document.getElementById('lockTimeYVal').textContent=this.value;draw()"></div>
+        </div>
+        <label>时间/日期颜色</label>
+        <input type="color" id="lockColor" value="#ffffff" onchange="draw()">
+        <div class="checkbox-row"><input type="checkbox" id="lockButtons" onchange="draw()" checked><span>底部手电筒 / 相机按钮</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="lockHomeBar" onchange="draw()" checked><span>底部 Home 指示条</span></div>
+
+        <h3 class="tool-h" style="margin-top:14px">⑪ 吸管取色</h3>
         <label>吸色目标</label>
         <select id="pickerTarget">
           <option value="msTitleColor">主文字颜色</option>
@@ -420,7 +511,7 @@ love
         <button class="ms-btn" onclick="enablePicker()" style="margin:4px 0">👁 进入吸管模式（点击画布吸色）</button>
         <div class="hint" id="pickerHint" style="display:none;color:#f4c842">吸管模式已开启：点击右侧画布任意位置吸取颜色</div>
 
-        <h3 class="tool-h">⑩ 导出</h3>
+        <h3 class="tool-h">⑫ 导出</h3>
         <button class="primary" onclick="exportPNG()">导出 PNG</button>
         <div class="hint" style="margin-top:10px">提示：预设只保存参数，自定义纹理图和头像需重新上传。</div>
       </aside>
@@ -910,17 +1001,22 @@ function drawManuscriptTitle(){
   const sColor=document.getElementById("msSubtitleColor").value;
   const author=document.getElementById("msAuthor").value;
   const scatter=document.getElementById("msScatterText").value.trim();
-  const fontScript='"Great Vibes","Snell Roundhand","KaiTi","STKaiti","SimSun",cursive';
-  const fontCN='"KaiTi","Kaiti SC","STKaiti","SimSun",serif';
+  const fontCN=document.getElementById("msMainFont").value;
   const fontEN='"Cormorant Garamond","Great Vibes",serif';
+  const mainX=parseInt(document.getElementById("msMainX").value)/100;
+  const mainY=parseInt(document.getElementById("msMainY").value)/100;
+  const scatterX=parseInt(document.getElementById("msScatterX").value)/100;
+  const scatterY=parseInt(document.getElementById("msScatterY").value)/100;
+  const authorX=parseInt(document.getElementById("msAuthorX").value)/100;
+  const authorY=parseInt(document.getElementById("msAuthorY").value)/100;
   ctx.save();
   ctx.textAlign="center";
-  // 主文字：金色+白色虚影双层（位于下半部分中央）
+  // 主文字：金色+白色虚影双层
   if(mainText){
     const lines=mainText.split("\n").filter(l=>l.trim());
     const fs=Math.floor(c.width*(parseInt(document.getElementById("msMainSize").value)/1000));
     const lh=fs*1.5;
-    const startY=c.height*0.6-(lines.length-1)*lh/2;
+    const startY=c.height*mainY-(lines.length-1)*lh/2;
     lines.forEach((line,i)=>{
       const y=startY+i*lh;
       // 白色虚影层（错位+模糊+半透明）
@@ -931,7 +1027,7 @@ function drawManuscriptTitle(){
       ctx.shadowOffsetY=fs*0.04;
       ctx.font=`${fs}px ${fontCN}`;
       ctx.fillStyle="rgba(255,255,255,0.4)";
-      ctx.fillText(line,c.width/2,y);
+      ctx.fillText(line,c.width*mainX,y);
       ctx.restore();
       // 金色主层（渐变填充）
       const goldGrad=ctx.createLinearGradient(0,y-fs,0,y+fs);
@@ -940,10 +1036,11 @@ function drawManuscriptTitle(){
       goldGrad.addColorStop(1,"#b8895a");
       ctx.fillStyle=goldGrad;
       ctx.font=`${fs}px ${fontCN}`;
-      ctx.fillText(line,c.width/2,y);
+      ctx.fillText(line,c.width*mainX,y);
     });
+    pushTextHit("msMain",c.width*mainX,c.height*mainY,c.width*0.7,lines.length*lh);
   }
-  // 散落小字装饰（中日英混排，右侧）
+  // 散落小字装饰（中日英混排）
   if(scatter){
     const sLines=scatter.split("\n").filter(l=>l.trim());
     const fs2=Math.floor(c.width*(parseInt(document.getElementById("msScatterSize").value)/1000));
@@ -951,18 +1048,20 @@ function drawManuscriptTitle(){
     ctx.fillStyle="rgba(255,240,210,0.7)";
     ctx.textAlign="right";
     sLines.forEach((line,i)=>{
-      const x=c.width*0.92;
-      const y=c.height*0.45+i*fs2*1.8;
+      const x=c.width*scatterX;
+      const y=c.height*scatterY+i*fs2*1.8;
       ctx.fillText(line,x,y);
     });
+    pushTextHit("msScatter",c.width*scatterX,c.height*scatterY,c.width*0.3,sLines.length*fs2*1.8);
   }
-  // 手写署名（左下，小一号金色）
+  // 手写署名
   if(author){
     const fs3=Math.floor(c.width*(parseInt(document.getElementById("msAuthorSize").value)/1000));
     ctx.font=`${fs3}px ${fontCN}`;
     ctx.fillStyle=tColor;
     ctx.textAlign="left";
-    ctx.fillText("— "+author,c.width*0.08,c.height*0.88);
+    ctx.fillText("— "+author,c.width*authorX,c.height*authorY);
+    pushTextHit("msAuthor",c.width*authorX,c.height*authorY,c.width*0.3,fs3*1.4);
   }
   ctx.restore();
 }
@@ -1116,12 +1215,14 @@ function drawInfoBar(){
     ctx.fillText(material,txtX,barH*0.80);
   }
 
-  // 右侧 Preview 大字（英文花体，金色+白描边，倾斜）
+  // Preview 大字（英文花体，金色+白描边，倾斜）
   if(previewText){
-    const fontScript='"Great Vibes","Snell Roundhand","Cormorant Garamond",cursive';
+    const fontScript=document.getElementById("msPreviewFont").value;
     const fs=Math.floor(c.width*(parseInt(document.getElementById("msPreviewSize").value)/1000));
+    const pvX=parseInt(document.getElementById("msPreviewX").value)/100;
+    const pvY=parseInt(document.getElementById("msPreviewY").value)/100;
     ctx.save();
-    ctx.translate(c.width*0.82,barH*0.55);
+    ctx.translate(c.width*pvX,c.height*pvY);
     ctx.rotate(-0.12);
     ctx.font=`${fs}px ${fontScript}`;
     ctx.textAlign="center";ctx.textBaseline="middle";
@@ -1136,6 +1237,7 @@ function drawInfoBar(){
     goldGrad.addColorStop(1,"#b8895a");
     ctx.fillStyle=goldGrad;
     ctx.fillText(previewText,0,0);
+    pushTextHit("msPreview",c.width*pvX,c.height*pvY,fs*2,fs*1.4);
     ctx.restore();
   }
   ctx.restore();
@@ -1147,24 +1249,31 @@ function drawText(){
   const cn=document.getElementById("textCN").value;
   const cEN=document.getElementById("colorEN").value;
   const cCN=document.getElementById("colorCN").value;
-  const pos=document.getElementById("textPos").value;
-  const fontEN='"Great Vibes","Snell Roundhand","Apple Chancery",cursive';
-  const fontCN='"KaiTi","Kaiti SC","STKaiti","SimSun",serif';
-  ctx.save();ctx.textAlign="center";
-  let enY,cnY;
-  if(pos==="tb"){enY=c.height*0.12;cnY=c.height*0.88;}
-  else if(pos==="bt"){cnY=c.height*0.12;enY=c.height*0.88;}
-  else if(pos==="cc"){enY=c.height*0.42;cnY=c.height*0.58;}
-  else{enY=c.height*0.82;cnY=c.height*0.90;}
-  if(en){ctx.font=`${Math.floor(c.width*0.09)}px ${fontEN}`;ctx.fillStyle=cEN;ctx.fillText(en,c.width/2,enY);}
+  const fontEN=document.getElementById("fontEN").value;
+  const fontCN=document.getElementById("fontCN").value;
+  const enX=parseInt(document.getElementById("textENX").value)/100;
+  const enY=parseInt(document.getElementById("textENY").value)/100;
+  const cnX=parseInt(document.getElementById("textCNX").value)/100;
+  const cnY=parseInt(document.getElementById("textCNY").value)/100;
+  ctx.save();
+  if(en){
+    ctx.textAlign="center";
+    const enSize=Math.floor(c.width*(parseInt(document.getElementById("textENSize").value)/100));
+    ctx.font=`${enSize}px ${fontEN}`;
+    ctx.fillStyle=cEN;
+    ctx.fillText(en,c.width*enX,c.height*enY);
+    pushTextHit("textEN",c.width*enX,c.height*enY,c.width*0.5,enSize*1.4);
+  }
   if(cn){
     const lines=cn.split("\n");
-    const fs=Math.floor(c.width*0.034);
+    const fs=Math.floor(c.width*(parseFloat(document.getElementById("textCNSize").value)/100));
     ctx.font=`${fs}px ${fontCN}`;
     ctx.fillStyle=cCN;
+    ctx.textAlign="center";
     const lh=fs*1.6;
-    const startY=cnY-(lines.length-1)*lh/2;
-    lines.forEach((line,i)=>ctx.fillText(line,c.width/2,startY+i*lh));
+    const startY=c.height*cnY-(lines.length-1)*lh/2;
+    lines.forEach((line,i)=>ctx.fillText(line,c.width*cnX,startY+i*lh));
+    pushTextHit("textCN",c.width*cnX,c.height*cnY,c.width*0.5,lines.length*lh);
   }
   ctx.restore();
 }
@@ -1190,9 +1299,27 @@ function drawDecor(){
   }
 }
 
+// ============ 文字拖拽系统 ============
+const textHitRects=[];
+const dragMap={
+  textEN:{xId:"textENX",yId:"textENY",xVal:"textENXVal",yVal:"textENYVal"},
+  textCN:{xId:"textCNX",yId:"textCNY",xVal:"textCNXVal",yVal:"textCNYVal"},
+  msMain:{xId:"msMainX",yId:"msMainY",xVal:"msMainXVal",yVal:"msMainYVal"},
+  msPreview:{xId:"msPreviewX",yId:"msPreviewY",xVal:"msPreviewXVal",yVal:"msPreviewYVal"},
+  msAuthor:{xId:"msAuthorX",yId:"msAuthorY",xVal:"msAuthorXVal",yVal:"msAuthorYVal"},
+  msScatter:{xId:"msScatterX",yId:"msScatterY",xVal:"msScatterXVal",yVal:"msScatterYVal"},
+  lockTime:{xId:"lockTimeX",yId:"lockTimeY",xVal:"lockTimeXVal",yVal:"lockTimeYVal"}
+};
+function pushTextHit(id,x,y,w,h){
+  textHitRects.push({id,x,y,w,h});
+}
+let dragTarget=null;
+let dragOffX=0,dragOffY=0;
+
 // ============ 主渲染 ============
 function draw(){
   ctx.clearRect(0,0,c.width,c.height);
+  textHitRects.length=0;
   const blurAmt=parseInt(document.getElementById("bgBlur").value);
   drawBackground();
   ctx.save();
@@ -1212,6 +1339,68 @@ function draw(){
     drawText();
     drawDecor();
   }
+  // 苹果锁屏 UI（最上层覆盖）
+  drawLockScreen();
+}
+
+// ============ 苹果锁屏 UI 预览 ============
+function drawLockScreen(){
+  if(!document.getElementById("lockScreen").checked) return;
+  const time=document.getElementById("lockTime").value;
+  const date=document.getElementById("lockDate").value;
+  const color=document.getElementById("lockColor").value;
+  const fs=Math.floor(c.width*(parseInt(document.getElementById("lockTimeSize").value)/100));
+  const tx=parseInt(document.getElementById("lockTimeX").value)/100;
+  const ty=parseInt(document.getElementById("lockTimeY").value)/100;
+  ctx.save();
+  ctx.textAlign="center";ctx.textBaseline="middle";
+  // 时间（大号，iOS 风格细体）
+  ctx.font=`600 ${fs}px 'Inter','PingFang SC',sans-serif`;
+  ctx.fillStyle=color;
+  ctx.shadowColor="rgba(0,0,0,0.35)";
+  ctx.shadowBlur=fs*0.12;
+  ctx.fillText(time,c.width*tx,c.height*ty);
+  pushTextHit("lockTime",c.width*tx,c.height*ty,c.width*0.5,fs*1.3);
+  // 日期（小号，时间下方）
+  if(date){
+    ctx.font=`500 ${Math.floor(fs*0.22)}px 'Inter','PingFang SC',sans-serif`;
+    ctx.fillStyle=color;
+    ctx.globalAlpha=0.9;
+    ctx.fillText(date,c.width*tx,c.height*ty+fs*0.8);
+    ctx.globalAlpha=1;
+  }
+  ctx.shadowBlur=0;
+  // 底部手电筒 / 相机按钮
+  if(document.getElementById("lockButtons").checked){
+    const r=c.width*0.045;
+    const bx1=c.width*0.14, bx2=c.width*0.86;
+    const by=c.height*0.94;
+    const btn=(x,icon)=>{
+      ctx.beginPath();
+      ctx.arc(x,by,r,0,Math.PI*2);
+      ctx.fillStyle="rgba(255,255,255,0.18)";
+      ctx.fill();
+      ctx.strokeStyle="rgba(255,255,255,0.25)";
+      ctx.lineWidth=Math.max(2,c.width*0.002);
+      ctx.stroke();
+      ctx.fillStyle=color;
+      ctx.font=`${Math.floor(r*1.1)}px sans-serif`;
+      ctx.fillText(icon,x,by);
+    };
+    btn(bx1,"🔦");btn(bx2,"📷");
+  }
+  // 底部 Home 指示条
+  if(document.getElementById("lockHomeBar").checked){
+    const bw=c.width*0.28, bh=Math.max(6,c.width*0.006);
+    const bx=c.width/2-bw/2, by=c.height*0.975;
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(bx,by,bw,bh,bh/2) : ctx.rect(bx,by,bw,bh);
+    ctx.fillStyle=color;
+    ctx.globalAlpha=0.9;
+    ctx.fill();
+    ctx.globalAlpha=1;
+  }
+  ctx.restore();
 }
 
 // ============ 字稿风预设一键应用 ============
@@ -1247,7 +1436,10 @@ function applyManuscriptPreset(){
   set("textCN","我很爱我普通的生活");
   set("colorEN","#d4a574");
   set("colorCN","#d4a574");
-  set("textPos","cc");
+  set("fontEN","'Great Vibes',cursive");
+  set("fontCN","'KaiTi','Kaiti SC','STKaiti',serif");
+  set("textENSize","9");set("textENX","50");set("textENY","12");
+  set("textCNSize","3.4");set("textCNX","50");set("textCNY","88");
   // 装饰：关闭
   set("strokeColor","#ffffff");
   chk("decBorder",false);
@@ -1270,13 +1462,25 @@ function applyManuscriptPreset(){
   set("msScatterText","Harris, I miss you.\nlove\n私は幸せ");
   set("msBlur","12");
   set("msMainSize","55");
+  set("msMainFont","'KaiTi','Kaiti SC','STKaiti',serif");
+  set("msMainX","50");set("msMainY","60");
   set("msPreviewSize","45");
+  set("msPreviewFont","'Great Vibes',cursive");
+  set("msPreviewX","82");set("msPreviewY","12");
   set("msAvatarSize","32");
   set("msScatterSize","16");
+  set("msScatterX","92");set("msScatterY","45");
   set("msAuthorSize","28");
+  set("msAuthorX","8");set("msAuthorY","88");
   set("msStarSize","25");
   set("msBarH","22");
   set("msStarCount","7");
+  // 锁屏预览默认关闭
+  chk("lockScreen",false);
+  set("lockTime","9:41");set("lockDate","10月6日 星期一");
+  set("lockTimeSize","18");set("lockTimeX","50");set("lockTimeY","20");
+  set("lockColor","#ffffff");
+  chk("lockButtons",true);chk("lockHomeBar",true);
   // 同步显示值
   document.getElementById("blurVal").textContent="0";
   document.getElementById("scaleVal").textContent="105";
@@ -1296,6 +1500,23 @@ function applyManuscriptPreset(){
   document.getElementById("msStarSizeVal").textContent="25";
   document.getElementById("msBarHVal").textContent="22";
   document.getElementById("msStarCountVal").textContent="7";
+  document.getElementById("textENSizeVal").textContent="9";
+  document.getElementById("textENXVal").textContent="50";
+  document.getElementById("textENYVal").textContent="12";
+  document.getElementById("textCNSizeVal").textContent="3.4";
+  document.getElementById("textCNXVal").textContent="50";
+  document.getElementById("textCNYVal").textContent="88";
+  document.getElementById("msMainXVal").textContent="50";
+  document.getElementById("msMainYVal").textContent="60";
+  document.getElementById("msPreviewXVal").textContent="82";
+  document.getElementById("msPreviewYVal").textContent="12";
+  document.getElementById("msScatterXVal").textContent="92";
+  document.getElementById("msScatterYVal").textContent="45";
+  document.getElementById("msAuthorXVal").textContent="8";
+  document.getElementById("msAuthorYVal").textContent="88";
+  document.getElementById("lockTimeSizeVal").textContent="18";
+  document.getElementById("lockTimeXVal").textContent="50";
+  document.getElementById("lockTimeYVal").textContent="20";
   onTexSourceChange();
   resizeCanvas();
   alert("字稿风预设已应用（IMG_6729 暖金风）！\n\n下一步：\n1. 在「④ 作品图」上传你的摄影图\n2. 点「从图片提取主色填入背景」自动配色\n3. 在「⑨ 字稿风模式」上传头像\n4. 调整署名 / 营业时间 / 版权 / 散落小字\n5. 点「导出 PNG」");
@@ -1330,7 +1551,14 @@ function getSettings(){
     textCN:document.getElementById("textCN").value,
     colorEN:document.getElementById("colorEN").value,
     colorCN:document.getElementById("colorCN").value,
-    textPos:document.getElementById("textPos").value,
+    fontEN:document.getElementById("fontEN").value,
+    fontCN:document.getElementById("fontCN").value,
+    textENSize:document.getElementById("textENSize").value,
+    textENX:document.getElementById("textENX").value,
+    textENY:document.getElementById("textENY").value,
+    textCNSize:document.getElementById("textCNSize").value,
+    textCNX:document.getElementById("textCNX").value,
+    textCNY:document.getElementById("textCNY").value,
     strokeColor:document.getElementById("strokeColor").value,
     decBorder:chk("decBorder"),
     decSilk:chk("decSilk"),
@@ -1351,13 +1579,32 @@ function getSettings(){
     msScatterText:document.getElementById("msScatterText").value,
     msBlur:document.getElementById("msBlur").value,
     msMainSize:document.getElementById("msMainSize").value,
+    msMainFont:document.getElementById("msMainFont").value,
+    msMainX:document.getElementById("msMainX").value,
+    msMainY:document.getElementById("msMainY").value,
     msPreviewSize:document.getElementById("msPreviewSize").value,
+    msPreviewFont:document.getElementById("msPreviewFont").value,
+    msPreviewX:document.getElementById("msPreviewX").value,
+    msPreviewY:document.getElementById("msPreviewY").value,
     msAvatarSize:document.getElementById("msAvatarSize").value,
     msScatterSize:document.getElementById("msScatterSize").value,
+    msScatterX:document.getElementById("msScatterX").value,
+    msScatterY:document.getElementById("msScatterY").value,
     msAuthorSize:document.getElementById("msAuthorSize").value,
+    msAuthorX:document.getElementById("msAuthorX").value,
+    msAuthorY:document.getElementById("msAuthorY").value,
     msStarSize:document.getElementById("msStarSize").value,
     msBarH:document.getElementById("msBarH").value,
-    msStarCount:document.getElementById("msStarCount").value
+    msStarCount:document.getElementById("msStarCount").value,
+    lockScreen:chk("lockScreen"),
+    lockTime:document.getElementById("lockTime").value,
+    lockDate:document.getElementById("lockDate").value,
+    lockTimeSize:document.getElementById("lockTimeSize").value,
+    lockTimeX:document.getElementById("lockTimeX").value,
+    lockTimeY:document.getElementById("lockTimeY").value,
+    lockColor:document.getElementById("lockColor").value,
+    lockButtons:chk("lockButtons"),
+    lockHomeBar:chk("lockHomeBar")
   };
 }
 function applySettings(s){
@@ -1373,7 +1620,10 @@ function applySettings(s){
   set("texSource",s.texSource||"preset");set("texPreset",s.texPreset||"kraft");
   set("texOpacity",s.texOpacity);chk("tornEdge",s.tornEdge);set("tornAmount",s.tornAmount);
   set("textEN",s.textEN);set("textCN",s.textCN);
-  set("colorEN",s.colorEN);set("colorCN",s.colorCN);set("textPos",s.textPos);
+  set("colorEN",s.colorEN);set("colorCN",s.colorCN);
+  set("fontEN",s.fontEN);set("fontCN",s.fontCN);
+  set("textENSize",s.textENSize||9);set("textENX",s.textENX||50);set("textENY",s.textENY||12);
+  set("textCNSize",s.textCNSize||3.4);set("textCNX",s.textCNX||50);set("textCNY",s.textCNY||88);
   set("strokeColor",s.strokeColor);
   chk("decBorder",s.decBorder);chk("decSilk",s.decSilk);chk("decDots",s.decDots);
   // 字稿风参数（IMG_6729 暖金风）
@@ -1393,13 +1643,24 @@ function applySettings(s){
   set("msScatterText",s.msScatterText||"Harris, I miss you.\nlove\n私は幸せ");
   set("msBlur",s.msBlur||"12");
   set("msMainSize",s.msMainSize||"55");
+  set("msMainFont",s.msMainFont);
+  set("msMainX",s.msMainX||"50");set("msMainY",s.msMainY||"60");
   set("msPreviewSize",s.msPreviewSize||"45");
+  set("msPreviewFont",s.msPreviewFont);
+  set("msPreviewX",s.msPreviewX||"82");set("msPreviewY",s.msPreviewY||"12");
   set("msAvatarSize",s.msAvatarSize||"32");
   set("msScatterSize",s.msScatterSize||"16");
+  set("msScatterX",s.msScatterX||"92");set("msScatterY",s.msScatterY||"45");
   set("msAuthorSize",s.msAuthorSize||"28");
+  set("msAuthorX",s.msAuthorX||"8");set("msAuthorY",s.msAuthorY||"88");
   set("msStarSize",s.msStarSize||"25");
   set("msBarH",s.msBarH||"22");
   set("msStarCount",s.msStarCount||"7");
+  chk("lockScreen",s.lockScreen||false);
+  set("lockTime",s.lockTime||"9:41");set("lockDate",s.lockDate||"10月6日 星期一");
+  set("lockTimeSize",s.lockTimeSize||"18");set("lockTimeX",s.lockTimeX||"50");set("lockTimeY",s.lockTimeY||"20");
+  set("lockColor",s.lockColor||"#ffffff");
+  chk("lockButtons",s.lockButtons!==false);chk("lockHomeBar",s.lockHomeBar!==false);
   // 同步显示值
   document.getElementById("blurVal").textContent=s.bgBlur;
   document.getElementById("scaleVal").textContent=s.artScale;
@@ -1419,6 +1680,23 @@ function applySettings(s){
   document.getElementById("msStarSizeVal").textContent=s.msStarSize||25;
   document.getElementById("msBarHVal").textContent=s.msBarH||22;
   document.getElementById("msStarCountVal").textContent=s.msStarCount||7;
+  document.getElementById("textENSizeVal").textContent=s.textENSize||9;
+  document.getElementById("textENXVal").textContent=s.textENX||50;
+  document.getElementById("textENYVal").textContent=s.textENY||12;
+  document.getElementById("textCNSizeVal").textContent=s.textCNSize||3.4;
+  document.getElementById("textCNXVal").textContent=s.textCNX||50;
+  document.getElementById("textCNYVal").textContent=s.textCNY||88;
+  document.getElementById("msMainXVal").textContent=s.msMainX||50;
+  document.getElementById("msMainYVal").textContent=s.msMainY||60;
+  document.getElementById("msPreviewXVal").textContent=s.msPreviewX||82;
+  document.getElementById("msPreviewYVal").textContent=s.msPreviewY||12;
+  document.getElementById("msScatterXVal").textContent=s.msScatterX||92;
+  document.getElementById("msScatterYVal").textContent=s.msScatterY||45;
+  document.getElementById("msAuthorXVal").textContent=s.msAuthorX||8;
+  document.getElementById("msAuthorYVal").textContent=s.msAuthorY||88;
+  document.getElementById("lockTimeSizeVal").textContent=s.lockTimeSize||18;
+  document.getElementById("lockTimeXVal").textContent=s.lockTimeX||50;
+  document.getElementById("lockTimeYVal").textContent=s.lockTimeY||20;
   onTexSourceChange();
   if((s.texSource||"preset")==="preset"){onTexPresetChange();}
   resizeCanvas();
@@ -1443,6 +1721,83 @@ function resetAll(){
   document.getElementById("avatarUpload").value="";
   draw();
 }
+
+// ============ 画布文字拖拽 ============
+function canvasPos(e){
+  const rect=c.getBoundingClientRect();
+  return {x:(e.clientX-rect.left)/rect.width*c.width, y:(e.clientY-rect.top)/rect.height*c.height};
+}
+c.addEventListener("mousedown",e=>{
+  if(pickerActive) return;
+  const p=canvasPos(e);
+  // 命中检测（从后往前，优先上层）
+  for(let i=textHitRects.length-1;i>=0;i--){
+    const r=textHitRects[i];
+    const pad=Math.max(20,r.h*0.3);
+    if(p.x>=r.x-r.w/2-pad && p.x<=r.x+r.w/2+pad && p.y>=r.y-r.h/2-pad && p.y<=r.y+r.h/2+pad){
+      const m=dragMap[r.id];
+      if(!m) continue;
+      dragTarget=r.id;
+      dragOffX=p.x-r.x;dragOffY=p.y-r.y;
+      c.style.cursor="grabbing";
+      e.preventDefault();
+      break;
+    }
+  }
+});
+c.addEventListener("mousemove",e=>{
+  if(!dragTarget) return;
+  const p=canvasPos(e);
+  const m=dragMap[dragTarget];
+  if(!m) return;
+  const nx=Math.max(0,Math.min(100,(p.x-dragOffX)/c.width*100));
+  const ny=Math.max(0,Math.min(100,(p.y-dragOffY)/c.height*100));
+  document.getElementById(m.xId).value=Math.round(nx);
+  document.getElementById(m.yId).value=Math.round(ny);
+  document.getElementById(m.xVal).textContent=Math.round(nx);
+  document.getElementById(m.yVal).textContent=Math.round(ny);
+  draw();
+});
+c.addEventListener("mouseup",()=>{
+  dragTarget=null;c.style.cursor="";
+});
+c.addEventListener("mouseleave",()=>{
+  dragTarget=null;c.style.cursor="";
+});
+// 触屏拖拽（手机/平板）
+c.addEventListener("touchstart",e=>{
+  if(pickerActive) return;
+  const t=e.touches[0];
+  const p=canvasPos(t);
+  for(let i=textHitRects.length-1;i>=0;i--){
+    const r=textHitRects[i];
+    const pad=Math.max(20,r.h*0.3);
+    if(p.x>=r.x-r.w/2-pad && p.x<=r.x+r.w/2+pad && p.y>=r.y-r.h/2-pad && p.y<=r.y+r.h/2+pad){
+      const m=dragMap[r.id];
+      if(!m) continue;
+      dragTarget=r.id;
+      dragOffX=p.x-r.x;dragOffY=p.y-r.y;
+      e.preventDefault();
+      break;
+    }
+  }
+},{passive:false});
+c.addEventListener("touchmove",e=>{
+  if(!dragTarget) return;
+  const t=e.touches[0];
+  const p=canvasPos(t);
+  const m=dragMap[dragTarget];
+  if(!m) return;
+  const nx=Math.max(0,Math.min(100,(p.x-dragOffX)/c.width*100));
+  const ny=Math.max(0,Math.min(100,(p.y-dragOffY)/c.height*100));
+  document.getElementById(m.xId).value=Math.round(nx);
+  document.getElementById(m.yId).value=Math.round(ny);
+  document.getElementById(m.xVal).textContent=Math.round(nx);
+  document.getElementById(m.yVal).textContent=Math.round(ny);
+  draw();
+  e.preventDefault();
+},{passive:false});
+c.addEventListener("touchend",()=>{dragTarget=null;});
 
 // ============ 吸管取色 ============
 let pickerActive=false;
