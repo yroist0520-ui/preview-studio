@@ -140,9 +140,44 @@ input[type=file]{font-size:11px}
   .btn-primary,.btn-ghost{padding:12px 22px;font-size:14px}
   .panel{max-height:40vh}
 }
+
+/* ===== 解锁码遮罩 ===== */
+.lock-overlay{position:fixed;inset:0;z-index:9999;background:rgba(10,10,14,.96);display:flex;align-items:center;justify-content:center;padding:24px}
+.lock-card{width:100%;max-width:420px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:40px 32px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.lock-card .lock-icon{font-size:44px;margin-bottom:12px}
+.lock-card h2{font-size:22px;font-weight:700;margin-bottom:8px;letter-spacing:-.3px}
+.lock-card p{color:var(--muted);font-size:14px;margin-bottom:24px}
+.lock-card input{text-align:center;font-size:15px;letter-spacing:2px;text-transform:uppercase;padding:14px}
+.lock-card button{width:100%;margin-top:6px;padding:14px;font-size:15px}
+.lock-types{display:flex;gap:6px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+.lock-type-chip{font-size:11px;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:4px 10px}
+.lock-msg{margin-top:12px;font-size:13px;min-height:20px}
+.lock-msg.ok{color:#6fd18a}
+.lock-msg.err{color:#f08a8a}
+.lock-footer{margin-top:20px;font-size:11px;color:#555}
+.lock-info{margin-top:16px;text-align:left;background:#121218;border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.7}
 </style>
 </head>
 <body>
+
+<div class="lock-overlay" id="lockOverlay" style="display:none">
+  <div class="lock-card">
+    <div class="lock-icon">🔒</div>
+    <h2>Preview Studio</h2>
+    <p>输入解锁码后即可使用全部功能</p>
+    <input type="text" id="unlockInput" placeholder="PS-XXXX-XXXX-XXXX" autocomplete="off" onkeydown="if(event.key==='Enter')unlockNow()">
+    <button class="primary" onclick="unlockNow()">解锁</button>
+    <div class="lock-msg" id="unlockMsg"></div>
+    <div class="lock-types">
+      <span class="lock-type-chip">日卡 24h</span>
+      <span class="lock-type-chip">月卡 30天</span>
+      <span class="lock-type-chip">年卡 365天</span>
+      <span class="lock-type-chip">永卡 永久</span>
+    </div>
+    <div class="lock-info" id="unlockInfo" style="display:none"></div>
+    <div class="lock-footer">解锁状态保存在本机浏览器，刷新无需重复输入</div>
+  </div>
+</div>
 
 <nav class="nav">
   <div class="nav-inner">
@@ -150,7 +185,10 @@ input[type=file]{font-size:11px}
     <div class="nav-links">
       <a href="#features">功能</a><a href="#tool">工具</a><a href="#how">教程</a><a href="#about">关于</a>
     </div>
-    <a href="#tool" class="nav-cta">立即使用</a>
+    <div style="display:flex;align-items:center;gap:10px">
+      <span id="unlockBadge" style="display:none;font-size:12px;color:var(--accent);border:1px solid rgba(201,163,124,.35);border-radius:999px;padding:4px 12px;cursor:pointer" title="点击退出解锁" onclick="relock()"></span>
+      <a href="#tool" class="nav-cta">立即使用</a>
+    </div>
   </div>
 </nav>
 
@@ -602,6 +640,94 @@ love
 </footer>
 
 <script>
+// ============ 解锁码系统 ============
+const UNLOCK_KEY="ps-unlock-v1";
+const UNLOCK_SECRET="PREVIEW-STUDIO-2026-SECRET-KEY";
+const CARD_TYPES={
+  DAY:{label:"日卡",ms:24*60*60*1000},
+  MONTH:{label:"月卡",ms:30*24*60*60*1000},
+  YEAR:{label:"年卡",ms:365*24*60*60*1000},
+  FOREVER:{label:"永卡",ms:0}
+};
+function unlockHash(str){
+  // djb2 哈希（与生成端一致）
+  let h=5381;
+  for(let i=0;i<str.length;i++){h=((h<<5)+h)^str.charCodeAt(i);}
+  return (h>>>0).toString(36);
+}
+function checkUnlocked(){
+  try{
+    const raw=localStorage.getItem(UNLOCK_KEY);
+    if(!raw) return false;
+    const u=JSON.parse(raw);
+    if(u.type==="FOREVER") return true;
+    return Date.now() < u.expiresAt;
+  }catch(e){return false;}
+}
+function showLockOverlay(){
+  document.getElementById("lockOverlay").style.display="flex";
+  if(checkUnlocked()){
+    document.getElementById("lockOverlay").style.display="none";
+  }
+}
+function unlockNow(){
+  const input=document.getElementById("unlockInput");
+  const msg=document.getElementById("unlockMsg");
+  const code=(input.value||"").trim().toUpperCase();
+  msg.className="lock-msg";
+  if(!code){msg.className="lock-msg err";msg.textContent="请输入解锁码";return;}
+  const parts=code.split("-");
+  if(parts.length!==4 || parts[0]!=="PS"){
+    msg.className="lock-msg err";msg.textContent="格式错误，应为 PS-类型-随机码-校验码";return;
+  }
+  const type=parts[1], random=parts[2], checksum=parts[3];
+  const card=CARD_TYPES[type];
+  if(!card){msg.className="lock-msg err";msg.textContent="未知的卡类型："+type;return;}
+  // 校验签名
+  const expect=unlockHash(type+random+UNLOCK_SECRET).slice(0,8).toUpperCase();
+  if(expect!==checksum){msg.className="lock-msg err";msg.textContent="解锁码无效（校验失败）";return;}
+  const now=Date.now();
+  const expiresAt=type==="FOREVER"?0:now+card.ms;
+  localStorage.setItem(UNLOCK_KEY,JSON.stringify({type,expiresAt,activatedAt:now,code}));
+  msg.className="lock-msg ok";
+  msg.textContent="✅ 解锁成功！"+(type==="FOREVER"?"（永久）":"");
+  updateBadge();
+  setTimeout(()=>{document.getElementById("lockOverlay").style.display="none";},600);
+}
+function updateBadge(){
+  const badge=document.getElementById("unlockBadge");
+  if(checkUnlocked()){
+    const u=JSON.parse(localStorage.getItem(UNLOCK_KEY)||"{}");
+    const label=(CARD_TYPES[u.type]?CARD_TYPES[u.type].label:u.type)||"已解锁";
+    badge.textContent="🔓 "+label;
+    badge.style.display="inline-block";
+  }else{
+    badge.style.display="none";
+  }
+}
+function relock(){
+  if(!confirm("退出当前解锁？退出后需重新输入解锁码。"))return;
+  localStorage.removeItem(UNLOCK_KEY);
+  updateBadge();
+  showLockOverlay();
+}
+// 页面加载时检查解锁状态
+(function(){
+  if(!checkUnlocked()){
+    showLockOverlay();
+  }else{
+    updateBadge();
+    const u=JSON.parse(localStorage.getItem(UNLOCK_KEY)||"{}");
+    if(u.type&&u.type!=="FOREVER"){
+      const info=document.getElementById("unlockInfo");
+      const remain=Math.max(0,u.expiresAt-Date.now());
+      const days=Math.ceil(remain/86400000);
+      info.style.display="block";
+      info.innerHTML="当前：<b>"+(CARD_TYPES[u.type]?CARD_TYPES[u.type].label:u.type)+"</b> · 剩余约 "+days+" 天<br>右上角可点「🔓」徽章退出解锁更换。";
+    }
+  }
+})();
+
 const c=document.getElementById("c");
 const ctx=c.getContext("2d");
 let layers=[];
