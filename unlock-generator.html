@@ -54,11 +54,7 @@ button.ghost:hover{background:#3a3a45}
     <h1>🔑 解锁码生成器</h1>
     <div class="sub">生成 Preview Studio 的激活码 · 与主站联动</div>
 
-    <h3>① 管理员密码（管理/下架用）</h3>
-    <label>Worker 端 ADMIN_KEY</label>
-    <input type="password" id="adminKey" placeholder="输入管理员密码" autocomplete="off">
-
-    <h3>② 选择卡类型</h3>
+    <h3>① 选择卡类型</h3>
     <div class="type-grid">
       <button class="type-btn" data-type="DAY"><span class="t">日卡</span><span class="d">24 小时</span></button>
       <button class="type-btn active" data-type="MONTH"><span class="t">月卡</span><span class="d">30 天</span></button>
@@ -66,7 +62,7 @@ button.ghost:hover{background:#3a3a45}
       <button class="type-btn" data-type="FOREVER"><span class="t">永卡</span><span class="d">永久</span></button>
     </div>
 
-    <h3>③ 生成数量</h3>
+    <h3>② 生成数量</h3>
     <label>批量生成数量（1-50）</label>
     <input type="number" id="count" value="1" min="1" max="50">
 
@@ -74,13 +70,8 @@ button.ghost:hover{background:#3a3a45}
 
     <div class="codes" id="codes"></div>
 
-    <h3>④ 已生成码管理（使用次数 / 下架）</h3>
-    <button class="ghost" onclick="loadList()" style="width:100%">🔄 加载已生成码列表</button>
-    <div class="mgmt" id="mgmt"></div>
-    <div class="msg" id="mgmtMsg"></div>
-
     <div class="note">
-      <b>说明：</b>解锁码在用户首次输入时开始计时（日卡 24h、月卡 30 天、年卡 365 天），永卡永久有效。接入后端后，每个码可查看被激活的次数，并可随时下架（下架后所有设备都无法再使用该码）。<br><br>
+      <b>说明：</b>解锁码在用户首次输入时开始计时（日卡 24h、月卡 30 天、年卡 365 天），永卡永久有效。每个码绑定激活设备，一台设备激活一次。<br><br>
       本生成器与主站共用同一密钥算法，请勿公开此页面链接。
     </div>
 
@@ -90,7 +81,6 @@ button.ghost:hover{background:#3a3a45}
 
 <script>
 const SECRET="PREVIEW-STUDIO-2026-SECRET-KEY";
-const API_URL=""; // 后端已停用
 const TYPE_LABEL={DAY:"日卡",MONTH:"月卡",YEAR:"年卡",FOREVER:"永卡"};
 
 // 与主站一致的 djb2 哈希
@@ -110,8 +100,6 @@ function generateCode(type){
   const checksum=hash(type+random+SECRET).slice(0,8).toUpperCase();
   return "PS-"+type+"-"+random+"-"+checksum;
 }
-function adminKey(){ return document.getElementById("adminKey").value.trim(); }
-function api(txt){ return fetch(API_URL+txt,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({adminKey:adminKey()})}).then(r=>r.json()); }
 
 // 卡类型选择
 let currentType="MONTH";
@@ -127,10 +115,8 @@ function generate(){
   const count=Math.min(50,Math.max(1,parseInt(document.getElementById("count").value)||1));
   const box=document.getElementById("codes");
   box.innerHTML="";
-  const codes=[];
   for(let i=0;i<count;i++){
     const code=generateCode(currentType);
-    codes.push(code);
     const row=document.createElement("div");
     row.className="code-row";
     row.innerHTML='<span class="tag">'+TYPE_LABEL[currentType]+'</span><span class="code">'+code+'</span><button class="copy">复制</button>';
@@ -140,12 +126,6 @@ function generate(){
       setTimeout(()=>row.querySelector(".copy").textContent="复制",1200);
     };
     box.appendChild(row);
-  }
-  // 有后端时批量登记
-  if(API_URL){
-    Promise.all(codes.map(c=>fetch(API_URL+"/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:c,adminKey:adminKey()})}).then(r=>r.json()))).then(()=>{
-      if(adminKey()) loadList();
-    });
   }
 }
 function copyText(t){
@@ -158,45 +138,6 @@ function copyText(t){
     try{document.execCommand("copy");}catch(e){}
     document.body.removeChild(ta);
   }
-}
-function loadList(){
-  const msg=document.getElementById("mgmtMsg");
-  msg.className="msg";
-  if(!API_URL){msg.textContent="尚未配置后端 Worker URL";return;}
-  if(!adminKey()){msg.className="msg err";msg.textContent="请先输入管理员密码";return;}
-  msg.textContent="加载中…";
-  fetch(API_URL+"/list",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({adminKey:adminKey()})})
-  .then(r=>r.json()).then(res=>{
-    if(!res.ok){msg.className="msg err";msg.textContent="加载失败："+(res.reason||"密码错误");return;}
-    renderList(res.list||[]);
-    msg.textContent="共 "+res.list.length+" 个码";
-  }).catch(()=>{msg.className="msg err";msg.textContent="加载失败，网络错误";});
-}
-function renderList(list){
-  const box=document.getElementById("mgmt");
-  box.innerHTML="";
-  list.forEach(item=>{
-    const row=document.createElement("div");
-    row.className="mgmt-row";
-    const disabled=item.disabled;
-    row.innerHTML='<span class="code">'+item.code+'</span>'+
-      '<span class="badge count">'+TYPE_LABEL[item.type||""]+'</span>'+
-      '<span class="badge count">已用 '+item.count+' 次</span>'+
-      (disabled?'<span class="badge off">已下架</span>':'<span class="badge on">使用中</span>');
-    const btn=document.createElement("button");
-    btn.textContent=disabled?"上架":"下架";
-    btn.className=disabled?"":"del";
-    btn.onclick=()=>toggleDisable(item.code,disabled);
-    row.appendChild(btn);
-    box.appendChild(row);
-  });
-}
-function toggleDisable(code,currentlyDisabled){
-  const path=currentlyDisabled?"/enable":"/disable";
-  fetch(API_URL+path,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code,adminKey:adminKey()})})
-  .then(r=>r.json()).then(res=>{
-    if(res.ok){loadList();}else{const m=document.getElementById("mgmtMsg");m.className="msg err";m.textContent="操作失败："+(res.reason||"");}
-  });
 }
 </script>
 </body>
