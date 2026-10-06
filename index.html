@@ -575,9 +575,14 @@ love
         <div class="hint">水印图会以所选混合模式叠加在作品图上</div>
 
         <h3 class="tool-h" style="margin-top:14px">⑫ 分享预设</h3>
-        <button class="primary" onclick="sharePreset()" style="margin-bottom:6px">🔗 生成分享链接</button>
-        <button onclick="importPresetFromUrl()">📥 导入 URL 中的预设</button>
-        <div class="hint" id="shareHint">分享链接可复制给别人，打开即自动应用你的预设。</div>
+        <button class="primary" onclick="sharePreset()" style="margin-bottom:6px">🔗 生成短链接</button>
+        <label>导入预设（粘贴链接或短码）</label>
+        <input type="text" id="shareInput" placeholder="粘贴链接或短码" style="margin-bottom:4px">
+        <div class="row">
+          <button onclick="importPresetFromUrl()">📥 导入</button>
+          <button onclick="importFromClipboard()">📋 读剪贴板</button>
+        </div>
+        <div class="hint" id="shareHint">生成短链接复制给别人，打开即自动应用；也可手动粘贴导入。</div>
 
         <h3 class="tool-h" style="margin-top:14px">⑬ 吸管取色</h3>
         <label>吸色目标</label>
@@ -2050,16 +2055,182 @@ function resetAll(){
   draw();
 }
 
+// ============ LZString 压缩（内联，用于短链接） ============
+var LZString=(function(){
+  var f=String.fromCharCode;
+  var keyStrUriSafe="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";
+  var baseReverseDic={};
+  function getBaseValue(alphabet,character){
+    if(!baseReverseDic[alphabet]){
+      baseReverseDic[alphabet]={};
+      for(var i=0;i<alphabet.length;i++)baseReverseDic[alphabet][alphabet.charAt(i)]=i;
+    }
+    return baseReverseDic[alphabet][character];
+  }
+  function _compress(uncompressed,bitsPerChar,getCharFromInt){
+    if(uncompressed==null)return"";
+    var i,value,context_dictionary={},context_dictionaryToCreate={},context_c="",context_wc="",context_w="",context_enlargeIn=2,context_dictSize=3,context_numBits=2,context_data=[],context_data_val=0,context_data_position=0,ii;
+    for(ii=0;ii<uncompressed.length;ii++){
+      context_c=uncompressed.charAt(ii);
+      if(!Object.prototype.hasOwnProperty.call(context_dictionary,context_c)){
+        context_dictionary[context_c]=context_dictSize++;
+        context_dictionaryToCreate[context_c]=true;
+      }
+      context_wc=context_w+context_c;
+      if(Object.prototype.hasOwnProperty.call(context_dictionary,context_wc)){
+        context_w=context_wc;
+      }else{
+        if(Object.prototype.hasOwnProperty.call(context_dictionaryToCreate,context_w)){
+          if(context_w.charCodeAt(0)<256){
+            for(i=0;i<context_numBits;i++){
+              context_data_val=(context_data_val<<1);
+              if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}
+            }
+            value=context_w.charCodeAt(0);
+            for(i=0;i<8;i++){
+              context_data_val=(context_data_val<<1)|(value&1);
+              if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}
+              value=value>>1;
+            }
+          }else{
+            value=1;
+            for(i=0;i<context_numBits;i++){
+              context_data_val=(context_data_val<<1)|value;
+              if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}
+              value=0;
+            }
+            value=context_w.charCodeAt(0);
+            for(i=0;i<16;i++){
+              context_data_val=(context_data_val<<1)|(value&1);
+              if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}
+              value=value>>1;
+            }
+          }
+          context_enlargeIn--;
+          if(context_enlargeIn==0){context_enlargeIn=Math.pow(2,context_numBits);context_numBits++;}
+          delete context_dictionaryToCreate[context_w];
+        }else{
+          value=context_dictionary[context_w];
+          for(i=0;i<context_numBits;i++){
+            context_data_val=(context_data_val<<1)|(value&1);
+            if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}
+            value=value>>1;
+          }
+        }
+        context_enlargeIn--;
+        if(context_enlargeIn==0){context_enlargeIn=Math.pow(2,context_numBits);context_numBits++;}
+        context_dictionary[context_wc]=context_dictSize++;
+        context_w=String(context_c);
+      }
+    }
+    if(context_w!==""){
+      if(Object.prototype.hasOwnProperty.call(context_dictionaryToCreate,context_w)){
+        if(context_w.charCodeAt(0)<256){
+          for(i=0;i<context_numBits;i++){
+            context_data_val=(context_data_val<<1);
+            if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}
+          }
+          value=context_w.charCodeAt(0);
+          for(i=0;i<8;i++){
+            context_data_val=(context_data_val<<1)|(value&1);
+            if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}
+            value=value>>1;
+          }
+        }else{
+          value=1;
+          for(i=0;i<context_numBits;i++){
+            context_data_val=(context_data_val<<1)|value;
+            if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}
+            value=0;
+          }
+          value=context_w.charCodeAt(0);
+          for(i=0;i<16;i++){
+            context_data_val=(context_data_val<<1)|(value&1);
+            if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}
+            value=value>>1;
+          }
+        }
+        context_enlargeIn--;
+        if(context_enlargeIn==0){context_enlargeIn=Math.pow(2,context_numBits);context_numBits++;}
+        delete context_dictionaryToCreate[context_w];
+      }else{
+        value=context_dictionary[context_w];
+        for(i=0;i<context_numBits;i++){
+          context_data_val=(context_data_val<<1)|(value&1);
+          if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}
+          value=value>>1;
+        }
+      }
+      context_enlargeIn--;
+      if(context_enlargeIn==0){context_enlargeIn=Math.pow(2,context_numBits);context_numBits++;}
+    }
+    value=2;
+    for(i=0;i<context_numBits;i++){
+      context_data_val=(context_data_val<<1)|(value&1);
+      if(context_data_position==bitsPerChar-1){context_data_position=0;context_data.push(getCharFromInt(context_data_val));context_data_val=0;}else{context_data_position++;}
+      value=value>>1;
+    }
+    while(true){
+      context_data_val=(context_data_val<<1);
+      if(context_data_position==bitsPerChar-1){context_data.push(getCharFromInt(context_data_val));break;}else context_data_position++;
+    }
+    return context_data.join("");
+  }
+  function _decompress(length,resetValue,getNextValue){
+    var dictionary=[],enlargeIn=4,dictSize=4,numBits=3,entry="",result=[],i,w,bits,resb,maxpower,power,c,data={val:getNextValue(0),position:resetValue,index:1};
+    for(i=0;i<3;i++)dictionary[i]=i;
+    bits=0;maxpower=Math.pow(2,2);power=1;
+    while(power!=maxpower){
+      resb=data.val&data.position;
+      data.position>>=1;
+      if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++);}
+      bits|=(resb>0?1:0)*power;
+      power<<=1;
+    }
+    switch(bits){
+      case 0:bits=0;maxpower=Math.pow(2,8);power=1;while(power!=maxpower){resb=data.val&data.position;data.position>>=1;if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++);}bits|=(resb>0?1:0)*power;power<<=1;}c=f(bits);break;
+      case 1:bits=0;maxpower=Math.pow(2,16);power=1;while(power!=maxpower){resb=data.val&data.position;data.position>>=1;if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++);}bits|=(resb>0?1:0)*power;power<<=1;}c=f(bits);break;
+      case 2:return"";
+    }
+    dictionary[3]=c;w=c;result.push(c);
+    while(true){
+      if(data.index>length)return"";
+      bits=0;maxpower=Math.pow(2,numBits);power=1;
+      while(power!=maxpower){
+        resb=data.val&data.position;
+        data.position>>=1;
+        if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++);}
+        bits|=(resb>0?1:0)*power;
+        power<<=1;
+      }
+      switch(c=bits){
+        case 0:bits=0;maxpower=Math.pow(2,8);power=1;while(power!=maxpower){resb=data.val&data.position;data.position>>=1;if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++);}bits|=(resb>0?1:0)*power;power<<=1;}dictionary[dictSize++]=f(bits);c=dictSize-1;enlargeIn--;break;
+        case 1:bits=0;maxpower=Math.pow(2,16);power=1;while(power!=maxpower){resb=data.val&data.position;data.position>>=1;if(data.position==0){data.position=resetValue;data.val=getNextValue(data.index++);}bits|=(resb>0?1:0)*power;power<<=1;}dictionary[dictSize++]=f(bits);c=dictSize-1;enlargeIn--;break;
+        case 2:return result.join("");
+      }
+      if(enlargeIn==0){enlargeIn=Math.pow(2,numBits);numBits++;}
+      if(dictionary[c]){entry=dictionary[c];}else{if(c===dictSize){entry=w+w.charAt(0);}else{return null;}}
+      result.push(entry);
+      dictionary[dictSize++]=w+entry.charAt(0);
+      enlargeIn--;
+      w=entry;
+      if(enlargeIn==0){enlargeIn=Math.pow(2,numBits);numBits++;}
+    }
+  }
+  return {
+    compressToEncodedURIComponent:function(input){if(input==null)return"";return _compress(input,6,function(a){return keyStrUriSafe.charAt(a);});},
+    decompressFromEncodedURIComponent:function(input){if(input==null)return"";if(input=="")return null;input=input.replace(/ /g,"+");return _decompress(input.length,32,function(index){return getBaseValue(keyStrUriSafe,input.charAt(index));});}
+  };
+})();
+
 // ============ 分享预设 ============
 function sharePreset(){
   const s=getSettings();
   const json=JSON.stringify(s);
-  // 中文安全编码：encodeURIComponent + base64
-  const b64=btoa(unescape(encodeURIComponent(json)));
-  const url=location.origin+location.pathname+"?preset="+b64;
-  // 复制到剪贴板
+  const short=LZString.compressToEncodedURIComponent(json);
+  const url=location.origin+location.pathname+"?p="+short;
   const done=()=>{
-    document.getElementById("shareHint").textContent="✅ 链接已复制："+url;
+    document.getElementById("shareHint").textContent="✅ 链接已复制（短）："+url;
     document.getElementById("shareHint").style.wordBreak="break-all";
   };
   if(navigator.clipboard&&navigator.clipboard.writeText){
@@ -2075,25 +2246,55 @@ function sharePreset(){
     document.body.removeChild(ta);
   }
 }
+// 从短码/URL 解析出预设并应用
+function parsePresetCode(input){
+  let short=input.trim();
+  // 支持粘贴完整 URL：提取 ?p= 或 &p= 或 #p= 后面的内容
+  const m=short.match(/[?&#]p=([^&#\s]+)/);
+  if(m) short=m[1];
+  // 兼容旧的 preset= 参数
+  const m2=short.match(/[?&#]preset=([^&#\s]+)/);
+  if(m2) short=m2[1];
+  // 兼容旧 base64 格式
+  if(/^[A-Za-z0-9+/=]+$/.test(short) && short.includes("=")===false && short.length>50){
+    try{ return JSON.parse(decodeURIComponent(escape(atob(short.replace(/-/g,'+').replace(/_/g,'/'))))); }catch(e){}
+  }
+  const json=LZString.decompressFromEncodedURIComponent(short);
+  if(!json) throw new Error("无法解析");
+  return JSON.parse(json);
+}
 function importPresetFromUrl(){
-  const b64=new URLSearchParams(location.search).get("preset");
-  if(!b64){alert("当前 URL 中没有预设参数");return;}
   try{
-    const json=decodeURIComponent(escape(atob(b64)));
-    const s=JSON.parse(json);
+    const input=(document.getElementById("shareInput")&&document.getElementById("shareInput").value)?document.getElementById("shareInput").value:(new URLSearchParams(location.search).get("p")||new URLSearchParams(location.search).get("preset"));
+    if(!input){alert("请输入或粘贴预设链接/短码");return;}
+    const s=parsePresetCode(input);
     applySettings(s);
     alert("已导入分享的预设！");
   }catch(e){
     alert("预设解析失败："+e.message);
   }
 }
+function importFromClipboard(){
+  if(navigator.clipboard&&navigator.clipboard.readText){
+    navigator.clipboard.readText().then(txt=>{
+      if(!txt){alert("剪贴板为空");return;}
+      document.getElementById("shareInput").value=txt;
+      try{
+        const s=parsePresetCode(txt);
+        applySettings(s);
+        alert("已从剪贴板导入预设！");
+      }catch(e){alert("剪贴板内容不是有效预设："+e.message);}
+    }).catch(()=>alert("无法读取剪贴板，请手动粘贴"));
+  }else{
+    alert("当前浏览器不支持读取剪贴板，请手动粘贴");
+  }
+}
 // 页面加载时自动导入 URL 中的预设
 (function(){
-  const b64=new URLSearchParams(location.search).get("preset");
-  if(b64){
+  const p=new URLSearchParams(location.search).get("p")||new URLSearchParams(location.search).get("preset");
+  if(p){
     try{
-      const json=decodeURIComponent(escape(atob(b64)));
-      const s=JSON.parse(json);
+      const s=parsePresetCode(p);
       applySettings(s);
       document.getElementById("shareHint").textContent="已自动应用分享链接中的预设。";
     }catch(e){}
