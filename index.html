@@ -819,6 +819,8 @@ function drawTexture(){
 // ============ 作品图绘制 ============
 function drawArtwork(){
   const msMode=document.getElementById("msMode").checked;
+  const lockScreen=document.getElementById("lockScreen").checked;
+  const coverMode=msMode||lockScreen; // 字稿风/锁屏模式：图片铺满不留白
   const scale=parseInt(document.getElementById("artScale").value)/100;
   const border=parseInt(document.getElementById("artBorder").value);
   const borderColor=document.getElementById("borderColor").value;
@@ -831,8 +833,8 @@ function drawArtwork(){
 
   layers.forEach(img=>{
     let w,h,x,y;
-    if(msMode){
-      // 字稿风：图片铺满画布（cover 模式，不留白边）
+    if(coverMode){
+      // 铺满画布（cover 模式，不留白边）
       const r=Math.max(c.width/img.width,c.height/img.height)*scale;
       w=img.width*r;h=img.height*r;
       x=(c.width-w)/2;y=(c.height-h)/2;
@@ -844,7 +846,7 @@ function drawArtwork(){
     }
 
     // 1) 向下投影
-    if((sDist>0||sBlur>0)&&!msMode){
+    if((sDist>0||sBlur>0)&&!coverMode){
       ctx.save();
       const offX=Math.cos(sAng)*sDist;
       const offY=Math.sin(sAng)*sDist;
@@ -857,8 +859,8 @@ function drawArtwork(){
       ctx.restore();
     }
 
-    // 2) 描边（字稿风模式下不画描边，因为图片铺满）
-    if(border>0&&!msMode){
+    // 2) 描边（铺满模式下不画描边）
+    if(border>0&&!coverMode){
       ctx.fillStyle=borderColor;
       ctx.fillRect(x-border,y-border,w+border*2,h+border*2);
     }
@@ -1321,12 +1323,18 @@ function draw(){
   ctx.clearRect(0,0,c.width,c.height);
   textHitRects.length=0;
   const blurAmt=parseInt(document.getElementById("bgBlur").value);
+  const lockScreen=document.getElementById("lockScreen").checked;
   drawBackground();
   ctx.save();
   if(blurAmt>0) ctx.filter=`blur(${blurAmt}px)`;
-  drawTexture();
+  if(!lockScreen) drawTexture(); // 锁屏模式跳过纹理装饰
   drawArtwork();
   ctx.restore();
+  // 苹果锁屏模式：只保留背景 + 铺满图片 + 锁屏UI，跳过一切装饰
+  if(lockScreen){
+    drawLockScreen();
+    return;
+  }
   // 字稿风专属元素
   drawTornDivider();
   drawStars();
@@ -1339,8 +1347,6 @@ function draw(){
     drawText();
     drawDecor();
   }
-  // 苹果锁屏 UI（最上层覆盖）
-  drawLockScreen();
 }
 
 // ============ 苹果锁屏 UI 预览 ============
