@@ -496,9 +496,46 @@ love
         <label>时间/日期颜色</label>
         <input type="color" id="lockColor" value="#ffffff" onchange="draw()">
         <div class="checkbox-row"><input type="checkbox" id="lockButtons" onchange="draw()" checked><span>底部手电筒 / 相机按钮</span></div>
+        <label>左侧图标（默认手电筒，可输入颜文字/emoji）</label>
+        <input type="text" id="lockLeftIcon" value="" placeholder="留空=矢量手电筒" oninput="draw()">
+        <label>右侧图标（默认相机，可输入颜文字/emoji）</label>
+        <input type="text" id="lockRightIcon" value="" placeholder="留空=矢量相机" oninput="draw()">
+        <div class="hint">彩色表情会自动栅格化为白色剪影</div>
         <div class="checkbox-row"><input type="checkbox" id="lockHomeBar" onchange="draw()" checked><span>底部 Home 指示条</span></div>
 
-        <h3 class="tool-h" style="margin-top:14px">⑪ 吸管取色</h3>
+        <h3 class="tool-h" style="margin-top:14px">⑪ 全屏水印</h3>
+        <div class="checkbox-row"><input type="checkbox" id="wmEnable" onchange="draw()"><span>启用全屏水印</span></div>
+        <input type="file" id="wmUpload" accept="image/*">
+        <label>混合模式</label>
+        <select id="wmBlend" onchange="draw()">
+          <option value="overlay" selected>叠加 (overlay)</option>
+          <option value="soft-light">柔光 (soft-light)</option>
+          <option value="hard-light">强光 (hard-light)</option>
+          <option value="multiply">正片叠底 (multiply)</option>
+          <option value="screen">滤色 (screen)</option>
+          <option value="lighten">变亮 (lighten)</option>
+          <option value="darken">变暗 (darken)</option>
+          <option value="normal">正常 (normal)</option>
+        </select>
+        <label>水印缩放: <span id="wmScaleVal">40</span>%</label>
+        <input type="range" id="wmScale" min="10" max="300" value="40" oninput="document.getElementById('wmScaleVal').textContent=this.value;draw()">
+        <label>水印透明度: <span id="wmOpacityVal">35</span>%</label>
+        <input type="range" id="wmOpacity" min="0" max="100" value="35" oninput="document.getElementById('wmOpacityVal').textContent=this.value;draw()">
+        <div class="row-2">
+          <div><label>X: <span id="wmXVal">50</span>%</label><input type="range" id="wmX" min="0" max="100" value="50" oninput="document.getElementById('wmXVal').textContent=this.value;draw()"></div>
+          <div><label>Y: <span id="wmYVal">50</span>%</label><input type="range" id="wmY" min="0" max="100" value="50" oninput="document.getElementById('wmYVal').textContent=this.value;draw()"></div>
+        </div>
+        <div class="checkbox-row"><input type="checkbox" id="wmTile" onchange="draw()" checked><span>全屏平铺</span></div>
+        <label>平铺间距: <span id="wmGapVal">60</span>%</label>
+        <input type="range" id="wmGap" min="0" max="150" value="60" oninput="document.getElementById('wmGapVal').textContent=this.value;draw()">
+        <div class="hint">水印图会以所选混合模式叠加在作品图上</div>
+
+        <h3 class="tool-h" style="margin-top:14px">⑫ 分享预设</h3>
+        <button class="primary" onclick="sharePreset()" style="margin-bottom:6px">🔗 生成分享链接</button>
+        <button onclick="importPresetFromUrl()">📥 导入 URL 中的预设</button>
+        <div class="hint" id="shareHint">分享链接可复制给别人，打开即自动应用你的预设。</div>
+
+        <h3 class="tool-h" style="margin-top:14px">⑬ 吸管取色</h3>
         <label>吸色目标</label>
         <select id="pickerTarget">
           <option value="msTitleColor">主文字颜色</option>
@@ -571,6 +608,7 @@ let layers=[];
 let textureImg=null;
 let presetTextureImg=null;
 let avatarImg=null;
+let watermarkImg=null;
 
 // ============ 画布尺寸 ============
 function resizeCanvas(){
@@ -596,6 +634,12 @@ document.getElementById("avatarUpload").onchange=e=>{
   const f=e.target.files[0];if(!f)return;
   const img=new Image();
   img.onload=()=>{avatarImg=img;draw();};
+  img.src=URL.createObjectURL(f);
+};
+document.getElementById("wmUpload").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const img=new Image();
+  img.onload=()=>{watermarkImg=img;draw();};
   img.src=URL.createObjectURL(f);
 };
 
@@ -1330,6 +1374,7 @@ function draw(){
   if(!lockScreen) drawTexture(); // 锁屏模式跳过纹理装饰
   drawArtwork();
   ctx.restore();
+  drawWatermark(); // 全屏水印（独立混合模式，叠加在图片上）
   // 苹果锁屏模式：只保留背景 + 铺满图片 + 锁屏UI，跳过一切装饰
   if(lockScreen){
     drawLockScreen();
@@ -1349,7 +1394,99 @@ function draw(){
   }
 }
 
+// ============ 全屏水印 ============
+function drawWatermark(){
+  if(!document.getElementById("wmEnable").checked) return;
+  if(!watermarkImg) return;
+  const blend=document.getElementById("wmBlend").value;
+  const scale=parseInt(document.getElementById("wmScale").value)/100;
+  const opacity=parseInt(document.getElementById("wmOpacity").value)/100;
+  const tile=document.getElementById("wmTile").checked;
+  const gap=parseInt(document.getElementById("wmGap").value)/100;
+  const wx=parseInt(document.getElementById("wmX").value)/100;
+  const wy=parseInt(document.getElementById("wmY").value)/100;
+  const w=watermarkImg.width*scale;
+  const h=watermarkImg.height*scale;
+  ctx.save();
+  ctx.globalAlpha=opacity;
+  ctx.globalCompositeOperation=blend;
+  if(tile){
+    const stepX=w*(1+gap);
+    const stepY=h*(1+gap);
+    for(let y=-h;y<c.height+h;y+=stepY){
+      for(let x=-w;x<c.width+w;x+=stepX){
+        ctx.drawImage(watermarkImg,x,y,w,h);
+      }
+    }
+  }else{
+    ctx.drawImage(watermarkImg,c.width*wx-w/2,c.height*wy-h/2,w,h);
+  }
+  ctx.restore();
+}
+
 // ============ 苹果锁屏 UI 预览 ============
+function rrPath(x,y,w,h,r){
+  // 圆角矩形路径（兼容旧浏览器）
+  const rr=Math.min(r,w/2,h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+rr,y);
+  ctx.arcTo(x+w,y,x+w,y+h,rr);
+  ctx.arcTo(x+w,y+h,x,y+h,rr);
+  ctx.arcTo(x,y+h,x,y,rr);
+  ctx.arcTo(x,y,x+w,y,rr);
+  ctx.closePath();
+}
+// 把任意文字/emoji 栅格化成白色剪影图标
+function iconToWhite(text,size){
+  const pad=Math.ceil(size*0.3);
+  const off=document.createElement("canvas");
+  off.width=Math.ceil(size+pad*2);off.height=Math.ceil(size+pad*2);
+  const o=off.getContext("2d");
+  o.font=`${size}px 'Apple Color Emoji','Segoe UI Emoji','PingFang SC',sans-serif`;
+  o.textAlign="center";o.textBaseline="middle";
+  o.fillStyle="#fff";
+  o.fillText(text,off.width/2,off.height/2);
+  const d=o.getImageData(0,0,off.width,off.height);
+  for(let i=0;i<d.data.length;i+=4){
+    d.data[i]=255;d.data[i+1]=255;d.data[i+2]=255; // RGB 全白，保留 alpha 形状
+  }
+  o.putImageData(d,0,0);
+  return off;
+}
+// 矢量手电筒图标（白色描边）
+function drawFlashlightIcon(x,y,s,color){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate(-Math.PI/4);
+  ctx.strokeStyle=color;
+  ctx.fillStyle=color;
+  ctx.lineWidth=s*0.085;
+  ctx.lineJoin="round";ctx.lineCap="round";
+  // 灯头
+  const hw=s*0.5,hh=s*0.52;
+  rrPath(-hw/2,-hh/2,hw,hh,s*0.14);ctx.stroke();
+  // 手柄
+  const gw=s*0.22,gh=s*0.42;
+  rrPath(-gw/2,hh/2,gw,gh,s*0.09);ctx.stroke();
+  // 开关
+  ctx.beginPath();ctx.arc(0,hh/2+s*0.13,s*0.055,0,Math.PI*2);ctx.fill();
+  ctx.restore();
+}
+// 矢量相机图标（白色描边）
+function drawCameraIcon(x,y,s,color){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.strokeStyle=color;
+  ctx.lineWidth=s*0.09;
+  ctx.lineJoin="round";ctx.lineCap="round";
+  // 机身
+  rrPath(-s*0.42,-s*0.28,s*0.84,s*0.56,s*0.12);ctx.stroke();
+  // 顶部快门凸起
+  ctx.beginPath();ctx.arc(0,-s*0.28,s*0.13,Math.PI,0);ctx.stroke();
+  // 镜头
+  ctx.beginPath();ctx.arc(0,0,s*0.17,0,Math.PI*2);ctx.stroke();
+  ctx.restore();
+}
 function drawLockScreen(){
   if(!document.getElementById("lockScreen").checked) return;
   const time=document.getElementById("lockTime").value;
@@ -1358,49 +1495,57 @@ function drawLockScreen(){
   const fs=Math.floor(c.width*(parseInt(document.getElementById("lockTimeSize").value)/100));
   const tx=parseInt(document.getElementById("lockTimeX").value)/100;
   const ty=parseInt(document.getElementById("lockTimeY").value)/100;
+  const fontFamily="-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','PingFang SC',sans-serif";
   ctx.save();
   ctx.textAlign="center";ctx.textBaseline="middle";
-  // 时间（大号，iOS 风格细体）
-  ctx.font=`600 ${fs}px 'Inter','PingFang SC',sans-serif`;
-  ctx.fillStyle=color;
-  ctx.shadowColor="rgba(0,0,0,0.35)";
-  ctx.shadowBlur=fs*0.12;
-  ctx.fillText(time,c.width*tx,c.height*ty);
-  pushTextHit("lockTime",c.width*tx,c.height*ty,c.width*0.5,fs*1.3);
-  // 日期（小号，时间下方）
+  // 日期（时间正上方，小字）
   if(date){
-    ctx.font=`500 ${Math.floor(fs*0.22)}px 'Inter','PingFang SC',sans-serif`;
+    ctx.font=`500 ${Math.floor(fs*0.2)}px ${fontFamily}`;
     ctx.fillStyle=color;
-    ctx.globalAlpha=0.9;
-    ctx.fillText(date,c.width*tx,c.height*ty+fs*0.8);
-    ctx.globalAlpha=1;
+    ctx.shadowColor="rgba(0,0,0,0.35)";
+    ctx.shadowBlur=fs*0.06;
+    ctx.fillText(date,c.width*tx,c.height*ty-fs*0.62);
+    ctx.shadowBlur=0;
   }
+  // 时间（大号粗体数字，SF Pro 风格）
+  ctx.font=`700 ${fs}px ${fontFamily}`;
+  ctx.fillStyle=color;
+  ctx.shadowColor="rgba(0,0,0,0.4)";
+  ctx.shadowBlur=fs*0.14;
+  ctx.fillText(time,c.width*tx,c.height*ty);
   ctx.shadowBlur=0;
-  // 底部手电筒 / 相机按钮
+  pushTextHit("lockTime",c.width*tx,c.height*ty,c.width*0.5,fs*1.3);
+  // 底部手电筒 / 相机按钮（白色矢量图标）
   if(document.getElementById("lockButtons").checked){
     const r=c.width*0.045;
     const bx1=c.width*0.14, bx2=c.width*0.86;
     const by=c.height*0.94;
-    const btn=(x,icon)=>{
+    const leftIcon=document.getElementById("lockLeftIcon").value.trim();
+    const rightIcon=document.getElementById("lockRightIcon").value.trim();
+    const drawBtn=(x,icon,isLeft)=>{
       ctx.beginPath();
       ctx.arc(x,by,r,0,Math.PI*2);
-      ctx.fillStyle="rgba(255,255,255,0.18)";
+      ctx.fillStyle="rgba(0,0,0,0.25)";
       ctx.fill();
-      ctx.strokeStyle="rgba(255,255,255,0.25)";
-      ctx.lineWidth=Math.max(2,c.width*0.002);
-      ctx.stroke();
-      ctx.fillStyle=color;
-      ctx.font=`${Math.floor(r*1.1)}px sans-serif`;
-      ctx.fillText(icon,x,by);
+      const is=Math.floor(r*1.05);
+      if(icon){
+        // 自定义文字/emoji → 栅格化白色剪影
+        const white=iconToWhite(icon,is);
+        ctx.drawImage(white,x-white.width/2,by-white.height/2);
+      }else if(isLeft){
+        drawFlashlightIcon(x,by,is,color);
+      }else{
+        drawCameraIcon(x,by,is,color);
+      }
     };
-    btn(bx1,"🔦");btn(bx2,"📷");
+    drawBtn(bx1,leftIcon,true);
+    drawBtn(bx2,rightIcon,false);
   }
   // 底部 Home 指示条
   if(document.getElementById("lockHomeBar").checked){
     const bw=c.width*0.28, bh=Math.max(6,c.width*0.006);
     const bx=c.width/2-bw/2, by=c.height*0.975;
-    ctx.beginPath();
-    ctx.roundRect ? ctx.roundRect(bx,by,bw,bh,bh/2) : ctx.rect(bx,by,bw,bh);
+    rrPath(bx,by,bw,bh,bh/2);
     ctx.fillStyle=color;
     ctx.globalAlpha=0.9;
     ctx.fill();
@@ -1487,6 +1632,12 @@ function applyManuscriptPreset(){
   set("lockTimeSize","18");set("lockTimeX","50");set("lockTimeY","20");
   set("lockColor","#ffffff");
   chk("lockButtons",true);chk("lockHomeBar",true);
+  set("lockLeftIcon","");set("lockRightIcon","");
+  // 水印默认关闭
+  chk("wmEnable",false);
+  set("wmBlend","overlay");set("wmScale","40");set("wmOpacity","35");
+  set("wmX","50");set("wmY","50");
+  chk("wmTile",true);set("wmGap","60");
   // 同步显示值
   document.getElementById("blurVal").textContent="0";
   document.getElementById("scaleVal").textContent="105";
@@ -1523,6 +1674,11 @@ function applyManuscriptPreset(){
   document.getElementById("lockTimeSizeVal").textContent="18";
   document.getElementById("lockTimeXVal").textContent="50";
   document.getElementById("lockTimeYVal").textContent="20";
+  document.getElementById("wmScaleVal").textContent="40";
+  document.getElementById("wmOpacityVal").textContent="35";
+  document.getElementById("wmXVal").textContent="50";
+  document.getElementById("wmYVal").textContent="50";
+  document.getElementById("wmGapVal").textContent="60";
   onTexSourceChange();
   resizeCanvas();
   alert("字稿风预设已应用（IMG_6729 暖金风）！\n\n下一步：\n1. 在「④ 作品图」上传你的摄影图\n2. 点「从图片提取主色填入背景」自动配色\n3. 在「⑨ 字稿风模式」上传头像\n4. 调整署名 / 营业时间 / 版权 / 散落小字\n5. 点「导出 PNG」");
@@ -1610,7 +1766,17 @@ function getSettings(){
     lockTimeY:document.getElementById("lockTimeY").value,
     lockColor:document.getElementById("lockColor").value,
     lockButtons:chk("lockButtons"),
-    lockHomeBar:chk("lockHomeBar")
+    lockHomeBar:chk("lockHomeBar"),
+    lockLeftIcon:document.getElementById("lockLeftIcon").value,
+    lockRightIcon:document.getElementById("lockRightIcon").value,
+    wmEnable:chk("wmEnable"),
+    wmBlend:document.getElementById("wmBlend").value,
+    wmScale:document.getElementById("wmScale").value,
+    wmOpacity:document.getElementById("wmOpacity").value,
+    wmX:document.getElementById("wmX").value,
+    wmY:document.getElementById("wmY").value,
+    wmTile:chk("wmTile"),
+    wmGap:document.getElementById("wmGap").value
   };
 }
 function applySettings(s){
@@ -1667,6 +1833,12 @@ function applySettings(s){
   set("lockTimeSize",s.lockTimeSize||"18");set("lockTimeX",s.lockTimeX||"50");set("lockTimeY",s.lockTimeY||"20");
   set("lockColor",s.lockColor||"#ffffff");
   chk("lockButtons",s.lockButtons!==false);chk("lockHomeBar",s.lockHomeBar!==false);
+  set("lockLeftIcon",s.lockLeftIcon||"");set("lockRightIcon",s.lockRightIcon||"");
+  chk("wmEnable",s.wmEnable||false);
+  set("wmBlend",s.wmBlend||"overlay");
+  set("wmScale",s.wmScale||"40");set("wmOpacity",s.wmOpacity||"35");
+  set("wmX",s.wmX||"50");set("wmY",s.wmY||"50");
+  chk("wmTile",s.wmTile!==false);set("wmGap",s.wmGap||"60");
   // 同步显示值
   document.getElementById("blurVal").textContent=s.bgBlur;
   document.getElementById("scaleVal").textContent=s.artScale;
@@ -1703,6 +1875,11 @@ function applySettings(s){
   document.getElementById("lockTimeSizeVal").textContent=s.lockTimeSize||18;
   document.getElementById("lockTimeXVal").textContent=s.lockTimeX||50;
   document.getElementById("lockTimeYVal").textContent=s.lockTimeY||20;
+  document.getElementById("wmScaleVal").textContent=s.wmScale||40;
+  document.getElementById("wmOpacityVal").textContent=s.wmOpacity||35;
+  document.getElementById("wmXVal").textContent=s.wmX||50;
+  document.getElementById("wmYVal").textContent=s.wmY||50;
+  document.getElementById("wmGapVal").textContent=s.wmGap||60;
   onTexSourceChange();
   if((s.texSource||"preset")==="preset"){onTexPresetChange();}
   resizeCanvas();
@@ -1721,12 +1898,63 @@ function loadPreset(n){
 }
 function resetAll(){
   if(!confirm("清空当前所有设置？"))return;
-  layers=[];textureImg=null;presetTextureImg=null;avatarImg=null;
+  layers=[];textureImg=null;presetTextureImg=null;avatarImg=null;watermarkImg=null;
   document.getElementById("upload").value="";
   document.getElementById("texUpload").value="";
   document.getElementById("avatarUpload").value="";
+  document.getElementById("wmUpload").value="";
   draw();
 }
+
+// ============ 分享预设 ============
+function sharePreset(){
+  const s=getSettings();
+  const json=JSON.stringify(s);
+  // 中文安全编码：encodeURIComponent + base64
+  const b64=btoa(unescape(encodeURIComponent(json)));
+  const url=location.origin+location.pathname+"?preset="+b64;
+  // 复制到剪贴板
+  const done=()=>{
+    document.getElementById("shareHint").textContent="✅ 链接已复制："+url;
+    document.getElementById("shareHint").style.wordBreak="break-all";
+  };
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(done).catch(()=>{fallbackCopy(url);done();});
+  }else{
+    fallbackCopy(url);done();
+  }
+  function fallbackCopy(t){
+    const ta=document.createElement("textarea");
+    ta.value=t;ta.style.position="fixed";ta.style.opacity="0";
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");}catch(e){}
+    document.body.removeChild(ta);
+  }
+}
+function importPresetFromUrl(){
+  const b64=new URLSearchParams(location.search).get("preset");
+  if(!b64){alert("当前 URL 中没有预设参数");return;}
+  try{
+    const json=decodeURIComponent(escape(atob(b64)));
+    const s=JSON.parse(json);
+    applySettings(s);
+    alert("已导入分享的预设！");
+  }catch(e){
+    alert("预设解析失败："+e.message);
+  }
+}
+// 页面加载时自动导入 URL 中的预设
+(function(){
+  const b64=new URLSearchParams(location.search).get("preset");
+  if(b64){
+    try{
+      const json=decodeURIComponent(escape(atob(b64)));
+      const s=JSON.parse(json);
+      applySettings(s);
+      document.getElementById("shareHint").textContent="已自动应用分享链接中的预设。";
+    }catch(e){}
+  }
+})();
 
 // ============ 画布文字拖拽 ============
 function canvasPos(e){
