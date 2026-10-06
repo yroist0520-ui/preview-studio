@@ -534,6 +534,12 @@ love
         <label>时间/日期颜色</label>
         <input type="color" id="lockColor" value="#ffffff" onchange="draw()">
         <div class="checkbox-row"><input type="checkbox" id="lockButtons" onchange="draw()" checked><span>底部手电筒 / 相机按钮</span></div>
+        <label>按钮大小: <span id="lockBtnSizeVal">4.5</span>%</label>
+        <input type="range" id="lockBtnSize" min="2" max="10" value="4.5" step="0.1" oninput="document.getElementById('lockBtnSizeVal').textContent=this.value;draw()">
+        <label>按钮高度(距底部): <span id="lockBtnYVal">94</span>%</label>
+        <input type="range" id="lockBtnY" min="80" max="98" value="94" oninput="document.getElementById('lockBtnYVal').textContent=this.value;draw()">
+        <label>按钮间距(距边缘): <span id="lockBtnGapVal">14</span>%</label>
+        <input type="range" id="lockBtnGap" min="5" max="30" value="14" oninput="document.getElementById('lockBtnGapVal').textContent=this.value;draw()">
         <label>左侧图标（默认手电筒，可输入颜文字/emoji）</label>
         <input type="text" id="lockLeftIcon" value="" placeholder="留空=矢量手电筒" oninput="draw()">
         <label>右侧图标（默认相机，可输入颜文字/emoji）</label>
@@ -1643,9 +1649,10 @@ function drawLockScreen(){
   pushTextHit("lockTime",c.width*tx,c.height*ty,c.width*0.5,fs*1.3);
   // 底部手电筒 / 相机按钮（白色矢量图标）
   if(document.getElementById("lockButtons").checked){
-    const r=c.width*0.045;
-    const bx1=c.width*0.14, bx2=c.width*0.86;
-    const by=c.height*0.94;
+    const r=c.width*(parseFloat(document.getElementById("lockBtnSize").value)/100);
+    const gap=parseFloat(document.getElementById("lockBtnGap").value)/100;
+    const bx1=c.width*gap, bx2=c.width*(1-gap);
+    const by=c.height*(parseFloat(document.getElementById("lockBtnY").value)/100);
     const leftIcon=document.getElementById("lockLeftIcon").value.trim();
     const rightIcon=document.getElementById("lockRightIcon").value.trim();
     const drawBtn=(x,icon,isLeft)=>{
@@ -1759,6 +1766,7 @@ function applyManuscriptPreset(){
   set("lockColor","#ffffff");
   chk("lockButtons",true);chk("lockHomeBar",true);
   set("lockLeftIcon","");set("lockRightIcon","");
+  set("lockBtnSize","4.5");set("lockBtnY","94");set("lockBtnGap","14");
   // 水印默认关闭
   chk("wmEnable",false);
   set("wmBlend","overlay");set("wmScale","40");set("wmOpacity","35");
@@ -1800,6 +1808,9 @@ function applyManuscriptPreset(){
   document.getElementById("lockTimeSizeVal").textContent="18";
   document.getElementById("lockTimeXVal").textContent="50";
   document.getElementById("lockTimeYVal").textContent="20";
+  document.getElementById("lockBtnSizeVal").textContent="4.5";
+  document.getElementById("lockBtnYVal").textContent="94";
+  document.getElementById("lockBtnGapVal").textContent="14";
   document.getElementById("wmScaleVal").textContent="40";
   document.getElementById("wmOpacityVal").textContent="35";
   document.getElementById("wmXVal").textContent="50";
@@ -1895,6 +1906,9 @@ function getSettings(){
     lockHomeBar:chk("lockHomeBar"),
     lockLeftIcon:document.getElementById("lockLeftIcon").value,
     lockRightIcon:document.getElementById("lockRightIcon").value,
+    lockBtnSize:document.getElementById("lockBtnSize").value,
+    lockBtnY:document.getElementById("lockBtnY").value,
+    lockBtnGap:document.getElementById("lockBtnGap").value,
     wmEnable:chk("wmEnable"),
     wmBlend:document.getElementById("wmBlend").value,
     wmScale:document.getElementById("wmScale").value,
@@ -1960,6 +1974,7 @@ function applySettings(s){
   set("lockColor",s.lockColor||"#ffffff");
   chk("lockButtons",s.lockButtons!==false);chk("lockHomeBar",s.lockHomeBar!==false);
   set("lockLeftIcon",s.lockLeftIcon||"");set("lockRightIcon",s.lockRightIcon||"");
+  set("lockBtnSize",s.lockBtnSize||"4.5");set("lockBtnY",s.lockBtnY||"94");set("lockBtnGap",s.lockBtnGap||"14");
   chk("wmEnable",s.wmEnable||false);
   set("wmBlend",s.wmBlend||"overlay");
   set("wmScale",s.wmScale||"40");set("wmOpacity",s.wmOpacity||"35");
@@ -2001,6 +2016,9 @@ function applySettings(s){
   document.getElementById("lockTimeSizeVal").textContent=s.lockTimeSize||18;
   document.getElementById("lockTimeXVal").textContent=s.lockTimeX||50;
   document.getElementById("lockTimeYVal").textContent=s.lockTimeY||20;
+  document.getElementById("lockBtnSizeVal").textContent=s.lockBtnSize||4.5;
+  document.getElementById("lockBtnYVal").textContent=s.lockBtnY||94;
+  document.getElementById("lockBtnGapVal").textContent=s.lockBtnGap||14;
   document.getElementById("wmScaleVal").textContent=s.wmScale||40;
   document.getElementById("wmOpacityVal").textContent=s.wmOpacity||35;
   document.getElementById("wmXVal").textContent=s.wmX||50;
