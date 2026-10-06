@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Preview Studio · 解锁码生成器</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d0d10;--card:#1a1a22;--border:#26262f;--text:#e8e8ee;--muted:#8b8b95;--accent:#c9a37c}
+body{background:var(--bg);color:var(--text);font-family:'Inter',"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.wrap{width:100%;max-width:560px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:36px 32px;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+h1{font-size:22px;font-weight:700;letter-spacing:-.3px;margin-bottom:6px}
+.sub{color:var(--muted);font-size:13px;margin-bottom:28px}
+h3{font-size:13px;color:#9a9aa3;margin:22px 0 10px;border-bottom:1px solid #2a2a35;padding-bottom:6px}
+.type-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.type-btn{padding:16px 8px;background:#21212a;border:1px solid #3a3a45;border-radius:10px;color:#fff;cursor:pointer;text-align:center;transition:all .15s;font-family:inherit}
+.type-btn:hover{border-color:var(--accent)}
+.type-btn.active{background:var(--accent);border-color:var(--accent);color:#1a1a1a;font-weight:600}
+.type-btn .t{font-size:16px;font-weight:700;display:block}
+.type-btn .d{font-size:11px;opacity:.75;display:block;margin-top:2px}
+label{display:block;font-size:12px;color:var(--muted);margin:8px 0 4px}
+input,select{width:100%;padding:11px;background:#21212a;color:#fff;border:1px solid #3a3a45;border-radius:8px;font-size:14px;font-family:inherit}
+button.gen{width:100%;margin-top:18px;padding:14px;background:var(--accent);color:#1a1a1a;font-weight:700;font-size:15px;border:none;border-radius:10px;cursor:pointer}
+button.gen:hover{background:#d4b08c}
+.codes{margin-top:20px}
+.code-row{display:flex;align-items:center;gap:8px;background:#121218;border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.code-row .code{flex:1;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:14px;letter-spacing:1px;word-break:break-all}
+.code-row .tag{font-size:11px;color:var(--accent);border:1px solid rgba(201,163,124,.3);border-radius:999px;padding:2px 8px;flex-shrink:0}
+.code-row .copy{background:#2c2c38;border:1px solid #3a3a45;color:#fff;border-radius:6px;padding:5px 12px;font-size:12px;cursor:pointer;flex-shrink:0}
+.code-row .copy:hover{background:#3a3a45}
+.note{margin-top:22px;font-size:11px;color:#555;line-height:1.7;background:#121218;border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.back{margin-top:18px;display:block;text-align:center;color:var(--muted);font-size:13px;text-decoration:none}
+.back:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>🔑 解锁码生成器</h1>
+    <div class="sub">生成 Preview Studio 的激活码 · 与主站联动</div>
+
+    <h3>① 选择卡类型</h3>
+    <div class="type-grid">
+      <button class="type-btn" data-type="DAY"><span class="t">日卡</span><span class="d">24 小时</span></button>
+      <button class="type-btn active" data-type="MONTH"><span class="t">月卡</span><span class="d">30 天</span></button>
+      <button class="type-btn" data-type="YEAR"><span class="t">年卡</span><span class="d">365 天</span></button>
+      <button class="type-btn" data-type="FOREVER"><span class="t">永卡</span><span class="d">永久</span></button>
+    </div>
+
+    <h3>② 生成数量</h3>
+    <label>批量生成数量（1-50）</label>
+    <input type="number" id="count" value="1" min="1" max="50">
+
+    <button class="gen" onclick="generate()">生成解锁码</button>
+
+    <div class="codes" id="codes"></div>
+
+    <div class="note">
+      <b>说明：</b>解锁码在用户首次输入时开始计时（日卡 24h、月卡 30 天、年卡 365 天），永卡永久有效。每个码仅用于解锁本机浏览器，同一码可在多台设备分别激活。<br><br>
+      本生成器与主站共用同一密钥算法，请勿公开此页面链接。
+    </div>
+
+    <a class="back" href="./">← 返回 Preview Studio</a>
+  </div>
+</div>
+
+<script>
+const SECRET="PREVIEW-STUDIO-2026-SECRET-KEY";
+const TYPE_LABEL={DAY:"日卡",MONTH:"月卡",YEAR:"年卡",FOREVER:"永卡"};
+
+// 与主站一致的 djb2 哈希
+function hash(str){
+  let h=5381;
+  for(let i=0;i<str.length;i++){h=((h<<5)+h)^str.charCodeAt(i);}
+  return (h>>>0).toString(36);
+}
+function randomStr(n){
+  const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let s="";
+  for(let i=0;i<n;i++)s+=chars[Math.floor(Math.random()*chars.length)];
+  return s;
+}
+function generateCode(type){
+  const random=randomStr(8);
+  const checksum=hash(type+random+SECRET).slice(0,8).toUpperCase();
+  return "PS-"+type+"-"+random+"-"+checksum;
+}
+
+// 卡类型选择
+let currentType="MONTH";
+document.querySelectorAll(".type-btn").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".type-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    currentType=btn.dataset.type;
+  };
+});
+
+function generate(){
+  const count=Math.min(50,Math.max(1,parseInt(document.getElementById("count").value)||1));
+  const box=document.getElementById("codes");
+  box.innerHTML="";
+  for(let i=0;i<count;i++){
+    const code=generateCode(currentType);
+    const row=document.createElement("div");
+    row.className="code-row";
+    row.innerHTML='<span class="tag">'+TYPE_LABEL[currentType]+'</span><span class="code">'+code+'</span><button class="copy">复制</button>';
+    row.querySelector(".copy").onclick=()=>{
+      copyText(code);
+      row.querySelector(".copy").textContent="已复制";
+      setTimeout(()=>row.querySelector(".copy").textContent="复制",1200);
+    };
+    box.appendChild(row);
+  }
+}
+function copyText(t){
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t);
+  }else{
+    const ta=document.createElement("textarea");
+    ta.value=t;ta.style.position="fixed";ta.style.opacity="0";
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy");}catch(e){}
+    document.body.removeChild(ta);
+  }
+}
+</script>
+</body>
+</html>
