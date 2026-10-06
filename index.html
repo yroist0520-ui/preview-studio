@@ -175,7 +175,7 @@ input[type=file]{font-size:11px}
       <span class="lock-type-chip">永卡 永久</span>
     </div>
     <div class="lock-info" id="unlockInfo" style="display:none"></div>
-    <div class="lock-footer">解锁状态保存在本机浏览器，刷新无需重复输入</div>
+    <div class="lock-footer">解锁状态绑定本设备（一机一用），刷新无需重复输入</div>
   </div>
 </div>
 
@@ -652,7 +652,7 @@ love
 
 <script>
 // ============ 解锁码系统 ============
-const UNLOCK_KEY="ps-unlock-v1";
+const UNLOCK_KEY="ps-unlock-v2";
 const UNLOCK_SECRET="PREVIEW-STUDIO-2026-SECRET-KEY";
 const CARD_TYPES={
   DAY:{label:"日卡",ms:24*60*60*1000},
@@ -666,11 +666,43 @@ function unlockHash(str){
   for(let i=0;i<str.length;i++){h=((h<<5)+h)^str.charCodeAt(i);}
   return (h>>>0).toString(36);
 }
+// 设备指纹：canvas 指纹 + 浏览器特征，用于"一机一用"的设备绑定
+function getDeviceFingerprint(){
+  try{
+    const cv=document.createElement("canvas");
+    cv.width=220;cv.height=60;
+    const g=cv.getContext("2d");
+    g.textBaseline="top";
+    g.font="14px Arial";
+    g.fillStyle="#f60";g.fillRect(125,1,62,20);
+    g.fillStyle="#069";g.fillText("DeviceFingerprint!@#",2,15);
+    g.fillStyle="rgba(102,204,0,0.7)";g.fillText("指纹锁定🔒",4,34);
+    g.beginPath();g.arc(30,20,12,0,Math.PI*2);g.stroke();
+    const canvasData=cv.toDataURL();
+    const features=[
+      canvasData,
+      navigator.userAgent,
+      navigator.language,
+      navigator.platform||"",
+      screen.width+"x"+screen.height+"x"+screen.colorDepth,
+      new Date().getTimezoneOffset(),
+      navigator.hardwareConcurrency||"",
+      navigator.maxTouchPoints||""
+    ].join("|");
+    let h=5381;
+    for(let i=0;i<features.length;i++){h=((h<<5)+h)^features.charCodeAt(i);}
+    return "fp-"+((h>>>0).toString(36))+"-"+features.length.toString(36);
+  }catch(e){
+    return "fp-unknown";
+  }
+}
 function checkUnlocked(){
   try{
     const raw=localStorage.getItem(UNLOCK_KEY);
     if(!raw) return false;
     const u=JSON.parse(raw);
+    // 设备绑定校验：解锁状态被复制到其他设备时会因指纹不匹配而失效
+    if(u.deviceId && u.deviceId!==getDeviceFingerprint()) return false;
     if(u.type==="FOREVER") return true;
     return Date.now() < u.expiresAt;
   }catch(e){return false;}
@@ -699,9 +731,9 @@ function unlockNow(){
   if(expect!==checksum){msg.className="lock-msg err";msg.textContent="解锁码无效（校验失败）";return;}
   const now=Date.now();
   const expiresAt=type==="FOREVER"?0:now+card.ms;
-  localStorage.setItem(UNLOCK_KEY,JSON.stringify({type,expiresAt,activatedAt:now,code}));
+  localStorage.setItem(UNLOCK_KEY,JSON.stringify({type,expiresAt,activatedAt:now,code,deviceId:getDeviceFingerprint()}));
   msg.className="lock-msg ok";
-  msg.textContent="✅ 解锁成功！"+(type==="FOREVER"?"（永久）":"");
+  msg.textContent="✅ 解锁成功（已绑定本设备）！"+(type==="FOREVER"?"（永久）":"");
   updateBadge();
   setTimeout(()=>{document.getElementById("lockOverlay").style.display="none";},600);
 }
