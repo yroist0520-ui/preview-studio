@@ -389,6 +389,37 @@ love
         <label>背景图模糊强度: <span id="msBlurVal">12</span>px</label>
         <input type="range" id="msBlur" min="0" max="40" value="12" oninput="document.getElementById('msBlurVal').textContent=this.value;draw()">
 
+        <h3 class="tool-h" style="margin-top:14px">⑨½ 元素大小调节</h3>
+        <label>主文字字号: <span id="msMainSizeVal">55</span>‰</label>
+        <input type="range" id="msMainSize" min="20" max="100" value="55" oninput="document.getElementById('msMainSizeVal').textContent=this.value;draw()">
+        <label>Preview 花体字号: <span id="msPreviewSizeVal">45</span>‰</label>
+        <input type="range" id="msPreviewSize" min="20" max="80" value="45" oninput="document.getElementById('msPreviewSizeVal').textContent=this.value;draw()">
+        <label>头像大小: <span id="msAvatarSizeVal">32</span>%</label>
+        <input type="range" id="msAvatarSize" min="10" max="50" value="32" oninput="document.getElementById('msAvatarSizeVal').textContent=this.value;draw()">
+        <label>散落小字字号: <span id="msScatterSizeVal">16</span>‰</label>
+        <input type="range" id="msScatterSize" min="8" max="30" value="16" oninput="document.getElementById('msScatterSizeVal').textContent=this.value;draw()">
+        <label>署名字号: <span id="msAuthorSizeVal">28</span>‰</label>
+        <input type="range" id="msAuthorSize" min="12" max="50" value="28" oninput="document.getElementById('msAuthorSizeVal').textContent=this.value;draw()">
+        <label>✦ 装饰大小: <span id="msStarSizeVal">25</span>‰</label>
+        <input type="range" id="msStarSize" min="10" max="50" value="25" oninput="document.getElementById('msStarSizeVal').textContent=this.value;draw()">
+        <label>信息栏高度: <span id="msBarHVal">22</span>%</label>
+        <input type="range" id="msBarH" min="10" max="35" value="22" oninput="document.getElementById('msBarHVal').textContent=this.value;draw()">
+        <label>✦ 装饰数量: <span id="msStarCountVal">7</span></label>
+        <input type="range" id="msStarCount" min="0" max="20" value="7" oninput="document.getElementById('msStarCountVal').textContent=this.value;draw()">
+
+        <h3 class="tool-h" style="margin-top:14px">⑨¾ 吸管取色</h3>
+        <label>吸色目标</label>
+        <select id="pickerTarget">
+          <option value="msTitleColor">主文字颜色</option>
+          <option value="msSubtitleColor">虚影颜色</option>
+          <option value="bgColor1">背景主色</option>
+          <option value="bgColor2">背景副色</option>
+          <option value="colorEN">英文文字色</option>
+          <option value="colorCN">中文文字色</option>
+        </select>
+        <button class="ms-btn" onclick="enablePicker()" style="margin:4px 0">👁 进入吸管模式（点击画布吸色）</button>
+        <div class="hint" id="pickerHint" style="display:none;color:#f4c842">吸管模式已开启：点击右侧画布任意位置吸取颜色</div>
+
         <h3 class="tool-h">⑩ 导出</h3>
         <button class="primary" onclick="exportPNG()">导出 PNG</button>
         <div class="hint" style="margin-top:10px">提示：预设只保存参数，自定义纹理图和头像需重新上传。</div>
@@ -819,7 +850,7 @@ function drawArtwork(){
       // 底部柔光过渡（如果开了底部信息栏，做柔和过渡）
       if(document.getElementById("msInfoBar").checked){
         // 顶部信息栏底部柔化
-        const barH=c.height*0.22;
+        const barH=c.height*(parseInt(document.getElementById("msBarH").value)/100);
         const grad=ctx.createLinearGradient(0,barH-80,0,barH+30);
         grad.addColorStop(0,"rgba(255,240,220,0)");
         grad.addColorStop(1,"rgba(255,240,220,0.25)");
@@ -834,30 +865,39 @@ function drawArtwork(){
 function drawStars(){
   const msStars=document.getElementById("msStars").checked;
   if(!msStars) return;
+  const starCount=parseInt(document.getElementById("msStarCount").value);
+  if(starCount<=0) return;
   const fontEN='"Great Vibes","Cormorant Garamond",cursive';
-  const stars=[
-    {x:c.width*0.08,y:c.height*0.10,size:c.width*0.025,op:0.85},
-    {x:c.width*0.92,y:c.height*0.08,size:c.width*0.02,op:0.7},
-    {x:c.width*0.06,y:c.height*0.92,size:c.width*0.022,op:0.75},
-    {x:c.width*0.94,y:c.height*0.94,size:c.width*0.028,op:0.9},
-    {x:c.width*0.5,y:c.height*0.06,size:c.width*0.018,op:0.6},
-    {x:c.width*0.15,y:c.height*0.45,size:c.width*0.015,op:0.5},
-    {x:c.width*0.85,y:c.height*0.55,size:c.width*0.016,op:0.55}
+  const baseSize=c.width*(parseInt(document.getElementById("msStarSize").value)/1000);
+  // 预设位置池（最多 20 个）
+  const positions=[
+    {x:0.08,y:0.10,op:0.85,sf:1.0},{x:0.92,y:0.08,op:0.7,sf:0.8},
+    {x:0.06,y:0.92,op:0.75,sf:0.88},{x:0.94,y:0.94,op:0.9,sf:1.12},
+    {x:0.5,y:0.06,op:0.6,sf:0.72},{x:0.15,y:0.45,op:0.5,sf:0.6},
+    {x:0.85,y:0.55,op:0.55,sf:0.64},{x:0.25,y:0.18,op:0.65,sf:0.7},
+    {x:0.75,y:0.22,op:0.6,sf:0.75},{x:0.3,y:0.78,op:0.7,sf:0.85},
+    {x:0.7,y:0.82,op:0.65,sf:0.78},{x:0.5,y:0.5,op:0.4,sf:0.55},
+    {x:0.12,y:0.32,op:0.55,sf:0.65},{x:0.88,y:0.35,op:0.5,sf:0.6},
+    {x:0.42,y:0.15,op:0.6,sf:0.7},{x:0.58,y:0.88,op:0.55,sf:0.65},
+    {x:0.2,y:0.65,op:0.6,sf:0.72},{x:0.8,y:0.7,op:0.5,sf:0.6},
+    {x:0.45,y:0.4,op:0.45,sf:0.58},{x:0.65,y:0.38,op:0.5,sf:0.62}
   ];
   ctx.save();
-  ctx.font=`${stars[0].size}px ${fontEN}`;
+  ctx.font=`${baseSize}px ${fontEN}`;
   ctx.textAlign="center";ctx.textBaseline="middle";
-  stars.forEach(s=>{
-    ctx.globalAlpha=s.op;
-    ctx.font=`${s.size}px ${fontEN}`;
+  for(let i=0;i<starCount&&i<positions.length;i++){
+    const p=positions[i];
+    const sz=baseSize*p.sf;
+    ctx.globalAlpha=p.op;
+    ctx.font=`${sz}px ${fontEN}`;
     ctx.fillStyle="#ffffff";
-    ctx.fillText("✦",s.x,s.y);
+    ctx.fillText("✦",c.width*p.x,c.height*p.y);
     // 加一点金色光晕
     ctx.shadowColor="rgba(255,220,150,0.6)";
-    ctx.shadowBlur=s.size*0.4;
-    ctx.fillText("✦",s.x,s.y);
+    ctx.shadowBlur=sz*0.4;
+    ctx.fillText("✦",c.width*p.x,c.height*p.y);
     ctx.shadowBlur=0;
-  });
+  }
   ctx.restore();
 }
 
@@ -878,7 +918,7 @@ function drawManuscriptTitle(){
   // 主文字：金色+白色虚影双层（位于下半部分中央）
   if(mainText){
     const lines=mainText.split("\n").filter(l=>l.trim());
-    const fs=Math.floor(c.width*0.055);
+    const fs=Math.floor(c.width*(parseInt(document.getElementById("msMainSize").value)/1000));
     const lh=fs*1.5;
     const startY=c.height*0.6-(lines.length-1)*lh/2;
     lines.forEach((line,i)=>{
@@ -906,7 +946,7 @@ function drawManuscriptTitle(){
   // 散落小字装饰（中日英混排，右侧）
   if(scatter){
     const sLines=scatter.split("\n").filter(l=>l.trim());
-    const fs2=Math.floor(c.width*0.016);
+    const fs2=Math.floor(c.width*(parseInt(document.getElementById("msScatterSize").value)/1000));
     ctx.font=`italic ${fs2}px ${fontEN}`;
     ctx.fillStyle="rgba(255,240,210,0.7)";
     ctx.textAlign="right";
@@ -918,7 +958,7 @@ function drawManuscriptTitle(){
   }
   // 手写署名（左下，小一号金色）
   if(author){
-    const fs3=Math.floor(c.width*0.028);
+    const fs3=Math.floor(c.width*(parseInt(document.getElementById("msAuthorSize").value)/1000));
     ctx.font=`${fs3}px ${fontCN}`;
     ctx.fillStyle=tColor;
     ctx.textAlign="left";
@@ -933,7 +973,7 @@ function drawTornDivider(){
   if(!msTorn) return;
   const msMode=document.getElementById("msMode").checked;
   if(!msMode) return;
-  const barH=c.height*0.22;
+  const barH=c.height*(parseInt(document.getElementById("msBarH").value)/100);
   const y=barH;
   // 不规则撕纸边缘：上侧（信息栏底）带浅色毛刺，下侧（主视觉区）带模糊过渡
   ctx.save();
@@ -996,7 +1036,7 @@ function drawInfoBar(){
   if(!msInfoBar) return;
   const msMode=document.getElementById("msMode").checked;
   if(!msMode) return;
-  const barH=c.height*0.22;
+  const barH=c.height*(parseInt(document.getElementById("msBarH").value)/100);
   const author=document.getElementById("msAuthor").value;
   const price=document.getElementById("msPrice").value;
   const copyright=document.getElementById("msCopyright").value;
@@ -1016,7 +1056,7 @@ function drawInfoBar(){
   ctx.beginPath();ctx.moveTo(0,barH);ctx.lineTo(c.width,barH);ctx.stroke();
 
   // 头像（圆形裁切，左上）
-  const avatarR=barH*0.32;
+  const avatarR=barH*(parseInt(document.getElementById("msAvatarSize").value)/100);
   const avatarX=c.width*0.07+avatarR;
   const avatarY=barH*0.5;
   if(avatarImg){
@@ -1079,7 +1119,7 @@ function drawInfoBar(){
   // 右侧 Preview 大字（英文花体，金色+白描边，倾斜）
   if(previewText){
     const fontScript='"Great Vibes","Snell Roundhand","Cormorant Garamond",cursive';
-    const fs=Math.floor(c.width*0.045);
+    const fs=Math.floor(c.width*(parseInt(document.getElementById("msPreviewSize").value)/1000));
     ctx.save();
     ctx.translate(c.width*0.82,barH*0.55);
     ctx.rotate(-0.12);
@@ -1229,6 +1269,14 @@ function applyManuscriptPreset(){
   set("msSubtitleColor","#ffffff");
   set("msScatterText","Harris, I miss you.\nlove\n私は幸せ");
   set("msBlur","12");
+  set("msMainSize","55");
+  set("msPreviewSize","45");
+  set("msAvatarSize","32");
+  set("msScatterSize","16");
+  set("msAuthorSize","28");
+  set("msStarSize","25");
+  set("msBarH","22");
+  set("msStarCount","7");
   // 同步显示值
   document.getElementById("blurVal").textContent="0";
   document.getElementById("scaleVal").textContent="105";
@@ -1240,6 +1288,14 @@ function applyManuscriptPreset(){
   document.getElementById("texOpVal").textContent="35";
   document.getElementById("tornVal").textContent="15";
   document.getElementById("msBlurVal").textContent="12";
+  document.getElementById("msMainSizeVal").textContent="55";
+  document.getElementById("msPreviewSizeVal").textContent="45";
+  document.getElementById("msAvatarSizeVal").textContent="32";
+  document.getElementById("msScatterSizeVal").textContent="16";
+  document.getElementById("msAuthorSizeVal").textContent="28";
+  document.getElementById("msStarSizeVal").textContent="25";
+  document.getElementById("msBarHVal").textContent="22";
+  document.getElementById("msStarCountVal").textContent="7";
   onTexSourceChange();
   resizeCanvas();
   alert("字稿风预设已应用（IMG_6729 暖金风）！\n\n下一步：\n1. 在「④ 作品图」上传你的摄影图\n2. 点「从图片提取主色填入背景」自动配色\n3. 在「⑨ 字稿风模式」上传头像\n4. 调整署名 / 营业时间 / 版权 / 散落小字\n5. 点「导出 PNG」");
@@ -1293,7 +1349,15 @@ function getSettings(){
     msTitleColor:document.getElementById("msTitleColor").value,
     msSubtitleColor:document.getElementById("msSubtitleColor").value,
     msScatterText:document.getElementById("msScatterText").value,
-    msBlur:document.getElementById("msBlur").value
+    msBlur:document.getElementById("msBlur").value,
+    msMainSize:document.getElementById("msMainSize").value,
+    msPreviewSize:document.getElementById("msPreviewSize").value,
+    msAvatarSize:document.getElementById("msAvatarSize").value,
+    msScatterSize:document.getElementById("msScatterSize").value,
+    msAuthorSize:document.getElementById("msAuthorSize").value,
+    msStarSize:document.getElementById("msStarSize").value,
+    msBarH:document.getElementById("msBarH").value,
+    msStarCount:document.getElementById("msStarCount").value
   };
 }
 function applySettings(s){
@@ -1328,6 +1392,14 @@ function applySettings(s){
   set("msSubtitleColor",s.msSubtitleColor||"#ffffff");
   set("msScatterText",s.msScatterText||"Harris, I miss you.\nlove\n私は幸せ");
   set("msBlur",s.msBlur||"12");
+  set("msMainSize",s.msMainSize||"55");
+  set("msPreviewSize",s.msPreviewSize||"45");
+  set("msAvatarSize",s.msAvatarSize||"32");
+  set("msScatterSize",s.msScatterSize||"16");
+  set("msAuthorSize",s.msAuthorSize||"28");
+  set("msStarSize",s.msStarSize||"25");
+  set("msBarH",s.msBarH||"22");
+  set("msStarCount",s.msStarCount||"7");
   // 同步显示值
   document.getElementById("blurVal").textContent=s.bgBlur;
   document.getElementById("scaleVal").textContent=s.artScale;
@@ -1339,6 +1411,14 @@ function applySettings(s){
   document.getElementById("texOpVal").textContent=s.texOpacity;
   document.getElementById("tornVal").textContent=s.tornAmount;
   document.getElementById("msBlurVal").textContent=s.msBlur||12;
+  document.getElementById("msMainSizeVal").textContent=s.msMainSize||55;
+  document.getElementById("msPreviewSizeVal").textContent=s.msPreviewSize||45;
+  document.getElementById("msAvatarSizeVal").textContent=s.msAvatarSize||32;
+  document.getElementById("msScatterSizeVal").textContent=s.msScatterSize||16;
+  document.getElementById("msAuthorSizeVal").textContent=s.msAuthorSize||28;
+  document.getElementById("msStarSizeVal").textContent=s.msStarSize||25;
+  document.getElementById("msBarHVal").textContent=s.msBarH||22;
+  document.getElementById("msStarCountVal").textContent=s.msStarCount||7;
   onTexSourceChange();
   if((s.texSource||"preset")==="preset"){onTexPresetChange();}
   resizeCanvas();
@@ -1362,6 +1442,39 @@ function resetAll(){
   document.getElementById("texUpload").value="";
   document.getElementById("avatarUpload").value="";
   draw();
+}
+
+// ============ 吸管取色 ============
+let pickerActive=false;
+function enablePicker(){
+  if(pickerActive){return;}
+  pickerActive=true;
+  document.getElementById("pickerHint").style.display="block";
+  c.style.cursor="crosshair";
+  // 临时禁用文字/装饰干扰：但仍要绘制以便看到要吸的像素
+  const pickerClick=(e)=>{
+    if(!pickerActive) return;
+    const rect=c.getBoundingClientRect();
+    const sx=(e.clientX-rect.left)/rect.width*c.width;
+    const sy=(e.clientY-rect.top)/rect.height*c.height;
+    const px=Math.floor(sx),py=Math.floor(sy);
+    try{
+      const data=ctx.getImageData(px,py,1,1).data;
+      const hex="#"+("0"+data[0].toString(16)).slice(-2)+("0"+data[1].toString(16)).slice(-2)+("0"+data[2].toString(16)).slice(-2);
+      const target=document.getElementById("pickerTarget").value;
+      const el=document.getElementById(target);
+      if(el){el.value=hex;}
+      draw();
+      alert("已吸取颜色 "+hex+" → 填入「"+document.querySelector('#pickerTarget option:checked').textContent+"」");
+    }catch(err){
+      alert("吸取失败："+err.message);
+    }
+    pickerActive=false;
+    document.getElementById("pickerHint").style.display="none";
+    c.style.cursor="";
+    c.removeEventListener("click",pickerClick);
+  };
+  c.addEventListener("click",pickerClick);
 }
 
 // ============ 导出 ============
