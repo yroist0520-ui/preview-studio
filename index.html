@@ -654,6 +654,7 @@ love
 // ============ 解锁码系统 ============
 const UNLOCK_KEY="ps-unlock-v2";
 const UNLOCK_SECRET="PREVIEW-STUDIO-2026-SECRET-KEY";
+const UNLOCK_API=""; // TODO: 填入 Cloudflare Worker URL，如 "https://xxx.workers.dev"（留空则本地验证）
 const CARD_TYPES={
   DAY:{label:"日卡",ms:24*60*60*1000},
   MONTH:{label:"月卡",ms:30*24*60*60*1000},
@@ -731,11 +732,28 @@ function unlockNow(){
   if(expect!==checksum){msg.className="lock-msg err";msg.textContent="解锁码无效（校验失败）";return;}
   const now=Date.now();
   const expiresAt=type==="FOREVER"?0:now+card.ms;
-  localStorage.setItem(UNLOCK_KEY,JSON.stringify({type,expiresAt,activatedAt:now,code,deviceId:getDeviceFingerprint()}));
-  msg.className="lock-msg ok";
-  msg.textContent="✅ 解锁成功（已绑定本设备）！"+(type==="FOREVER"?"（永久）":"");
-  updateBadge();
-  setTimeout(()=>{document.getElementById("lockOverlay").style.display="none";},600);
+  const deviceId=getDeviceFingerprint();
+  const saveUnlock=()=>{
+    localStorage.setItem(UNLOCK_KEY,JSON.stringify({type,expiresAt,activatedAt:Date.now(),code,deviceId}));
+    msg.className="lock-msg ok";
+    msg.textContent="✅ 解锁成功（已绑定本设备）！"+(type==="FOREVER"?"（永久）":"");
+    updateBadge();
+    setTimeout(()=>{document.getElementById("lockOverlay").style.display="none";},600);
+  };
+  // 有后端：在线激活（统计次数 + 下架校验）；无后端：本地验证
+  if(UNLOCK_API){
+    msg.className="lock-msg";msg.textContent="正在激活…";
+    fetch(UNLOCK_API+"/activate",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({code,deviceId})
+    }).then(r=>r.json()).then(res=>{
+      if(res&&res.ok){saveUnlock();}
+      else if(res&&res.reason==="disabled"){msg.className="lock-msg err";msg.textContent="该解锁码已被下架，无法使用";}
+      else{msg.className="lock-msg err";msg.textContent="激活失败，解锁码无效";}
+    }).catch(()=>{msg.className="lock-msg err";msg.textContent="激活服务不可用，请稍后重试";});
+  }else{
+    saveUnlock();
+  }
 }
 function updateBadge(){
   const badge=document.getElementById("unlockBadge");
