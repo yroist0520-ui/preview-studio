@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
+<title>Preview Studio · 作品预览图生成器</title>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Snell+Roundhand&family=Apple+Chancery&family=Inter:wght@300;400;500;600;700;800&family=Cormorant+Garamond:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0d10;--bg-soft:#15151a;--card:#1a1a22;--border:#26262f;
+  --text:#e8e8ee;--muted:#8b8b95;--accent:#c9a37c;--accent-soft:#3a5a8a;
+  --radius:14px;--max:1280px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+.container{max-width:var(--max);margin:0 auto;padding:0 24px}
+
+/* NAVBAR */
+.nav{position:sticky;top:0;z-index:100;background:rgba(13,13,16,.78);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;height:64px;max-width:var(--max);margin:0 auto;padding:0 24px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;letter-spacing:-.3px}
+.brand-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#a87f5a);display:flex;align-items:center;justify-content:center;font-family:'Great Vibes',cursive;color:#fff;font-size:22px;box-shadow:0 4px 16px rgba(201,163,124,.35)}
+.nav-links{display:flex;gap:32px;font-size:14px;color:var(--muted)}
+.nav-links a{transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{padding:8px 18px;border-radius:8px;background:var(--accent);color:#1a1a1a;font-weight:600;font-size:14px;transition:transform .15s}
+.nav-cta:hover{transform:translateY(-1px)}
+@media(max-width:768px){.nav-links{display:none}.nav-cta{padding:6px 14px;font-size:13px}}
+
+/* HERO */
+.hero{padding:90px 0 70px;text-align:center;position:relative;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(201,163,124,.12),transparent 60%),radial-gradient(ellipse 60% 40% at 50% 100%,rgba(58,90,138,.08),transparent 60%)}
+.hero::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.04) 1px,transparent 0);background-size:32px 32px;pointer-events:none}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;background:rgba(201,163,124,.12);border:1px solid rgba(201,163,124,.25);color:var(--accent);font-size:13px;font-weight:500;margin-bottom:24px}
+.hero-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hero h1{font-size:clamp(40px,6vw,72px);font-weight:800;letter-spacing:-2px;margin-bottom:20px;line-height:1.05}
+.hero h1 .accent{font-family:'Great Vibes',cursive;font-weight:400;color:var(--accent);font-size:1.1em;display:inline-block;transform:translateY(4px)}
+.hero p{font-size:clamp(16px,2vw,19px);color:var(--muted);max-width:620px;margin:0 auto 36px}
+.hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn-primary{padding:14px 30px;border-radius:10px;background:var(--accent);color:#1a1a1a;font-weight:600;font-size:15px;transition:transform .15s,box-shadow .2s;box-shadow:0 6px 24px rgba(201,163,124,.3)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(201,163,124,.4)}
+.btn-ghost{padding:14px 30px;border-radius:10px;background:transparent;color:var(--text);border:1px solid var(--border);font-weight:500;font-size:15px;transition:border-color .2s,background .2s}
+.btn-ghost:hover{border-color:var(--accent);background:rgba(201,163,124,.06)}
+.hero-stats{display:flex;gap:48px;justify-content:center;margin-top:60px;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-num{font-size:32px;font-weight:700;color:var(--accent)}
+.stat-label{font-size:13px;color:var(--muted);margin-top:4px}
+
+/* SECTION */
+.section{padding:80px 0}
+.section-head{text-align:center;margin-bottom:56px}
+.section-eyebrow{color:var(--accent);font-size:13px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px}
+.section h2{font-size:clamp(28px,4vw,42px);font-weight:700;letter-spacing:-1px;margin-bottom:14px}
+.section-sub{color:var(--muted);font-size:16px;max-width:560px;margin:0 auto}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.feature{padding:28px;border-radius:var(--radius);background:var(--card);border:1px solid var(--border);transition:border-color .2s,transform .2s}
+.feature:hover{border-color:var(--accent);transform:translateY(-3px)}
+.feature-icon{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px;background:linear-gradient(135deg,rgba(201,163,124,.18),rgba(201,163,124,.04));border:1px solid rgba(201,163,124,.25)}
+.feature h3{font-size:17px;font-weight:600;margin-bottom:8px}
+.feature p{color:var(--muted);font-size:14px;line-height:1.55}
+
+/* TOOL */
+.tool-section{padding:80px 0 60px;background:linear-gradient(180deg,var(--bg) 0%,#0a0a0d 100%)}
+.tool-shell{display:flex;gap:0;border:1px solid var(--border);border-radius:16px;overflow:hidden;background:#0f0f13;box-shadow:0 30px 80px rgba(0,0,0,.5);max-height:88vh}
+.panel{width:340px;flex-shrink:0;padding:18px;background:#16161c;overflow:auto;border-right:1px solid var(--border)}
+.panel::-webkit-scrollbar{width:6px}
+.panel::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+.stage{flex:1;display:flex;align-items:center;justify-content:center;background:#070708;background-image:radial-gradient(circle at center,#1a1a22 0,#000 100%);min-height:600px}
+canvas{box-shadow:0 0 50px #000;max-width:90%;max-height:90%;object-fit:contain}
+h3.tool-h{font-size:13px;margin:14px 0 6px;color:#9a9aa3;border-bottom:1px solid #2a2a35;padding-bottom:4px;letter-spacing:.5px}
+button,select,input[type=text],input[type=number],textarea{width:100%;margin:5px 0;padding:8px;background:#21212a;color:#fff;border:1px solid #3a3a45;border-radius:7px;font-size:12px;font-family:inherit}
+button{cursor:pointer;transition:background .15s}
+button:hover{background:#2c2c38}
+button.primary{background:var(--accent);border-color:var(--accent);color:#1a1a1a;font-weight:600}
+button.primary:hover{background:#d4b08c}
+button.warn{background:#6a3a3a;border-color:#8a5a5a}
+button.small{width:auto;padding:6px 12px;margin:2px;display:inline-block}
+.row{display:flex;gap:6px}
+.row>button{flex:1;margin:2px}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+label{display:block;font-size:11px;color:#8b8b95;margin:6px 0 3px}
+input[type=range]{width:100%;margin:4px 0}
+input[type=color]{width:100%;height:32px;padding:2px;background:#21212a;border:1px solid #3a3a45;border-radius:6px}
+input[type=file]{font-size:11px}
+.preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.hint{font-size:10px;color:#666;line-height:1.5;margin:4px 0}
+.checkbox-row{display:flex;align-items:center;gap:6px;margin:5px 0;font-size:11px;color:#8b8b95}
+.checkbox-row input[type=checkbox]{width:auto;margin:0}
+.ms-btn{background:#3a2a4a;border-color:#5a3a6a;color:#e8d8f8}
+.ms-btn:hover{background:#4a3a5a}
+
+/* STEPS */
+.steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px;margin-top:8px}
+.step{position:relative;padding-left:20px}
+.step-num{width:36px;height:36px;border-radius:50%;background:rgba(201,163,124,.12);border:1px solid rgba(201,163,124,.3);color:var(--accent);font-weight:700;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.step h4{font-size:16px;font-weight:600;margin-bottom:6px}
+.step p{color:var(--muted);font-size:14px;line-height:1.6}
+
+.cta-banner{margin:40px 0 80px;padding:56px 40px;border-radius:20px;text-align:center;background:radial-gradient(ellipse at center,rgba(201,163,124,.15),transparent 70%),linear-gradient(135deg,#1a1a22,#22222c);border:1px solid var(--border)}
+.cta-banner h2{font-size:clamp(24px,3.5vw,36px);font-weight:700;margin-bottom:12px}
+.cta-banner p{color:var(--muted);margin-bottom:28px}
+
+/* FOOTER */
+.footer{padding:48px 0 32px;border-top:1px solid var(--border);background:#0a0a0d}
+.footer-inner{display:flex;justify-content:space-between;flex-wrap:wrap;gap:32px}
+.footer-brand{max-width:300px}
+.footer-brand p{color:var(--muted);font-size:13px;margin-top:10px;line-height:1.6}
+.footer-cols{display:flex;gap:60px;flex-wrap:wrap}
+.footer-col h5{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text)}
+.footer-col a{display:block;color:var(--muted);font-size:13px;margin-bottom:8px;transition:color .15s}
+.footer-col a:hover{color:var(--accent)}
+.footer-bottom{margin-top:40px;padding-top:24px;border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;color:var(--muted);font-size:12px}
+
+/* 移动端 / 平板响应式 */
+@media(max-width:1024px){
+  .tool-shell{flex-direction:column;max-height:none}
+  .panel{width:100%;max-height:50vh;border-right:none;border-bottom:1px solid var(--border)}
+  .stage{min-height:50vh}
+  canvas{max-width:98%;max-height:98%}
+}
+@media(max-width:768px){
+  .container{padding:0 16px}
+  .nav-inner{height:56px;padding:0 16px}
+  .hero{padding:60px 0 50px}
+  .hero-stats{gap:24px;margin-top:40px}
+  .stat-num{font-size:26px}
+  .section{padding:60px 0}
+  .panel{max-height:45vh;padding:14px}
+  .stage{min-height:45vh}
+  button,select,input[type=text],input[type=number],textarea{font-size:13px;padding:10px}
+  .preset-grid{grid-template-columns:1fr 1fr}
+  .footer-cols{gap:32px}
+}
+@media(max-width:480px){
+  .hero h1{font-size:34px;letter-spacing:-1px}
+  .hero p{font-size:14px}
+  .btn-primary,.btn-ghost{padding:12px 22px;font-size:14px}
+  .panel{max-height:40vh}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#top" class="brand"><div class="brand-logo">P</div><span>Preview Studio</span></a>
+    <div class="nav-links">
+      <a href="#features">功能</a><a href="#tool">工具</a><a href="#how">教程</a><a href="#about">关于</a>
+    </div>
+    <a href="#tool" class="nav-cta">立即使用</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="container">
+    <div class="hero-eyebrow"><span class="dot"></span><span>v4.0 · 字稿风预设 + 智能取色</span></div>
+    <h1>把你的作品<br>变成<span class="accent">Preview</span>级视觉</h1>
+    <p>专为创作者打造的作品预览图生成器。新增字稿风模式：图片铺满 + 智能取色 + 头像署名 + 四角星装饰，一键导出适配手机 / 平板 / 1:1 正方形的 PNG。</p>
+    <div class="hero-cta">
+      <a href="#tool" class="btn-primary">开始创作</a>
+      <a href="#features" class="btn-ghost">查看功能</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">12</div><div class="stat-label">画布尺寸预设</div></div>
+      <div class="stat"><div class="stat-num">4</div><div class="stat-label">内置撕纸素材</div></div>
+      <div class="stat"><div class="stat-num">5</div><div class="stat-label">本地预设槽位</div></div>
+      <div class="stat"><div class="stat-num">1</div><div class="stat-label">字稿风预设</div></div>
+    </div>
+  </div>
+</header>
+
+<section class="section" id="features">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">Features</div>
+      <h2>一个工具，搞定预览图全部细节</h2>
+      <p class="section-sub">从背景到文字、从作品图到撕纸纹理，每一项都为你调好。</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature"><div class="feature-icon">✦</div><h3>字稿风模式</h3><p>图片铺满画布 + 冷调滤镜 + 底部信息栏 + 头像署名 + 四角星装饰，一键还原字稿圈美学。</p></div>
+      <div class="feature"><div class="feature-icon">🎨</div><h3>智能取色渐变</h3><p>上传图片后一键采样像素，自动提取主色 + 副色，填入背景渐变，配色不再凭感觉。</p></div>
+      <div class="feature"><div class="feature-icon">🖼️</div><h3>作品图描边 + 向下投影</h3><p>描边颜色可选，独立的向下投影距离、模糊、角度可调。</p></div>
+      <div class="feature"><div class="feature-icon">📜</div><h3>内置 4 种撕纸素材</h3><p>牛皮纸 / 米色宣纸 / 白卡 / 复古纸，Canvas 离屏生成，免上传。</p></div>
+      <div class="feature"><div class="feature-icon">🌫️</div><h3>上下羽化蒙版</h3><p>作品图上方 / 下方 / 上下双羽化，羽化宽度可调，柔和过渡到背景。</p></div>
+      <div class="feature"><div class="feature-icon">📐</div><h3>iPhone / iPad 横竖屏 / 1:1</h3><p>12 种画布尺寸，覆盖手机壁纸、平板横屏壁纸、社交正方形封面。</p></div>
+      <div class="feature"><div class="feature-icon">✍️</div><h3>手写英文 + 楷体中文</h3><p>顶部 Great Vibes 手写体英文，底部 KaiTi 楷体中文多行排版。</p></div>
+      <div class="feature"><div class="feature-icon">💾</div><h3>5 槽位本地预设</h3><p>所有参数一键保存到 localStorage，5 个独立槽位 + 字稿风一键应用。</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="tool-section" id="tool">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">Studio</div>
+      <h2>在线工具台</h2>
+      <p class="section-sub">所有操作即时渲染，左边调参，右边看效果。手机、平板、电脑全适配。</p>
+    </div>
+
+    <div class="tool-shell">
+      <aside class="panel">
+        <h3 class="tool-h">① 画布尺寸</h3>
+        <select id="size">
+          <optgroup label="iPhone 壁纸">
+            <option value="1080,1920">iPhone 1080×1920</option>
+            <option value="1179,2556">iPhone 1179×2556</option>
+            <option value="1290,2796">iPhone 1290×2796</option>
+          </optgroup>
+          <optgroup label="iPad 竖屏壁纸">
+            <option value="1668,2388">iPad 竖 1668×2388</option>
+            <option value="2048,2732">iPad 竖 2048×2732</option>
+          </optgroup>
+          <optgroup label="iPad 横屏壁纸">
+            <option value="2388,1668">iPad 横 2388×1668</option>
+            <option value="2732,2048">iPad 横 2732×2048</option>
+          </optgroup>
+          <optgroup label="1:1 正方形">
+            <option value="1080,1080">正方形 1080×1080</option>
+            <option value="2048,2048">正方形 2048×2048</option>
+            <option value="1500,1500" selected>正方形 1500×1500</option>
+          </optgroup>
+          <optgroup label="3:4 竖版">
+            <option value="1500,2000">3:4 竖 1500×2000</option>
+            <option value="1200,1600">3:4 竖 1200×1600</option>
+          </optgroup>
+        </select>
+        <button onclick="resizeCanvas()">切换尺寸</button>
+
+        <h3 class="tool-h">② 预设管理</h3>
+        <button class="primary" onclick="applyManuscriptPreset()" style="margin-bottom:6px">✦ 一键应用字稿风预设</button>
+        <div class="preset-grid">
+          <button class="primary small" onclick="savePreset(1)">存到 1</button>
+          <button class="primary small" onclick="loadPreset(1)">载入 1</button>
+          <button class="primary small" onclick="savePreset(2)">存到 2</button>
+          <button class="primary small" onclick="loadPreset(2)">载入 2</button>
+          <button class="primary small" onclick="savePreset(3)">存到 3</button>
+          <button class="primary small" onclick="loadPreset(3)">载入 3</button>
+          <button class="primary small" onclick="savePreset(4)">存到 4</button>
+          <button class="primary small" onclick="loadPreset(4)">载入 4</button>
+          <button class="primary small" onclick="savePreset(5)">存到 5</button>
+          <button class="primary small" onclick="loadPreset(5)">载入 5</button>
+        </div>
+        <button class="warn" onclick="resetAll()" style="margin-top:6px">清空当前设置</button>
+
+        <h3 class="tool-h">③ 背景</h3>
+        <label>背景类型</label>
+        <select id="bgType" onchange="draw()">
+          <option value="solid">纯色</option>
+          <option value="gradient" selected>渐变（暖色调）</option>
+          <option value="dark">深色</option>
+        </select>
+        <label>主色</label>
+        <input type="color" id="bgColor1" value="#f0e6d0" onchange="draw()">
+        <label>副色（渐变用）</label>
+        <input type="color" id="bgColor2" value="#e8d5b5" onchange="draw()">
+        <label>渐变方向</label>
+        <select id="bgDir" onchange="draw()">
+          <option value="v" selected>上→下</option>
+          <option value="h">左→右</option>
+          <option value="d">左上→右下</option>
+          <option value="r">径向</option>
+        </select>
+        <label>背景高斯模糊强度: <span id="blurVal">0</span>px</label>
+        <input type="range" id="bgBlur" min="0" max="80" value="0" oninput="document.getElementById('blurVal').textContent=this.value;draw()">
+
+        <h3 class="tool-h">④ 作品图</h3>
+        <input type="file" id="upload" accept="image/*">
+        <button class="ms-btn" onclick="extractColors()" style="margin:4px 0">✦ 从图片提取主色填入背景</button>
+        <label>缩放比例: <span id="scaleVal">100</span>%</label>
+        <input type="range" id="artScale" min="20" max="150" value="100" oninput="document.getElementById('scaleVal').textContent=this.value;draw()">
+        <label>描边颜色</label>
+        <input type="color" id="borderColor" value="#ffffff" onchange="draw()">
+        <label>描边宽度: <span id="borderVal">24</span>px</label>
+        <input type="range" id="artBorder" min="0" max="80" value="24" oninput="document.getElementById('borderVal').textContent=this.value;draw()">
+        <label>向下投影距离: <span id="shadowDVal">20</span>px</label>
+        <input type="range" id="shadowDist" min="0" max="80" value="20" oninput="document.getElementById('shadowDVal').textContent=this.value;draw()">
+        <label>投影模糊: <span id="shadowBVal">25</span>px</label>
+        <input type="range" id="shadowBlur" min="0" max="60" value="25" oninput="document.getElementById('shadowBVal').textContent=this.value;draw()">
+        <label>投影透明度: <span id="shadowOVal">45</span>%</label>
+        <input type="range" id="shadowOp" min="0" max="100" value="45" oninput="document.getElementById('shadowOVal').textContent=this.value;draw()">
+        <label>投影角度（偏移方向）</label>
+        <select id="shadowAngle" onchange="draw()">
+          <option value="90" selected>正下方</option>
+          <option value="120">左下</option>
+          <option value="60">右下</option>
+          <option value="0">无偏移（光晕）</option>
+        </select>
+        <div class="row">
+          <button class="small" onclick="front()">置顶</button>
+          <button class="small" onclick="back()">置底</button>
+          <button class="small" onclick="removeArt()">删除</button>
+        </div>
+
+        <h3 class="tool-h">⑤ 羽化蒙版（作品图边缘）</h3>
+        <label>羽化模式</label>
+        <select id="featherMode" onchange="draw()">
+          <option value="none" selected>无羽化</option>
+          <option value="top">上方羽化</option>
+          <option value="bottom">下方羽化</option>
+          <option value="both">上下双羽化</option>
+          <option value="all">四周羽化</option>
+        </select>
+        <label>羽化宽度: <span id="featherVal">120</span>px</label>
+        <input type="range" id="featherW" min="20" max="400" value="120" oninput="document.getElementById('featherVal').textContent=this.value;draw()">
+        <div class="hint">作品图边缘会渐变透明，融合到背景中。</div>
+
+        <h3 class="tool-h">⑥ 纸张纹理 / 撕纸效果</h3>
+        <label>纹理来源</label>
+        <select id="texSource" onchange="onTexSourceChange()">
+          <option value="preset" selected>内置预设素材</option>
+          <option value="upload">上传自定义纹理</option>
+          <option value="none">无纹理</option>
+        </select>
+        <div id="presetTexRow">
+          <label>预设撕纸素材</label>
+          <select id="texPreset" onchange="onTexPresetChange()">
+            <option value="kraft" selected>牛皮纸（暖棕）</option>
+            <option value="xuan">米色宣纸</option>
+            <option value="card">白色卡纸</option>
+            <option value="vintage">复古纸（斑点）</option>
+          </select>
+        </div>
+        <div id="uploadTexRow" style="display:none">
+          <input type="file" id="texUpload" accept="image/*">
+        </div>
+        <label>纹理透明度: <span id="texOpVal">35</span>%</label>
+        <input type="range" id="texOpacity" min="0" max="100" value="35" oninput="document.getElementById('texOpVal').textContent=this.value;draw()">
+        <div class="checkbox-row"><input type="checkbox" id="tornEdge" onchange="draw()" checked><span>启用撕纸边缘效果</span></div>
+        <label>撕纸强度: <span id="tornVal">15</span></label>
+        <input type="range" id="tornAmount" min="5" max="40" value="15" oninput="document.getElementById('tornVal').textContent=this.value;draw()">
+
+        <h3 class="tool-h">⑦ 文字</h3>
+        <label>英文标题（手写体）</label>
+        <input type="text" id="textEN" value="Preview" oninput="draw()">
+        <label>中文内容（楷体，可多行）</label>
+        <textarea id="textCN" rows="3" oninput="draw()">营业时间 9:00-18:00
+版权所有 © 2026</textarea>
+        <label>英文颜色</label>
+        <input type="color" id="colorEN" value="#5a4a3a" onchange="draw()">
+        <label>中文颜色</label>
+        <input type="color" id="colorCN" value="#4a3a2a" onchange="draw()">
+        <label>文字位置</label>
+        <select id="textPos" onchange="draw()">
+          <option value="tb" selected>顶英 / 底中</option>
+          <option value="bt">顶中 / 底英</option>
+          <option value="cc">全部居中</option>
+          <option value="bc">全部底部</option>
+        </select>
+
+        <h3 class="tool-h">⑧ 装饰</h3>
+        <label>外框颜色</label>
+        <input type="color" id="strokeColor" value="#ffffff" onchange="draw()">
+        <div class="checkbox-row"><input type="checkbox" id="decBorder" onchange="draw()"><span>绘制外框</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="decSilk" onchange="draw()"><span>丝质曲线</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="decDots" onchange="draw()"><span>点阵装饰</span></div>
+
+        <h3 class="tool-h">⑨ 字稿风模式（IMG_6729 暖金风）</h3>
+        <div class="checkbox-row"><input type="checkbox" id="msMode" onchange="draw()"><span>启用字稿风（图片模糊铺满 + 暖金叠加）</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="msStars" onchange="draw()"><span>✦ 装饰符号</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="msInfoBar" onchange="draw()"><span>顶部信息栏（头像 + 版权 + 营业时间）</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="msTornDivider" onchange="draw()"><span>中间撕纸过渡边缘</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="msRoundedCard" onchange="draw()"><span>圆角卡片容器</span></div>
+        <label>头像（圆形裁切到顶部信息栏）</label>
+        <input type="file" id="avatarUpload" accept="image/*">
+        <label>作者署名（手写体，画面左下）</label>
+        <input type="text" id="msAuthor" value="裴砚" oninput="draw()">
+        <label>营业时间</label>
+        <input type="text" id="msPrice" value="营业时间:10:00-22:00" oninput="draw()">
+        <label>版权声明（全大写英文，顶部右侧）</label>
+        <textarea id="msCopyright" rows="2" oninput="draw()">DO NOT STEAL IMAGES, IMITATE OR PLAGIARIZE</textarea>
+        <label>素材来源（Material source 下方）</label>
+        <input type="text" id="msMaterial" value="@底素网络 素材xxx" oninput="draw()">
+        <label>右侧英文花体大字（Preview 标识）</label>
+        <input type="text" id="msPreviewText" value="Preview" oninput="draw()">
+        <label>中文手写主文字（多行，金色+虚影双层）</label>
+        <textarea id="msVerticalText" rows="3" oninput="draw()">我很爱我普通的生活
+我们都是走向幸福的人</textarea>
+        <label>主文字颜色（金色渐变）</label>
+        <input type="color" id="msTitleColor" value="#d4a574" onchange="draw()">
+        <label>虚影颜色（白色半透明）</label>
+        <input type="color" id="msSubtitleColor" value="#ffffff" onchange="draw()">
+        <label>散落小字装饰（中日英混排，每行一句）</label>
+        <textarea id="msScatterText" rows="3" oninput="draw()">Harris, I miss you.
+love
+私は幸せ</textarea>
+        <label>背景图模糊强度: <span id="msBlurVal">12</span>px</label>
+        <input type="range" id="msBlur" min="0" max="40" value="12" oninput="document.getElementById('msBlurVal').textContent=this.value;draw()">
+
+        <h3 class="tool-h">⑩ 导出</h3>
+        <button class="primary" onclick="exportPNG()">导出 PNG</button>
+        <div class="hint" style="margin-top:10px">提示：预设只保存参数，自定义纹理图和头像需重新上传。</div>
+      </aside>
+
+      <div class="stage">
+        <canvas id="c" width="1500" height="1500"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how" style="background:var(--bg-soft)">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">How it works</div>
+      <h2>四步出图</h2>
+      <p class="section-sub">从打开页面到导出 PNG，全流程不超过 30 秒。</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step"><div class="step-num">1</div><h4>选尺寸 / 一键字稿风</h4><p>选 12 种画布尺寸任一，或直接点「一键应用字稿风预设」自动配好全部参数。</p></div>
+      <div class="step"><div class="step-num">2</div><h4>上传作品 + 智能取色</h4><p>「④」上传主图后点「从图片提取主色」，背景渐变自动跟随图片色调。</p></div>
+      <div class="step"><div class="step-num">3</div><h4>调字稿风细节</h4><p>开字稿风模式，上传头像、填署名、调四角星 / 竖排英文 / 底部信息栏。</p></div>
+      <div class="step"><div class="step-num">4</div><h4>存预设并导出</h4><p>满意后点「存到 1」留档，再点「导出 PNG」即下载，手机平板电脑全兼容。</p></div>
+    </div>
+    <div class="cta-banner">
+      <h2>准备好了吗？</h2>
+      <p>所有渲染在浏览器本地完成，不上传任何图片，安全又快速。手机、平板、电脑均可使用。</p>
+      <a href="#tool" class="btn-primary">立即开始创作</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer" id="about">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href="#top" class="brand"><div class="brand-logo">P</div><span>Preview Studio</span></a>
+        <p>面向创作者的作品预览图生成器。Canvas 渲染、本地存储、零依赖、一键导出、全设备适配。</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col"><h5>产品</h5><a href="#features">功能特性</a><a href="#tool">在线工具</a><a href="#how">使用教程</a></div>
+        <div class="footer-col"><h5>资源</h5><a href="#">更新日志</a><a href="#">字体说明</a><a href="#">纹理素材</a></div>
+        <div class="footer-col"><h5>关于</h5><a href="#">项目背景</a><a href="#">技术栈</a><a href="#">反馈建议</a></div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Preview Studio. All rights reserved.</span>
+      <span>Built with Canvas API · No backend · 100% local · Mobile ready</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+const c=document.getElementById("c");
+const ctx=c.getContext("2d");
+let layers=[];
+let textureImg=null;
+let presetTextureImg=null;
+let avatarImg=null;
+
+// ============ 画布尺寸 ============
+function resizeCanvas(){
+  const s=document.getElementById("size").value.split(",");
+  c.width=parseInt(s[0]);c.height=parseInt(s[1]);
+  draw();
+}
+
+// ============ 图片上传 ============
+document.getElementById("upload").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const img=new Image();
+  img.onload=()=>{layers.push(img);draw();};
+  img.src=URL.createObjectURL(f);
+};
+document.getElementById("texUpload").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const img=new Image();
+  img.onload=()=>{textureImg=img;draw();};
+  img.src=URL.createObjectURL(f);
+};
+document.getElementById("avatarUpload").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const img=new Image();
+  img.onload=()=>{avatarImg=img;draw();};
+  img.src=URL.createObjectURL(f);
+};
+
+// ============ 智能取色：从上传图片提取主色+副色 ============
+function extractColors(){
+  if(!layers.length){alert("请先在「④ 作品图」上传一张图片");return;}
+  const img=layers[layers.length-1];
+  // 离屏采样：缩到 100×100 加速
+  const sw=100,sh=100;
+  const off=document.createElement("canvas");
+  off.width=sw;off.height=sh;
+  const o=off.getContext("2d");
+  o.drawImage(img,0,0,sw,sh);
+  const data=o.getImageData(0,0,sw,sh).data;
+  // 按 16 级分桶（每通道量化到 16 档）
+  const buckets={};
+  for(let i=0;i<data.length;i+=4){
+    const r=Math.floor(data[i]/16)*16;
+    const g=Math.floor(data[i+1]/16)*16;
+    const b=Math.floor(data[i+2]/16)*16;
+    const a=data[i+3];
+    if(a<128) continue; // 跳过透明像素
+    const key=r+"_"+g+"_"+b;
+    if(!buckets[key]) buckets[key]={count:0,r:r,g:g,b:b};
+    buckets[key].count++;
+  }
+  const sorted=Object.values(buckets).sort((a,b)=>b.count-a.count);
+  if(!sorted.length){alert("无法提取颜色");return;}
+  // 跳过接近纯黑/纯白的桶，找有色彩的主色
+  const isVivid=(c)=>{
+    const max=Math.max(c.r,c.g,c.b),min=Math.min(c.r,c.g,c.b);
+    return (max-min)>20 && max<245 && min>15;
+  };
+  let main=sorted[0],sub=sorted[1]||sorted[0];
+  // 优先选有色彩的主色
+  const vivid=sorted.filter(isVivid);
+  if(vivid.length){main=vivid[0];sub=vivid[1]||vivid[0];}
+  // 转 hex
+  const toHex=v=>("0"+v.toString(16)).slice(-2);
+  const hex=v=>"#"+toHex(v.r)+toHex(v.g)+toHex(v.b);
+  // 主色提亮 10% 作为渐变起点，副色加深 10% 作为终点
+  const lighten=(c,d)=>({r:Math.min(255,c.r+d),g:Math.min(255,c.g+d),b:Math.min(255,c.b+d)});
+  const darken=(c,d)=>({r:Math.max(0,c.r-d),g:Math.max(0,c.g-d),b:Math.max(0,c.b-d)});
+  const c1=hex(lighten(main,20));
+  const c2=hex(darken(sub,20));
+  document.getElementById("bgColor1").value=c1;
+  document.getElementById("bgColor2").value=c2;
+  document.getElementById("bgType").value="gradient";
+  document.getElementById("bgDir").value="v";
+  // 文字颜色用主色提亮到接近白
+  const txtC=hex(lighten(main,80));
+  document.getElementById("colorEN").value=txtC;
+  document.getElementById("colorCN").value=txtC;
+  document.getElementById("msTitleColor").value=txtC;
+  document.getElementById("msSubtitleColor").value=hex(lighten(sub,60));
+  draw();
+  alert("已提取主色 "+c1+" / 副色 "+c2+" 并填入背景渐变");
+}
+
+// ============ 内置撕纸素材生成 ============
+function generatePaperTexture(type,w,h){
+  w=w||1200;h=h||1600;
+  const off=document.createElement("canvas");
+  off.width=w;off.height=h;
+  const o=off.getContext("2d");
+  const rnd=(min,max)=>min+Math.random()*(max-min);
+  if(type==="kraft"){
+    const g=o.createLinearGradient(0,0,w,h);
+    g.addColorStop(0,"#c9a37c");g.addColorStop(.5,"#b8895e");g.addColorStop(1,"#a0744a");
+    o.fillStyle=g;o.fillRect(0,0,w,h);
+    o.globalAlpha=.08;
+    for(let i=0;i<800;i++){
+      o.strokeStyle=Math.random()>.5?"#5a3a1a":"#8a6a3a";
+      o.lineWidth=rnd(.3,1.2);
+      o.beginPath();
+      const x1=Math.random()*w,y1=Math.random()*h;
+      const ang=Math.random()*Math.PI*2,len=rnd(20,80);
+      o.moveTo(x1,y1);o.lineTo(x1+Math.cos(ang)*len,y1+Math.sin(ang)*len);o.stroke();
+    }
+    o.globalAlpha=.12;
+    for(let i=0;i<150;i++){
+      o.fillStyle=Math.random()>.5?"#7a5a3a":"#3a2a1a";
+      const r=rnd(1,4);
+      o.beginPath();o.arc(Math.random()*w,Math.random()*h,r,0,Math.PI*2);o.fill();
+    }
+    o.globalAlpha=1;
+  }else if(type==="xuan"){
+    const g=o.createLinearGradient(0,0,0,h);
+    g.addColorStop(0,"#f5ebd6");g.addColorStop(1,"#ebe0c2");
+    o.fillStyle=g;o.fillRect(0,0,w,h);
+    o.globalAlpha=.06;
+    for(let i=0;i<1500;i++){
+      o.strokeStyle=Math.random()>.5?"#a08050":"#c9a37c";
+      o.lineWidth=rnd(.2,.8);
+      o.beginPath();
+      const x1=Math.random()*w,y1=Math.random()*h;
+      const ang=Math.random()*Math.PI*2,len=rnd(15,50);
+      o.moveTo(x1,y1);o.lineTo(x1+Math.cos(ang)*len,y1+Math.sin(ang)*len);o.stroke();
+    }
+    o.globalAlpha=1;
+  }else if(type==="card"){
+    const g=o.createRadialGradient(w/2,h/2,0,w/2,h/2,Math.max(w,h)*.7);
+    g.addColorStop(0,"#fdfbf7");g.addColorStop(1,"#f0ebe0");
+    o.fillStyle=g;o.fillRect(0,0,w,h);
+    o.globalAlpha=.04;
+    for(let i=0;i<2000;i++){
+      o.strokeStyle="#666";
+      o.lineWidth=rnd(.2,.6);
+      o.beginPath();
+      const x1=Math.random()*w,y1=Math.random()*h;
+      const ang=Math.random()*Math.PI*2,len=rnd(10,40);
+      o.moveTo(x1,y1);o.lineTo(x1+Math.cos(ang)*len,y1+Math.sin(ang)*len);o.stroke();
+    }
+    o.globalAlpha=1;
+  }else if(type==="vintage"){
+    const g=o.createLinearGradient(0,0,w,h);
+    g.addColorStop(0,"#e8d8b0");g.addColorStop(.6,"#d4c089");g.addColorStop(1,"#b89a6a");
+    o.fillStyle=g;o.fillRect(0,0,w,h);
+    o.globalAlpha=.18;
+    for(let i=0;i<80;i++){
+      o.fillStyle=["#8a6a3a","#5a3a1a","#6a4a2a"][Math.floor(Math.random()*3)];
+      const r=rnd(8,30);
+      o.beginPath();o.arc(Math.random()*w,Math.random()*h,r,0,Math.PI*2);o.fill();
+    }
+    o.globalAlpha=.15;
+    for(let i=0;i<400;i++){
+      o.fillStyle=Math.random()>.5?"#4a3a1a":"#8a6a3a";
+      const r=rnd(1,3);
+      o.beginPath();o.arc(Math.random()*w,Math.random()*h,r,0,Math.PI*2);o.fill();
+    }
+    o.globalAlpha=.08;
+    for(let i=0;i<600;i++){
+      o.strokeStyle="#3a2a1a";
+      o.lineWidth=rnd(.3,1);
+      o.beginPath();
+      const x1=Math.random()*w,y1=Math.random()*h;
+      const ang=Math.random()*Math.PI*2,len=rnd(20,70);
+      o.moveTo(x1,y1);o.lineTo(x1+Math.cos(ang)*len,y1+Math.sin(ang)*len);o.stroke();
+    }
+    o.globalAlpha=1;
+  }
+  return off;
+}
+
+function onTexSourceChange(){
+  const src=document.getElementById("texSource").value;
+  document.getElementById("presetTexRow").style.display=src==="preset"?"block":"none";
+  document.getElementById("uploadTexRow").style.display=src==="upload"?"block":"none";
+  if(src==="preset"){onTexPresetChange();}
+  else if(src==="upload"){presetTextureImg=null;if(!textureImg) draw();}
+  else{presetTextureImg=null;textureImg=null;draw();}
+}
+function onTexPresetChange(){
+  const type=document.getElementById("texPreset").value;
+  presetTextureImg=generatePaperTexture(type);
+  draw();
+}
+
+// ============ 图层操作 ============
+function front(){if(layers.length){layers.push(layers.shift());draw();}}
+function back(){if(layers.length){layers.unshift(layers.pop());draw();}}
+function removeArt(){layers=[];draw();}
+
+// ============ 背景绘制 ============
+function drawBackground(){
+  const type=document.getElementById("bgType").value;
+  const c1=document.getElementById("bgColor1").value;
+  const c2=document.getElementById("bgColor2").value;
+  const dir=document.getElementById("bgDir").value;
+  let grad;
+  if(type==="solid"){ctx.fillStyle=c1;ctx.fillRect(0,0,c.width,c.height);}
+  else if(type==="gradient"){
+    if(dir==="v") grad=ctx.createLinearGradient(0,0,0,c.height);
+    else if(dir==="h") grad=ctx.createLinearGradient(0,0,c.width,0);
+    else if(dir==="d") grad=ctx.createLinearGradient(0,0,c.width,c.height);
+    else grad=ctx.createRadialGradient(c.width/2,c.height/2,Math.min(c.width,c.height)*0.1,c.width/2,c.height/2,Math.max(c.width,c.height)*0.7);
+    grad.addColorStop(0,c1);grad.addColorStop(1,c2);
+    ctx.fillStyle=grad;ctx.fillRect(0,0,c.width,c.height);
+  }else{
+    grad=ctx.createLinearGradient(0,0,0,c.height);
+    grad.addColorStop(0,"#1a1a1a");grad.addColorStop(1,"#000");
+    ctx.fillStyle=grad;ctx.fillRect(0,0,c.width,c.height);
+  }
+}
+
+// ============ 撕纸边缘路径 ============
+function tornPath(x,y,w,h,amount){
+  const p=new Path2D();
+  const steps=Math.max(8,Math.floor(w/30));
+  p.moveTo(x,y);
+  for(let i=0;i<=steps;i++){p.lineTo(x+(w*i/steps),y+(Math.random()-0.5)*amount*2);}
+  const stepsR=Math.max(8,Math.floor(h/30));
+  for(let i=1;i<=stepsR;i++){p.lineTo(x+w+(Math.random()-0.5)*amount*2,y+(h*i/stepsR));}
+  for(let i=1;i<=steps;i++){p.lineTo(x+w-(w*i/steps),y+h+(Math.random()-0.5)*amount*2);}
+  for(let i=1;i<=stepsR;i++){p.lineTo(x+(Math.random()-0.5)*amount*2,y+h-(h*i/stepsR));}
+  p.closePath();return p;
+}
+
+// ============ 纸张纹理绘制 ============
+function drawTexture(){
+  const src=document.getElementById("texSource").value;
+  let tex=null;
+  if(src==="preset"&&presetTextureImg) tex=presetTextureImg;
+  else if(src==="upload"&&textureImg) tex=textureImg;
+  else return;
+  const op=parseInt(document.getElementById("texOpacity").value)/100;
+  const torn=document.getElementById("tornEdge").checked;
+  const amount=parseInt(document.getElementById("tornAmount").value);
+  ctx.save();
+  ctx.globalAlpha=op;
+  if(torn){
+    const margin=Math.min(c.width,c.height)*0.02;
+    ctx.clip(tornPath(margin,margin,c.width-margin*2,c.height-margin*2,amount));
+  }
+  const r=Math.max(c.width/tex.width,c.height/tex.height);
+  const tw=tex.width*r,th=tex.height*r;
+  ctx.drawImage(tex,(c.width-tw)/2,(c.height-th)/2,tw,th);
+  ctx.restore();
+}
+
+// ============ 作品图绘制 ============
+function drawArtwork(){
+  const msMode=document.getElementById("msMode").checked;
+  const scale=parseInt(document.getElementById("artScale").value)/100;
+  const border=parseInt(document.getElementById("artBorder").value);
+  const borderColor=document.getElementById("borderColor").value;
+  const sDist=parseInt(document.getElementById("shadowDist").value);
+  const sBlur=parseInt(document.getElementById("shadowBlur").value);
+  const sOp=parseInt(document.getElementById("shadowOp").value)/100;
+  const sAng=parseInt(document.getElementById("shadowAngle").value)*Math.PI/180;
+  const featherMode=document.getElementById("featherMode").value;
+  const featherW=parseInt(document.getElementById("featherW").value);
+
+  layers.forEach(img=>{
+    let w,h,x,y;
+    if(msMode){
+      // 字稿风：图片铺满画布（cover 模式，不留白边）
+      const r=Math.max(c.width/img.width,c.height/img.height)*scale;
+      w=img.width*r;h=img.height*r;
+      x=(c.width-w)/2;y=(c.height-h)/2;
+    }else{
+      // 默认：contain 模式（居中留白）
+      const ratio=Math.min(c.width/img.width,c.height/img.height);
+      w=img.width*ratio*scale;h=img.height*ratio*scale;
+      x=(c.width-w)/2;y=(c.height-h)/2;
+    }
+
+    // 1) 向下投影
+    if((sDist>0||sBlur>0)&&!msMode){
+      ctx.save();
+      const offX=Math.cos(sAng)*sDist;
+      const offY=Math.sin(sAng)*sDist;
+      ctx.shadowColor=`rgba(0,0,0,${sOp})`;
+      ctx.shadowBlur=sBlur;
+      ctx.shadowOffsetX=offX;
+      ctx.shadowOffsetY=Math.max(0,offY);
+      ctx.fillStyle=`rgba(0,0,0,${sOp})`;
+      ctx.fillRect(x-border,y-border,w+border*2,h+border*2);
+      ctx.restore();
+    }
+
+    // 2) 描边（字稿风模式下不画描边，因为图片铺满）
+    if(border>0&&!msMode){
+      ctx.fillStyle=borderColor;
+      ctx.fillRect(x-border,y-border,w+border*2,h+border*2);
+    }
+
+    // 3) 作品图本体
+    if(featherMode==="none"){
+      ctx.drawImage(img,x,y,w,h);
+    }else{
+      const tmp=document.createElement("canvas");
+      tmp.width=w;tmp.height=h;
+      const tctx=tmp.getContext("2d");
+      tctx.drawImage(img,0,0,w,h);
+      tctx.globalCompositeOperation="destination-in";
+      let grad;
+      if(featherMode==="top"){
+        grad=tctx.createLinearGradient(0,0,0,h);
+        grad.addColorStop(0,"rgba(0,0,0,0)");
+        grad.addColorStop(Math.min(.99,featherW/h),"rgba(0,0,0,1)");
+        grad.addColorStop(1,"rgba(0,0,0,1)");
+      }else if(featherMode==="bottom"){
+        grad=tctx.createLinearGradient(0,0,0,h);
+        grad.addColorStop(0,"rgba(0,0,0,1)");
+        grad.addColorStop(Math.max(.01,1-featherW/h),"rgba(0,0,0,1)");
+        grad.addColorStop(1,"rgba(0,0,0,0)");
+      }else if(featherMode==="both"){
+        grad=tctx.createLinearGradient(0,0,0,h);
+        const half=Math.min(.49,featherW/h/2);
+        grad.addColorStop(0,"rgba(0,0,0,0)");
+        grad.addColorStop(half,"rgba(0,0,0,1)");
+        grad.addColorStop(1-half,"rgba(0,0,0,1)");
+        grad.addColorStop(1,"rgba(0,0,0,0)");
+      }else{
+        grad=tctx.createRadialGradient(w/2,h/2,Math.min(w,h)/2-featherW,w/2,h/2,Math.min(w,h)/2);
+        grad.addColorStop(0,"rgba(0,0,0,1)");
+        grad.addColorStop(1,"rgba(0,0,0,0)");
+      }
+      tctx.fillStyle=grad;
+      tctx.fillRect(0,0,w,h);
+      ctx.drawImage(tmp,x,y,w,h);
+    }
+
+    // 字稿风模式：高斯模糊背景 + 暖金胶片滤镜叠加
+    if(msMode){
+      const msBlur=parseInt(document.getElementById("msBlur").value)||12;
+      // 重新绘制带模糊的背景图（覆盖之前的清晰版本）
+      ctx.save();
+      ctx.filter=`blur(${msBlur}px)`;
+      ctx.drawImage(img,x,y,w,h);
+      ctx.restore();
+      // 暖金色调叠加（soft-light 让暖色融入）
+      ctx.save();
+      ctx.globalCompositeOperation="soft-light";
+      const warmGrad=ctx.createLinearGradient(0,0,0,c.height);
+      warmGrad.addColorStop(0,"rgba(212,165,116,0.55)");
+      warmGrad.addColorStop(0.5,"rgba(201,169,110,0.4)");
+      warmGrad.addColorStop(1,"rgba(180,140,90,0.5)");
+      ctx.fillStyle=warmGrad;
+      ctx.fillRect(0,0,c.width,c.height);
+      ctx.restore();
+      // 颗粒噪点（模拟胶片质感）
+      ctx.save();
+      ctx.globalCompositeOperation="overlay";
+      ctx.globalAlpha=0.08;
+      for(let i=0;i<3000;i++){
+        const g=Math.random()*60+100;
+        ctx.fillStyle=`rgb(${g},${g-10},${g-30})`;
+        ctx.fillRect(Math.random()*c.width,Math.random()*c.height,1.5,1.5);
+      }
+      ctx.restore();
+      // 镜头光晕（左下角柔和光斑）
+      ctx.save();
+      ctx.globalCompositeOperation="screen";
+      const flare=ctx.createRadialGradient(c.width*0.2,c.height*0.85,0,c.width*0.2,c.height*0.85,c.width*0.4);
+      flare.addColorStop(0,"rgba(255,230,180,0.35)");
+      flare.addColorStop(0.5,"rgba(255,210,150,0.15)");
+      flare.addColorStop(1,"rgba(255,200,120,0)");
+      ctx.fillStyle=flare;
+      ctx.fillRect(0,0,c.width,c.height);
+      ctx.restore();
+      // 底部柔光过渡（如果开了底部信息栏，做柔和过渡）
+      if(document.getElementById("msInfoBar").checked){
+        // 顶部信息栏底部柔化
+        const barH=c.height*0.22;
+        const grad=ctx.createLinearGradient(0,barH-80,0,barH+30);
+        grad.addColorStop(0,"rgba(255,240,220,0)");
+        grad.addColorStop(1,"rgba(255,240,220,0.25)");
+        ctx.fillStyle=grad;
+        ctx.fillRect(0,barH-80,c.width,110);
+      }
+    }
+  });
+}
+
+// ============ 四角星✦装饰 ============
+function drawStars(){
+  const msStars=document.getElementById("msStars").checked;
+  if(!msStars) return;
+  const fontEN='"Great Vibes","Cormorant Garamond",cursive';
+  const stars=[
+    {x:c.width*0.08,y:c.height*0.10,size:c.width*0.025,op:0.85},
+    {x:c.width*0.92,y:c.height*0.08,size:c.width*0.02,op:0.7},
+    {x:c.width*0.06,y:c.height*0.92,size:c.width*0.022,op:0.75},
+    {x:c.width*0.94,y:c.height*0.94,size:c.width*0.028,op:0.9},
+    {x:c.width*0.5,y:c.height*0.06,size:c.width*0.018,op:0.6},
+    {x:c.width*0.15,y:c.height*0.45,size:c.width*0.015,op:0.5},
+    {x:c.width*0.85,y:c.height*0.55,size:c.width*0.016,op:0.55}
+  ];
+  ctx.save();
+  ctx.font=`${stars[0].size}px ${fontEN}`;
+  ctx.textAlign="center";ctx.textBaseline="middle";
+  stars.forEach(s=>{
+    ctx.globalAlpha=s.op;
+    ctx.font=`${s.size}px ${fontEN}`;
+    ctx.fillStyle="#ffffff";
+    ctx.fillText("✦",s.x,s.y);
+    // 加一点金色光晕
+    ctx.shadowColor="rgba(255,220,150,0.6)";
+    ctx.shadowBlur=s.size*0.4;
+    ctx.fillText("✦",s.x,s.y);
+    ctx.shadowBlur=0;
+  });
+  ctx.restore();
+}
+
+// ============ 字稿风手写主文字（金色+白色虚影双层）============
+function drawManuscriptTitle(){
+  const msMode=document.getElementById("msMode").checked;
+  if(!msMode) return;
+  const mainText=document.getElementById("msVerticalText").value.trim();
+  const tColor=document.getElementById("msTitleColor").value;
+  const sColor=document.getElementById("msSubtitleColor").value;
+  const author=document.getElementById("msAuthor").value;
+  const scatter=document.getElementById("msScatterText").value.trim();
+  const fontScript='"Great Vibes","Snell Roundhand","KaiTi","STKaiti","SimSun",cursive';
+  const fontCN='"KaiTi","Kaiti SC","STKaiti","SimSun",serif';
+  const fontEN='"Cormorant Garamond","Great Vibes",serif';
+  ctx.save();
+  ctx.textAlign="center";
+  // 主文字：金色+白色虚影双层（位于下半部分中央）
+  if(mainText){
+    const lines=mainText.split("\n").filter(l=>l.trim());
+    const fs=Math.floor(c.width*0.055);
+    const lh=fs*1.5;
+    const startY=c.height*0.6-(lines.length-1)*lh/2;
+    lines.forEach((line,i)=>{
+      const y=startY+i*lh;
+      // 白色虚影层（错位+模糊+半透明）
+      ctx.save();
+      ctx.shadowColor="rgba(255,255,255,0.7)";
+      ctx.shadowBlur=fs*0.2;
+      ctx.shadowOffsetX=fs*0.04;
+      ctx.shadowOffsetY=fs*0.04;
+      ctx.font=`${fs}px ${fontCN}`;
+      ctx.fillStyle="rgba(255,255,255,0.4)";
+      ctx.fillText(line,c.width/2,y);
+      ctx.restore();
+      // 金色主层（渐变填充）
+      const goldGrad=ctx.createLinearGradient(0,y-fs,0,y+fs);
+      goldGrad.addColorStop(0,"#f0d4a0");
+      goldGrad.addColorStop(0.5,tColor);
+      goldGrad.addColorStop(1,"#b8895a");
+      ctx.fillStyle=goldGrad;
+      ctx.font=`${fs}px ${fontCN}`;
+      ctx.fillText(line,c.width/2,y);
+    });
+  }
+  // 散落小字装饰（中日英混排，右侧）
+  if(scatter){
+    const sLines=scatter.split("\n").filter(l=>l.trim());
+    const fs2=Math.floor(c.width*0.016);
+    ctx.font=`italic ${fs2}px ${fontEN}`;
+    ctx.fillStyle="rgba(255,240,210,0.7)";
+    ctx.textAlign="right";
+    sLines.forEach((line,i)=>{
+      const x=c.width*0.92;
+      const y=c.height*0.45+i*fs2*1.8;
+      ctx.fillText(line,x,y);
+    });
+  }
+  // 手写署名（左下，小一号金色）
+  if(author){
+    const fs3=Math.floor(c.width*0.028);
+    ctx.font=`${fs3}px ${fontCN}`;
+    ctx.fillStyle=tColor;
+    ctx.textAlign="left";
+    ctx.fillText("— "+author,c.width*0.08,c.height*0.88);
+  }
+  ctx.restore();
+}
+
+// ============ 撕纸过渡边缘（中间分隔）============
+function drawTornDivider(){
+  const msTorn=document.getElementById("msTornDivider").checked;
+  if(!msTorn) return;
+  const msMode=document.getElementById("msMode").checked;
+  if(!msMode) return;
+  const barH=c.height*0.22;
+  const y=barH;
+  // 不规则撕纸边缘：上侧（信息栏底）带浅色毛刺，下侧（主视觉区）带模糊过渡
+  ctx.save();
+  // 上侧浅色毛刺（米色延伸到下方）
+  ctx.fillStyle="rgba(255,248,235,0.6)";
+  ctx.beginPath();
+  ctx.moveTo(0,y);
+  const steps=Math.max(20,Math.floor(c.width/40));
+  for(let i=0;i<=steps;i++){
+    const jag=Math.sin(i*1.7)*c.width*0.008+(Math.random()-0.5)*c.width*0.012;
+    ctx.lineTo(c.width*(i/steps),y+jag+c.width*0.01);
+  }
+  ctx.lineTo(c.width,y);
+  ctx.closePath();
+  ctx.fill();
+  // 下侧细线（加深撕纸痕迹）
+  ctx.strokeStyle="rgba(150,120,80,0.5)";
+  ctx.lineWidth=Math.max(1,c.width*0.0006);
+  ctx.beginPath();
+  ctx.moveTo(0,y);
+  for(let i=0;i<=steps;i++){
+    const jag=Math.sin(i*1.7)*c.width*0.008+(Math.random()-0.5)*c.width*0.012;
+    ctx.lineTo(c.width*(i/steps),y+jag);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+// ============ 圆角卡片容器 ============
+function drawRoundedCard(){
+  const msRounded=document.getElementById("msRoundedCard").checked;
+  if(!msRounded) return;
+  const msMode=document.getElementById("msMode").checked;
+  if(!msMode) return;
+  // 在最外层画白色圆角边框
+  ctx.save();
+  const r=Math.min(c.width,c.height)*0.04;
+  const margin=Math.min(c.width,c.height)*0.02;
+  ctx.strokeStyle="rgba(255,255,255,0.9)";
+  ctx.lineWidth=Math.max(3,c.width*0.004);
+  // 圆角矩形描边
+  ctx.beginPath();
+  ctx.moveTo(margin+r,margin);
+  ctx.lineTo(c.width-margin-r,margin);
+  ctx.quadraticCurveTo(c.width-margin,margin,c.width-margin,margin+r);
+  ctx.lineTo(c.width-margin,c.height-margin-r);
+  ctx.quadraticCurveTo(c.width-margin,c.height-margin,c.width-margin-r,c.height-margin);
+  ctx.lineTo(margin+r,c.height-margin);
+  ctx.quadraticCurveTo(margin,c.height-margin,margin,c.height-margin-r);
+  ctx.lineTo(margin,margin+r);
+  ctx.quadraticCurveTo(margin,margin,margin+r,margin);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.restore();
+}
+
+// ============ 顶部信息栏（字稿风 IMG_6729）============
+function drawInfoBar(){
+  const msInfoBar=document.getElementById("msInfoBar").checked;
+  if(!msInfoBar) return;
+  const msMode=document.getElementById("msMode").checked;
+  if(!msMode) return;
+  const barH=c.height*0.22;
+  const author=document.getElementById("msAuthor").value;
+  const price=document.getElementById("msPrice").value;
+  const copyright=document.getElementById("msCopyright").value;
+  const material=document.getElementById("msMaterial").value||"";
+  const previewText=document.getElementById("msPreviewText").value||"Preview";
+
+  // 顶部信息栏：半透明米色底（不画深灰，保留暖金氛围）
+  ctx.save();
+  const g=ctx.createLinearGradient(0,0,0,barH);
+  g.addColorStop(0,"rgba(255,248,235,0.55)");
+  g.addColorStop(1,"rgba(255,248,235,0.15)");
+  ctx.fillStyle=g;
+  ctx.fillRect(0,0,c.width,barH);
+  // 底部分隔细线
+  ctx.strokeStyle="rgba(150,120,80,0.35)";
+  ctx.lineWidth=Math.max(1,c.width*0.0008);
+  ctx.beginPath();ctx.moveTo(0,barH);ctx.lineTo(c.width,barH);ctx.stroke();
+
+  // 头像（圆形裁切，左上）
+  const avatarR=barH*0.32;
+  const avatarX=c.width*0.07+avatarR;
+  const avatarY=barH*0.5;
+  if(avatarImg){
+    ctx.save();
+    ctx.beginPath();ctx.arc(avatarX,avatarY,avatarR,0,Math.PI*2);ctx.clip();
+    const r=Math.max(avatarR*2/avatarImg.width,avatarR*2/avatarImg.height);
+    const dw=avatarImg.width*r,dh=avatarImg.height*r;
+    ctx.drawImage(avatarImg,avatarX-dw/2,avatarY-dh/2,dw,dh);
+    ctx.restore();
+    // 头像白色边框
+    ctx.strokeStyle="rgba(255,255,255,0.9)";
+    ctx.lineWidth=Math.max(2,c.width*0.002);
+    ctx.beginPath();ctx.arc(avatarX,avatarY,avatarR,0,Math.PI*2);ctx.stroke();
+    // 右下黄色状态点
+    ctx.fillStyle="#f4c842";
+    ctx.beginPath();ctx.arc(avatarX+avatarR*0.7,avatarY+avatarR*0.7,avatarR*0.22,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle="rgba(255,255,255,0.9)";
+    ctx.lineWidth=2;
+    ctx.stroke();
+  }else{
+    ctx.strokeStyle="rgba(120,90,60,0.5)";
+    ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(avatarX,avatarY,avatarR,0,Math.PI*2);ctx.stroke();
+    ctx.fillStyle="rgba(120,90,60,0.4)";
+    ctx.font=`${avatarR*0.8}px 'Inter',sans-serif`;
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText("?",avatarX,avatarY);
+  }
+
+  // 右侧信息文字（头像右侧，全大写无衬线小字）
+  const fontEN='"Inter","Helvetica",sans-serif';
+  const txtX=avatarX+avatarR+c.width*0.035;
+  ctx.textAlign="left";ctx.textBaseline="top";
+  // 版权声明（全大写，灰色小字）
+  if(copyright){
+    ctx.fillStyle="rgba(100,80,60,0.85)";
+    ctx.font=`${c.width*0.011}px ${fontEN}`;
+    const cp=copyright.toUpperCase();
+    // 分行：按逗号断行
+    const cpLines=cp.split(/,\s*/);
+    cpLines.forEach((line,i)=>ctx.fillText(line,txtX,barH*0.18+i*c.width*0.018));
+  }
+  // 营业时间（中文，小字）
+  if(price){
+    ctx.fillStyle="rgba(100,80,60,0.9)";
+    ctx.font=`${c.width*0.013}px ${fontEN}`;
+    ctx.fillText(price,txtX,barH*0.5);
+  }
+  // Material source 下拉箭头 UI 拟态
+  ctx.fillStyle="rgba(100,80,60,0.7)";
+  ctx.font=`${c.width*0.011}px ${fontEN}`;
+  ctx.fillText("▼ Material source",txtX,barH*0.65);
+  // 素材来源
+  if(material){
+    ctx.fillStyle="rgba(100,80,60,0.85)";
+    ctx.font=`${c.width*0.012}px ${fontEN}`;
+    ctx.fillText(material,txtX,barH*0.80);
+  }
+
+  // 右侧 Preview 大字（英文花体，金色+白描边，倾斜）
+  if(previewText){
+    const fontScript='"Great Vibes","Snell Roundhand","Cormorant Garamond",cursive';
+    const fs=Math.floor(c.width*0.045);
+    ctx.save();
+    ctx.translate(c.width*0.82,barH*0.55);
+    ctx.rotate(-0.12);
+    ctx.font=`${fs}px ${fontScript}`;
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    // 白色描边
+    ctx.strokeStyle="rgba(255,255,255,0.85)";
+    ctx.lineWidth=fs*0.12;
+    ctx.strokeText(previewText,0,0);
+    // 金色填充
+    const goldGrad=ctx.createLinearGradient(-fs,0,fs,0);
+    goldGrad.addColorStop(0,"#e8c896");
+    goldGrad.addColorStop(0.5,"#d4a574");
+    goldGrad.addColorStop(1,"#b8895a");
+    ctx.fillStyle=goldGrad;
+    ctx.fillText(previewText,0,0);
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+// ============ 文字绘制（原有）============
+function drawText(){
+  const en=document.getElementById("textEN").value;
+  const cn=document.getElementById("textCN").value;
+  const cEN=document.getElementById("colorEN").value;
+  const cCN=document.getElementById("colorCN").value;
+  const pos=document.getElementById("textPos").value;
+  const fontEN='"Great Vibes","Snell Roundhand","Apple Chancery",cursive';
+  const fontCN='"KaiTi","Kaiti SC","STKaiti","SimSun",serif';
+  ctx.save();ctx.textAlign="center";
+  let enY,cnY;
+  if(pos==="tb"){enY=c.height*0.12;cnY=c.height*0.88;}
+  else if(pos==="bt"){cnY=c.height*0.12;enY=c.height*0.88;}
+  else if(pos==="cc"){enY=c.height*0.42;cnY=c.height*0.58;}
+  else{enY=c.height*0.82;cnY=c.height*0.90;}
+  if(en){ctx.font=`${Math.floor(c.width*0.09)}px ${fontEN}`;ctx.fillStyle=cEN;ctx.fillText(en,c.width/2,enY);}
+  if(cn){
+    const lines=cn.split("\n");
+    const fs=Math.floor(c.width*0.034);
+    ctx.font=`${fs}px ${fontCN}`;
+    ctx.fillStyle=cCN;
+    const lh=fs*1.6;
+    const startY=cnY-(lines.length-1)*lh/2;
+    lines.forEach((line,i)=>ctx.fillText(line,c.width/2,startY+i*lh));
+  }
+  ctx.restore();
+}
+
+// ============ 装饰绘制 ============
+function drawDecor(){
+  const sc=document.getElementById("strokeColor").value;
+  if(document.getElementById("decBorder").checked){
+    ctx.strokeStyle=sc;ctx.lineWidth=Math.max(4,c.width*0.006);
+    ctx.strokeRect(10,10,c.width-20,c.height-20);
+  }
+  if(document.getElementById("decSilk").checked){
+    ctx.beginPath();
+    ctx.moveTo(0,c.height*0.5);
+    ctx.bezierCurveTo(c.width*0.3,c.height*0.2,c.width*0.7,c.height*0.8,c.width,c.height*0.5);
+    ctx.strokeStyle="rgba(200,200,200,0.4)";ctx.lineWidth=4;ctx.stroke();
+  }
+  if(document.getElementById("decDots").checked){
+    ctx.fillStyle="rgba(180,180,180,0.5)";
+    for(let x=40;x<c.width;x+=60)for(let y=40;y<c.height;y+=60){
+      ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fill();
+    }
+  }
+}
+
+// ============ 主渲染 ============
+function draw(){
+  ctx.clearRect(0,0,c.width,c.height);
+  const blurAmt=parseInt(document.getElementById("bgBlur").value);
+  drawBackground();
+  ctx.save();
+  if(blurAmt>0) ctx.filter=`blur(${blurAmt}px)`;
+  drawTexture();
+  drawArtwork();
+  ctx.restore();
+  // 字稿风专属元素
+  drawTornDivider();
+  drawStars();
+  drawManuscriptTitle();
+  drawInfoBar();
+  drawRoundedCard();
+  // 原有文字和装饰（字稿风模式下跳过，避免冲突）
+  const msMode=document.getElementById("msMode").checked;
+  if(!msMode){
+    drawText();
+    drawDecor();
+  }
+}
+
+// ============ 字稿风预设一键应用 ============
+function applyManuscriptPreset(){
+  const set=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val;};
+  const chk=(id,val)=>{const el=document.getElementById(id);if(el)el.checked=val;};
+  // 画布：3:4 竖版 1500×2000（匹配竖版海报）
+  set("size","1500,2000");
+  // 背景：暖米金渐变
+  set("bgType","gradient");
+  set("bgColor1","#f5ead4");
+  set("bgColor2","#e8d4a8");
+  set("bgDir","v");
+  set("bgBlur","0");
+  // 作品图：铺满、无描边、无投影
+  set("artScale","105");
+  set("artBorder","0");
+  set("borderColor","#ffffff");
+  set("shadowDist","0");
+  set("shadowBlur","0");
+  set("shadowOp","0");
+  set("shadowAngle","90");
+  set("featherMode","none");
+  set("featherW","120");
+  // 纹理：无
+  set("texSource","none");
+  set("texPreset","kraft");
+  set("texOpacity","35");
+  chk("tornEdge",false);
+  set("tornAmount","15");
+  // 文字（字稿风模式下不显示，但保留参数）
+  set("textEN","Preview");
+  set("textCN","我很爱我普通的生活");
+  set("colorEN","#d4a574");
+  set("colorCN","#d4a574");
+  set("textPos","cc");
+  // 装饰：关闭
+  set("strokeColor","#ffffff");
+  chk("decBorder",false);
+  chk("decSilk",false);
+  chk("decDots",false);
+  // 字稿风模式参数（IMG_6729 暖金风）
+  chk("msMode",true);
+  chk("msStars",true);
+  chk("msInfoBar",true);
+  chk("msTornDivider",true);
+  chk("msRoundedCard",true);
+  set("msAuthor","裴砚");
+  set("msPrice","营业时间:10:00-22:00");
+  set("msCopyright","DO NOT STEAL IMAGES, IMITATE OR PLAGIARIZE");
+  set("msMaterial","@底素网络 素材xxx");
+  set("msPreviewText","Preview");
+  set("msVerticalText","我很爱我普通的生活\n我们都是走向幸福的人");
+  set("msTitleColor","#d4a574");
+  set("msSubtitleColor","#ffffff");
+  set("msScatterText","Harris, I miss you.\nlove\n私は幸せ");
+  set("msBlur","12");
+  // 同步显示值
+  document.getElementById("blurVal").textContent="0";
+  document.getElementById("scaleVal").textContent="105";
+  document.getElementById("borderVal").textContent="0";
+  document.getElementById("shadowDVal").textContent="0";
+  document.getElementById("shadowBVal").textContent="0";
+  document.getElementById("shadowOVal").textContent="0";
+  document.getElementById("featherVal").textContent="120";
+  document.getElementById("texOpVal").textContent="35";
+  document.getElementById("tornVal").textContent="15";
+  document.getElementById("msBlurVal").textContent="12";
+  onTexSourceChange();
+  resizeCanvas();
+  alert("字稿风预设已应用（IMG_6729 暖金风）！\n\n下一步：\n1. 在「④ 作品图」上传你的摄影图\n2. 点「从图片提取主色填入背景」自动配色\n3. 在「⑨ 字稿风模式」上传头像\n4. 调整署名 / 营业时间 / 版权 / 散落小字\n5. 点「导出 PNG」");
+}
+
+// ============ 预设系统 ============
+const PRESET_KEY="artwork-preview-presets-v4";
+function getSettings(){
+  const chk=id=>document.getElementById(id).checked;
+  return{
+    size:document.getElementById("size").value,
+    bgType:document.getElementById("bgType").value,
+    bgColor1:document.getElementById("bgColor1").value,
+    bgColor2:document.getElementById("bgColor2").value,
+    bgDir:document.getElementById("bgDir").value,
+    bgBlur:document.getElementById("bgBlur").value,
+    artScale:document.getElementById("artScale").value,
+    artBorder:document.getElementById("artBorder").value,
+    borderColor:document.getElementById("borderColor").value,
+    shadowDist:document.getElementById("shadowDist").value,
+    shadowBlur:document.getElementById("shadowBlur").value,
+    shadowOp:document.getElementById("shadowOp").value,
+    shadowAngle:document.getElementById("shadowAngle").value,
+    featherMode:document.getElementById("featherMode").value,
+    featherW:document.getElementById("featherW").value,
+    texSource:document.getElementById("texSource").value,
+    texPreset:document.getElementById("texPreset").value,
+    texOpacity:document.getElementById("texOpacity").value,
+    tornEdge:chk("tornEdge"),
+    tornAmount:document.getElementById("tornAmount").value,
+    textEN:document.getElementById("textEN").value,
+    textCN:document.getElementById("textCN").value,
+    colorEN:document.getElementById("colorEN").value,
+    colorCN:document.getElementById("colorCN").value,
+    textPos:document.getElementById("textPos").value,
+    strokeColor:document.getElementById("strokeColor").value,
+    decBorder:chk("decBorder"),
+    decSilk:chk("decSilk"),
+    decDots:chk("decDots"),
+    msMode:chk("msMode"),
+    msStars:chk("msStars"),
+    msInfoBar:chk("msInfoBar"),
+    msTornDivider:chk("msTornDivider"),
+    msRoundedCard:chk("msRoundedCard"),
+    msAuthor:document.getElementById("msAuthor").value,
+    msPrice:document.getElementById("msPrice").value,
+    msCopyright:document.getElementById("msCopyright").value,
+    msMaterial:document.getElementById("msMaterial").value,
+    msPreviewText:document.getElementById("msPreviewText").value,
+    msVerticalText:document.getElementById("msVerticalText").value,
+    msTitleColor:document.getElementById("msTitleColor").value,
+    msSubtitleColor:document.getElementById("msSubtitleColor").value,
+    msScatterText:document.getElementById("msScatterText").value,
+    msBlur:document.getElementById("msBlur").value
+  };
+}
+function applySettings(s){
+  if(!s)return;
+  const set=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val;};
+  const chk=(id,val)=>{const el=document.getElementById(id);if(el)el.checked=val;};
+  set("size",s.size);set("bgType",s.bgType);set("bgColor1",s.bgColor1);
+  set("bgColor2",s.bgColor2);set("bgDir",s.bgDir);set("bgBlur",s.bgBlur);
+  set("artScale",s.artScale);set("artBorder",s.artBorder);set("borderColor",s.borderColor||"#ffffff");
+  set("shadowDist",s.shadowDist||20);set("shadowBlur",s.shadowBlur||25);
+  set("shadowOp",s.shadowOp||45);set("shadowAngle",s.shadowAngle||90);
+  set("featherMode",s.featherMode||"none");set("featherW",s.featherW||120);
+  set("texSource",s.texSource||"preset");set("texPreset",s.texPreset||"kraft");
+  set("texOpacity",s.texOpacity);chk("tornEdge",s.tornEdge);set("tornAmount",s.tornAmount);
+  set("textEN",s.textEN);set("textCN",s.textCN);
+  set("colorEN",s.colorEN);set("colorCN",s.colorCN);set("textPos",s.textPos);
+  set("strokeColor",s.strokeColor);
+  chk("decBorder",s.decBorder);chk("decSilk",s.decSilk);chk("decDots",s.decDots);
+  // 字稿风参数（IMG_6729 暖金风）
+  chk("msMode",s.msMode||false);
+  chk("msStars",s.msStars||false);
+  chk("msInfoBar",s.msInfoBar||false);
+  chk("msTornDivider",s.msTornDivider||false);
+  chk("msRoundedCard",s.msRoundedCard||false);
+  set("msAuthor",s.msAuthor||"裴砚");
+  set("msPrice",s.msPrice||"营业时间:10:00-22:00");
+  set("msCopyright",s.msCopyright||"DO NOT STEAL IMAGES, IMITATE OR PLAGIARIZE");
+  set("msMaterial",s.msMaterial||"@底素网络 素材xxx");
+  set("msPreviewText",s.msPreviewText||"Preview");
+  set("msVerticalText",s.msVerticalText||"我很爱我普通的生活\n我们都是走向幸福的人");
+  set("msTitleColor",s.msTitleColor||"#d4a574");
+  set("msSubtitleColor",s.msSubtitleColor||"#ffffff");
+  set("msScatterText",s.msScatterText||"Harris, I miss you.\nlove\n私は幸せ");
+  set("msBlur",s.msBlur||"12");
+  // 同步显示值
+  document.getElementById("blurVal").textContent=s.bgBlur;
+  document.getElementById("scaleVal").textContent=s.artScale;
+  document.getElementById("borderVal").textContent=s.artBorder;
+  document.getElementById("shadowDVal").textContent=s.shadowDist||20;
+  document.getElementById("shadowBVal").textContent=s.shadowBlur||25;
+  document.getElementById("shadowOVal").textContent=s.shadowOp||45;
+  document.getElementById("featherVal").textContent=s.featherW||120;
+  document.getElementById("texOpVal").textContent=s.texOpacity;
+  document.getElementById("tornVal").textContent=s.tornAmount;
+  document.getElementById("msBlurVal").textContent=s.msBlur||12;
+  onTexSourceChange();
+  if((s.texSource||"preset")==="preset"){onTexPresetChange();}
+  resizeCanvas();
+}
+function savePreset(n){
+  const presets=JSON.parse(localStorage.getItem(PRESET_KEY)||"{}");
+  presets[n]=getSettings();
+  localStorage.setItem(PRESET_KEY,JSON.stringify(presets));
+  alert("预设 "+n+" 已保存");
+}
+function loadPreset(n){
+  const presets=JSON.parse(localStorage.getItem(PRESET_KEY)||"{}");
+  if(!presets[n]){alert("预设 "+n+" 为空");return;}
+  applySettings(presets[n]);
+  alert("预设 "+n+" 已载入（如需自定义纹理图或头像请重新上传）");
+}
+function resetAll(){
+  if(!confirm("清空当前所有设置？"))return;
+  layers=[];textureImg=null;presetTextureImg=null;avatarImg=null;
+  document.getElementById("upload").value="";
+  document.getElementById("texUpload").value="";
+  document.getElementById("avatarUpload").value="";
+  draw();
+}
+
+// ============ 导出 ============
+function exportPNG(){
+  const a=document.createElement("a");
+  a.download="preview-studio.png";
+  a.href=c.toDataURL("image/png");
+  a.click();
+}
+
+// 初始化：生成默认牛皮纸纹理
+onTexPresetChange();
+draw();
+</script>
+</body>
+</html>
