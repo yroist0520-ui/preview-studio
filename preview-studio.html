@@ -322,29 +322,10 @@ input[type=file]{font-size:11px}
         <label>背景高斯模糊强度: <span id="blurVal">0</span>px</label>
         <input type="range" id="bgBlur" min="0" max="80" value="0" oninput="document.getElementById('blurVal').textContent=this.value;draw()">
 
-        <h3 class="tool-h">④ 作品图（多图）</h3>
-        <input type="file" id="upload" accept="image/*" multiple>
-        <div style="font-size:10px;color:#666;margin:2px 0">支持多选 / 拖拽上传 / Ctrl+V 粘贴</div>
-        <div id="layerList" style="max-height:160px;overflow-y:auto;margin:4px 0;background:#1a1a22;border:1px solid #2a2a35;border-radius:6px;padding:4px"></div>
-        <div class="row">
-          <button class="small" onclick="front()">↑置顶</button>
-          <button class="small" onclick="back()">↓置底</button>
-          <button class="small warn" onclick="removeArt()">×删除</button>
-        </div>
-        <label>布局模式</label>
-        <select id="layoutMode" onchange="layoutMode=this.value;if(layers.length>0){if(layoutMode==='fillWidth'){layers.forEach(l=>{l.fitMode='fillWidth';l.imgY=0.5;});document.getElementById('layerY').max=100;document.getElementById('layerY').value=50;document.getElementById('layerYVal').textContent=50;}else{layoutAuto();}updateLayerPanel();}draw()">
-          <option value="auto" selected>自动横向并排</option>
-          <option value="free">自由定位</option>
-          <option value="fillWidth">填满宽度（上下可调）</option>
-        </select>
-        <label>图片间距: <span id="gapVal">0</span>px</label>
-        <input type="range" id="imgGap" min="0" max="40" value="0" oninput="document.getElementById('gapVal').textContent=this.value;if(layers.length>0&&layoutMode==='auto')layoutAuto();draw()">
-        <div class="hint" id="layoutHint">自动模式：图片左右对齐画布，上下可拖动调整位置</div>
-        <div id="layerPosCtrl" style="margin-top:6px">
-          <label>图片 Y 位置: <span id="layerYVal">50</span>%</label>
-          <input type="range" id="layerY" min="0" max="100" value="50" oninput="var v=parseInt(this.value);document.getElementById('layerYVal').textContent=v;if(activeLayerIndex>=0&&layers[activeLayerIndex]){layers[activeLayerIndex].imgY=v/100;layers[activeLayerIndex].fitMode='fillWidth';document.getElementById('layoutMode').value='fillWidth';layoutMode='fillWidth';updateLayerPanel();draw();}">
-        </div>
-        <button class="ms-btn" onclick="extractColors()" style="margin:4px 0">✦ 从图片提取主色填入背景</button>
+        <h3 class="tool-h">④ 作品图</h3>
+        <input type="file" id="upload" accept="image/*">
+        <button class="warn small" onclick="removeArt()">× 删除图片</button>
+        <button class="ms-btn" onclick="extractColors()" style="margin-top:4px">✦ 从图片提取主色填入背景</button>
         <label>缩放比例: <span id="scaleVal">100</span>%</label>
         <input type="range" id="artScale" min="20" max="150" value="100" oninput="document.getElementById('scaleVal').textContent=this.value;draw()">
         <label>描边颜色</label>
@@ -818,8 +799,6 @@ function relock(){
 const c=document.getElementById("c");
 const ctx=c.getContext("2d");
 let layers=[];
-let activeLayerIndex=-1;
-let layoutMode="auto";
 let textureImg=null;
 let presetTextureImg=null;
 let avatarImg=null;
@@ -829,124 +808,26 @@ let watermarkImg=null;
 function resizeCanvas(){
   const s=document.getElementById("size").value.split(",");
   c.width=parseInt(s[0]);c.height=parseInt(s[1]);
-  if(layers.length>0)layoutAuto();
   draw();
 }
 
 // ============ 图片上传（支持多选） ============
 function addImageFiles(files){
-  const arr=Array.from(files).filter(f=>f.type.startsWith("image/"));
-  if(!arr.length)return;
-  let loaded=0;
-  arr.forEach(f=>{
-    const img=new Image();
-    img.onload=()=>{
-      const layer={
-        img:img,
-        x:0.5, y:0.2,
-        w:1, h:1,
-        fitMode:layoutMode
-      };
-      layers.push(layer);
-      loaded++;
-      if(loaded===arr.length){
-        layoutAuto();
-        updateLayerPanel();
-        draw();
-      }
-    };
-    img.src=URL.createObjectURL(f);
-  });
+  const f=Array.from(files).filter(x=>x.type.startsWith("image/"))[0];
+  if(!f)return;
+  const img=new Image();
+  img.onload=()=>{
+    layers.length=0;
+    layers.push({img,x:0.5,y:0.5,w:1,h:1,fitMode:"cover"});
+    draw();
+  };
+  img.src=URL.createObjectURL(f);
 }
 
 document.getElementById("upload").onchange=e=>{
-  if(e.target.files.length>1){
-    addImageFiles(e.target.files);
-  }else{
-    const f=e.target.files[0];if(!f)return;
-    const img=new Image();
-    img.onload=()=>{
-      if(layers.length===0){
-        layers.push({img,x:0.5,y:0.2,w:1,h:1,fitMode:layoutMode});
-      }else{
-        layers[0]={img,x:0.5,y:0.2,w:1,h:1,fitMode:layoutMode};
-      }
-      layoutAuto();
-      updateLayerPanel();
-      draw();
-    };
-    img.src=URL.createObjectURL(f);
-  }
+  addImageFiles(e.target.files);
   e.target.value="";
 };
-
-// ============ 自动布局（横向并排，等高铺满画布） ============
-function layoutAuto(){
-  if(layers.length===0)return;
-  const gap=parseInt(document.getElementById("imgGap")?parseInt(document.getElementById("imgGap").value):0);
-  const totalGap=gap*(layers.length-1);
-  const availableW=c.width-totalGap;
-  let totalAspect=0;
-  layers.forEach(l=>{if(l.fitMode!=="fillWidth")totalAspect+=l.img.width/l.img.height;});
-  const baseH=c.height;
-  const totalW=baseH*totalAspect;
-  const scale=availableW/totalW;
-  let curX=0;
-  layers.forEach(l=>{
-    if(l.fitMode==="fillWidth")return;
-    const w=l.img.width*baseH*scale/l.img.height;
-    l.nx=curX/c.width;
-    l.nw=w/c.width;
-    l.ny=0;
-    l.nh=1;
-    l.fitMode="auto";
-    curX+=w+gap;
-  });
-}
-
-function updateLayerPanel(){
-  const panel=document.getElementById("layerList");
-  if(!panel)return;
-  panel.innerHTML="";
-  layers.forEach((l,i)=>{
-    const div=document.createElement("div");
-    div.style.cssText="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #2a2a35;font-size:11px;color:#aaa;cursor:pointer;background:"+(i===activeLayerIndex?"rgba(201,163,124,0.15)":"");
-    div.onclick=()=>{activeLayerIndex=i;updateLayerPanel();syncActiveLayerControls();};
-    const thumb=document.createElement("canvas");
-    thumb.width=40;thumb.height=40;
-    const tctx=thumb.getContext("2d");
-    const r=Math.max(40/l.img.width,40/l.img.height);
-    tctx.drawImage(l.img,0,0,l.img.width*r,l.img.height*r);
-    const label=document.createElement("span");
-    label.textContent="图"+(i+1)+(l.fitMode==="auto"?" 自动":" 自由");
-    const del=document.createElement("button");
-    del.textContent="×";del.style.cssText="margin-left:auto;background:#3a2a2a;border:1px solid #5a3a3a;color:#f88;width:22px;height:22px;padding:0;font-size:12px;border-radius:4px;cursor:pointer";
-    del.onclick=e=>{e.stopPropagation();removeLayer(i);};
-    div.appendChild(thumb);div.appendChild(label);div.appendChild(del);
-    panel.appendChild(div);
-  });
-}
-
-function syncActiveLayerControls(){
-  if(activeLayerIndex<0||activeLayerIndex>=layers.length)return;
-  const l=layers[activeLayerIndex];
-  const xEl=document.getElementById("layerX");
-  const yEl=document.getElementById("layerY");
-  if(xEl)xEl.value=Math.round(l.x*100);
-  if(yEl)yEl.value=Math.round(l.y*100);
-  const xVal=document.getElementById("layerXVal");
-  const yVal=document.getElementById("layerYVal");
-  if(xVal)xVal.textContent=Math.round(l.x*100);
-  if(yVal)yVal.textContent=Math.round(l.y*100);
-}
-
-function removeLayer(idx){
-  layers.splice(idx,1);
-  if(activeLayerIndex>=layers.length)activeLayerIndex=layers.length-1;
-  if(layers.length>0)layoutAuto();
-  updateLayerPanel();
-  draw();
-}
 
 // ============ 拖拽文件到画布上传 ============
 document.querySelector(".stage").addEventListener("dragover",e=>{e.preventDefault();});
@@ -1140,31 +1021,10 @@ function onTexPresetChange(){
   draw();
 }
 
-// ============ 图层操作 ============
-function front(){
-  if(layers.length<=1)return;
-  const idx=activeLayerIndex>=0?activeLayerIndex:layers.length-1;
-  const item=layers.splice(idx,1)[0];
-  const newIdx=Math.min(idx,layers.length);
-  layers.splice(newIdx,0,item);
-  activeLayerIndex=newIdx;
-  updateLayerPanel();draw();
-}
-function back(){
-  if(layers.length<=1)return;
-  const idx=activeLayerIndex>=0?activeLayerIndex:layers.length-1;
-  const item=layers.splice(idx,1)[0];
-  const newIdx=Math.max(0,idx-1);
-  layers.splice(newIdx,0,item);
-  activeLayerIndex=newIdx;
-  updateLayerPanel();draw();
-}
+// ============ 删除图片 ============
 function removeArt(){
   if(layers.length===0)return;
-  const idx=activeLayerIndex>=0?activeLayerIndex:layers.length-1;
-  layers.splice(idx,1);
-  if(activeLayerIndex>=layers.length)activeLayerIndex=layers.length-1;
-  updateLayerPanel();
+  layers.splice(0,layers.length);
   draw();
 }
 
@@ -1228,6 +1088,8 @@ function drawTexture(){
 // ============ 作品图绘制（支持多图层 + 自动布局） ============
 function drawArtwork(){
   if(layers.length===0)return;
+  const img=layers[0].img;
+  if(!img||!img.complete||!img.naturalWidth)return;
   const msMode=document.getElementById("msMode").checked;
   const lockScreen=document.getElementById("lockScreen").checked;
   const coverMode=msMode||lockScreen;
@@ -1241,166 +1103,76 @@ function drawArtwork(){
   const featherMode=document.getElementById("featherMode").value;
   const featherW=parseInt(document.getElementById("featherW").value);
 
-  layers.forEach((layer,layerIdx)=>{
-    const img=layer.img;
-    if(!img||!img.complete||!img.naturalWidth)return;
-    let w,h,x,y;
+  let w,h,x,y;
+  if(coverMode){
+    const r=Math.max(c.width/img.width,c.height/img.height)*scale;
+    w=img.width*r;h=img.height*r;
+    x=(c.width-w)/2;y=(c.height-h)/2;
+  }else{
+    const ratio=Math.min(c.width/img.width,c.height/img.height);
+    w=img.width*ratio*scale;h=img.height*ratio*scale;
+    x=(c.width-w)/2;y=(c.height-h)/2;
+  }
 
-    if(coverMode){
-      const r=Math.max(c.width/img.width,c.height/img.height)*scale;
-      w=img.width*r;h=img.height*r;
-      x=(c.width-w)/2;y=(c.height-h)/2;
-    }else if(layer.fitMode==="fillWidth"){
-      w=c.width;
-      const imgAspect=img.width/img.height;
-      const canvasAspect=c.width/c.height;
-      h=w/imgAspect;
-      x=0;
-      const imgY=(layer.imgY!==undefined?layer.imgY:0.5);
-      const scaledH=h;
-      const scaledW=w;
-      const topCrop=scaledH>c.height?(scaledH-c.height)*imgY:0;
-      y=-topCrop;
-      if(featherMode==="none"){
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(0,0,c.width,c.height);
-        ctx.clip();
-        ctx.drawImage(img,x,y,scaledW,scaledH);
-        ctx.restore();
-      }else{
-        const fw=Math.min(featherW,w*0.8);
-        const oc=document.createElement("canvas");
-        oc.width=Math.ceil(scaledW);oc.height=Math.ceil(scaledH);
-        const octx=oc.getContext("2d");
-        octx.drawImage(img,0,0,scaledW,scaledH);
-        octx.globalCompositeOperation="destination-in";
-        let grad;
-        const topCropPx=scaledH>c.height?(scaledH-c.height)*imgY:0;
-        const botCropPx=scaledH>c.height?scaledH-c.height-topCropPx:0;
-        if(featherMode==="top"||featherMode==="both"){
-          const feathH=Math.min(fw,scaledH*0.5);
-          if(scaledH>c.height){
-            grad=octx.createLinearGradient(0,topCropPx,0,topCropPx+feathH);
-          }else{
-            grad=octx.createLinearGradient(0,0,0,feathH);
-          }
-          grad.addColorStop(0,"rgba(0,0,0,0)");
-          grad.addColorStop(1,"rgba(0,0,0,1)");
-          octx.fillStyle=grad;
-          if(scaledH>c.height){
-            octx.fillRect(0,topCropPx,scaledW,feathH);
-          }else{
-            octx.fillRect(0,0,scaledW,feathH);
-          }
-        }
-        if(featherMode==="bottom"||featherMode==="both"){
-          const feathH=Math.min(fw,scaledH*0.5);
-          if(scaledH>c.height){
-            grad=octx.createLinearGradient(0,scaledH-botCropPx-feathH,0,scaledH-botCropPx);
-          }else{
-            grad=octx.createLinearGradient(0,scaledH-feathH,0,scaledH);
-          }
-          grad.addColorStop(0,"rgba(0,0,0,1)");
-          grad.addColorStop(1,"rgba(0,0,0,0)");
-          octx.fillStyle=grad;
-          if(scaledH>c.height){
-            octx.fillRect(0,scaledH-botCropPx-feathH,scaledW,feathH);
-          }else{
-            octx.fillRect(0,scaledH-feathH,scaledW,feathH);
-          }
-        }
-        if(featherMode==="all"){
-          const feathH=Math.min(fw,scaledH*0.4);
-          grad=octx.createRadialGradient(scaledW/2,scaledH/2,Math.min(scaledW,scaledH)/2-feathH,scaledW/2,scaledH/2,Math.min(scaledW,scaledH)/2);
-          grad.addColorStop(0,"rgba(0,0,0,1)");
-          grad.addColorStop(1,"rgba(0,0,0,0)");
-          octx.fillStyle=grad;
-          octx.fillRect(0,0,scaledW,scaledH);
-        }
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(0,0,c.width,c.height);
-        ctx.clip();
-        ctx.drawImage(oc,x,y,scaledW,scaledH);
-        ctx.restore();
-      }
-      return;
-    }else if(layer.fitMode==="auto"&&layer.nw!==undefined){
-      w=layer.nw*c.width;
-      h=layer.nh*c.height;
-      x=layer.nx*c.width;
-      y=layer.ny*c.height+(layer.ny===0?(c.height-h)/2:0);
+  if(sDist>0||sBlur>0){
+    ctx.save();
+    ctx.shadowColor=`rgba(0,0,0,${sOp})`;
+    ctx.shadowBlur=sBlur;
+    ctx.shadowOffsetX=Math.cos(sAng)*sDist;
+    ctx.shadowOffsetY=Math.max(0,Math.sin(sAng)*sDist);
+    ctx.fillStyle=`rgba(0,0,0,${sOp})`;
+    ctx.fillRect(x-border,y-border,w+border*2,h+border*2);
+    ctx.restore();
+  }
+
+  if(border>0){
+    ctx.fillStyle=borderColor;
+    ctx.fillRect(x-border,y-border,w+border*2,h+border*2);
+  }
+
+  if(featherMode==="none"){
+    ctx.drawImage(img,x,y,w,h);
+  }else{
+    if(!offscreenCache.feather || offscreenCache.feather.width!==Math.ceil(w)|| offscreenCache.feather.height!==Math.ceil(h)){
+      offscreenCache.feather=document.createElement("canvas");
+      offscreenCache.feather.width=Math.ceil(w);offscreenCache.feather.height=Math.ceil(h);
+    }
+    const tmp=offscreenCache.feather;
+    const tctx=tmp.getContext("2d");
+    tctx.clearRect(0,0,tmp.width,tmp.height);
+    tctx.drawImage(img,0,0,w,h);
+    tctx.globalCompositeOperation="destination-in";
+    let grad;
+    const fw=Math.min(featherW,w*0.8);
+    const ratio=fw/h;
+    if(featherMode==="top"){
+      grad=tctx.createLinearGradient(0,0,0,h);
+      grad.addColorStop(0,"rgba(0,0,0,0)");
+      grad.addColorStop(Math.min(.99,ratio),"rgba(0,0,0,1)");
+      grad.addColorStop(1,"rgba(0,0,0,1)");
+    }else if(featherMode==="bottom"){
+      grad=tctx.createLinearGradient(0,0,0,h);
+      grad.addColorStop(0,"rgba(0,0,0,1)");
+      grad.addColorStop(Math.max(.01,1-ratio),"rgba(0,0,0,1)");
+      grad.addColorStop(1,"rgba(0,0,0,0)");
+    }else if(featherMode==="both"){
+      grad=tctx.createLinearGradient(0,0,0,h);
+      const half=Math.min(.49,ratio/2);
+      const halfEnd=Math.max(.51,1-half);
+      grad.addColorStop(0,"rgba(0,0,0,0)");
+      grad.addColorStop(half,"rgba(0,0,0,1)");
+      grad.addColorStop(halfEnd,"rgba(0,0,0,1)");
+      grad.addColorStop(1,"rgba(0,0,0,0)");
     }else{
-      if(layer.fitMode==="free"&&layer.w&&layer.h){
-        w=layer.w*c.width;
-        h=layer.h*c.height;
-        x=layer.x*c.width-w/2;
-        y=layer.y*c.height-h/2;
-      }else{
-        const ratio=Math.min(c.width/img.width,c.height/img.height);
-        w=img.width*ratio*scale;h=img.height*ratio*scale;
-        x=(c.width-w)/2;y=(c.height-h)/2;
-      }
+      const minDim=Math.min(w,h);
+      grad=tctx.createRadialGradient(w/2,h/2,Math.max(0,minDim/2-fw),w/2,h/2,minDim/2);
+      grad.addColorStop(0,"rgba(0,0,0,1)");
+      grad.addColorStop(1,"rgba(0,0,0,0)");
     }
-
-    if(sDist>0||sBlur>0){
-      ctx.save();
-      ctx.shadowColor=`rgba(0,0,0,${sOp})`;
-      ctx.shadowBlur=sBlur;
-      ctx.shadowOffsetX=Math.cos(sAng)*sDist;
-      ctx.shadowOffsetY=Math.max(0,Math.sin(sAng)*sDist);
-      ctx.fillStyle=`rgba(0,0,0,${sOp})`;
-      ctx.fillRect(x-border,y-border,w+border*2,h+border*2);
-      ctx.restore();
-    }
-
-    if(border>0){
-      ctx.fillStyle=borderColor;
-      ctx.fillRect(x-border,y-border,w+border*2,h+border*2);
-    }
-
-    if(featherMode==="none"){
-      ctx.drawImage(img,x,y,w,h);
-    }else{
-      if(!offscreenCache.feather || offscreenCache.feather.width!==Math.ceil(w)|| offscreenCache.feather.height!==Math.ceil(h)){
-        offscreenCache.feather=document.createElement("canvas");
-        offscreenCache.feather.width=Math.ceil(w);offscreenCache.feather.height=Math.ceil(h);
-      }
-      const tmp=offscreenCache.feather;
-      const tctx=tmp.getContext("2d");
-      tctx.clearRect(0,0,tmp.width,tmp.height);
-      tctx.drawImage(img,0,0,w,h);
-      tctx.globalCompositeOperation="destination-in";
-      let grad;
-      const fw=Math.min(featherW,w*0.8);
-      if(featherMode==="top"){
-        grad=tctx.createLinearGradient(0,0,0,h);
-        grad.addColorStop(0,"rgba(0,0,0,0)");
-        grad.addColorStop(Math.min(.99,fw/h),"rgba(0,0,0,1)");
-        grad.addColorStop(1,"rgba(0,0,0,1)");
-      }else if(featherMode==="bottom"){
-        grad=tctx.createLinearGradient(0,0,0,h);
-        grad.addColorStop(0,"rgba(0,0,0,1)");
-        grad.addColorStop(Math.max(.01,1-fw/h),"rgba(0,0,0,1)");
-        grad.addColorStop(1,"rgba(0,0,0,0)");
-      }else if(featherMode==="both"){
-        grad=tctx.createLinearGradient(0,0,0,h);
-        const half=Math.min(.49,fw/h/2);
-        grad.addColorStop(0,"rgba(0,0,0,0)");
-        grad.addColorStop(half,"rgba(0,0,0,1)");
-        grad.addColorStop(1-half,"rgba(0,0,0,1)");
-        grad.addColorStop(1,"rgba(0,0,0,0)");
-      }else{
-        grad=tctx.createRadialGradient(w/2,h/2,Math.min(w,h)/2-fw,w/2,h/2,Math.min(w,h)/2);
-        grad.addColorStop(0,"rgba(0,0,0,1)");
-        grad.addColorStop(1,"rgba(0,0,0,0)");
-      }
-      tctx.fillStyle=grad;
-      tctx.fillRect(0,0,tmp.width,tmp.height);
-      ctx.drawImage(tmp,x,y,w,h);
-    }
-  });
+    tctx.fillStyle=grad;
+    tctx.fillRect(0,0,tmp.width,tmp.height);
+    ctx.drawImage(tmp,x,y,w,h);
+  }
 
   // 字稿风效果（整张画布，只执行一次）
   if(msMode){
@@ -2172,9 +1944,6 @@ function getSettings(){
     bgColor2:document.getElementById("bgColor2").value,
     bgDir:document.getElementById("bgDir").value,
     bgBlur:document.getElementById("bgBlur").value,
-    layoutMode:document.getElementById("layoutMode").value,
-    imgGap:document.getElementById("imgGap").value,
-    layerY:document.getElementById("layerY").value,
     artScale:document.getElementById("artScale").value,
     artBorder:document.getElementById("artBorder").value,
     borderColor:document.getElementById("borderColor").value,
@@ -2270,8 +2039,6 @@ function applySettings(s){
   const chk=(id,val)=>{const el=document.getElementById(id);if(el)el.checked=val;};
   set("size",s.size);set("bgType",s.bgType);set("bgColor1",s.bgColor1);
   set("bgColor2",s.bgColor2);set("bgDir",s.bgDir);set("bgBlur",s.bgBlur);
-  set("layoutMode",s.layoutMode||"auto");layoutMode=s.layoutMode||"auto";set("imgGap",s.imgGap||0);
-  set("layerY",s.layerY||50);document.getElementById("layerYVal").textContent=s.layerY||50;
   set("artScale",s.artScale);set("artBorder",s.artBorder);set("borderColor",s.borderColor||"#ffffff");
   set("shadowDist",s.shadowDist||20);set("shadowBlur",s.shadowBlur||25);
   set("shadowOp",s.shadowOp||45);set("shadowAngle",s.shadowAngle||90);
@@ -2369,7 +2136,6 @@ function applySettings(s){
   document.getElementById("lockBtnGapVal").textContent=s.lockBtnGap||14;
   document.getElementById("lockShadowOpVal").textContent=s.lockShadowOp||40;
   document.getElementById("lockShadowBlurVal").textContent=s.lockShadowBlur||14;
-  document.getElementById("gapVal").textContent=s.imgGap||0;
   document.getElementById("wmScaleVal").textContent=s.wmScale||40;
   document.getElementById("wmOpacityVal").textContent=s.wmOpacity||35;
   document.getElementById("wmXVal").textContent=s.wmX||50;
@@ -2377,7 +2143,6 @@ function applySettings(s){
   document.getElementById("wmGapVal").textContent=s.wmGap||60;
   onTexSourceChange();
   if((s.texSource||"preset")==="preset"){onTexPresetChange();}
-  updateLayerPanel();
   resizeCanvas();
 }
 function savePreset(n){
