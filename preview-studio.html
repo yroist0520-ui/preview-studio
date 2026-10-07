@@ -69,7 +69,7 @@ img{max-width:100%;display:block}
 .panel::-webkit-scrollbar{width:6px}
 .panel::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
 .stage{flex:1;display:flex;align-items:center;justify-content:center;background:#070708;background-image:radial-gradient(circle at center,#1a1a22 0,#000 100%);min-height:600px}
-canvas{box-shadow:0 0 50px #000;max-width:90%;max-height:90%;object-fit:contain}
+#c{box-shadow:0 0 50px #000;display:block;width:auto;height:auto;max-width:100%;max-height:100%;object-fit:contain}
 h3.tool-h{font-size:13px;margin:14px 0 6px;color:#9a9aa3;border-bottom:1px solid #2a2a35;padding-bottom:4px;letter-spacing:.5px}
 button,select,input[type=text],input[type=number],textarea{width:100%;margin:5px 0;padding:8px;background:#21212a;color:#fff;border:1px solid #3a3a45;border-radius:7px;font-size:12px;font-family:inherit}
 button{cursor:pointer;transition:background .15s}
@@ -118,8 +118,8 @@ input[type=file]{font-size:11px}
 @media(max-width:1024px){
   .tool-shell{flex-direction:column;max-height:none}
   .panel{width:100%;max-height:50vh;border-right:none;border-bottom:1px solid var(--border)}
-  .stage{min-height:50vh}
-  canvas{max-width:98%;max-height:98%}
+  .stage{height:50vh;min-height:0;padding:14px}
+  #c{max-width:100%;max-height:100%}
 }
 @media(max-width:768px){
   .container{padding:0 16px}
@@ -129,7 +129,7 @@ input[type=file]{font-size:11px}
   .stat-num{font-size:26px}
   .section{padding:60px 0}
   .panel{max-height:45vh;padding:14px}
-  .stage{min-height:45vh}
+  .stage{height:45vh}
   button,select,input[type=text],input[type=number],textarea{font-size:13px;padding:10px}
   .preset-grid{grid-template-columns:1fr 1fr}
   .footer-cols{gap:32px}
@@ -1048,8 +1048,8 @@ function resizeCanvas(){
   previewScale=Math.min(1,PREVIEW_MAX/Math.max(w,h));
   c.width=Math.round(w*previewScale);
   c.height=Math.round(h*previewScale);
-  c.style.width=Math.round(w*previewScale)+"px";
-  c.style.height=Math.round(h*previewScale)+"px";
+  c.style.width="auto";
+  c.style.height="auto";
   requestDraw();
 }
 
