@@ -243,9 +243,12 @@ input[type=file]{font-size:11px}
         <h3 class="tool-h">① 画布尺寸</h3>
         <select id="size">
           <optgroup label="苹果锁屏 iPhone">
-            <option value="1170,2532">iPhone 锁屏 1170×2532 (12/13/14)</option>
-            <option value="1179,2556">iPhone 锁屏 1179×2556 (14 Pro/15)</option>
-            <option value="1290,2796">iPhone 锁屏 1290×2796 (15 Pro Max)</option>
+            <option value="1320,2868">iPhone 锁屏 1320×2868 (16/17/18 Pro Max)</option>
+            <option value="1206,2622">iPhone 锁屏 1206×2622 (16/17/18 Pro)</option>
+            <option value="1260,2736">iPhone 锁屏 1260×2736 (Air)</option>
+            <option value="1290,2796">iPhone 锁屏 1290×2796 (16 Plus)</option>
+            <option value="1179,2556">iPhone 锁屏 1179×2556 (14 Pro/15/16)</option>
+            <option value="1170,2532">iPhone 锁屏 1170×2532 (12/13/14/17e)</option>
           </optgroup>
           <optgroup label="苹果锁屏 iPad">
             <option value="1668,2388">iPad 锁屏竖 1668×2388 (11")</option>
@@ -254,9 +257,13 @@ input[type=file]{font-size:11px}
             <option value="2732,2048">iPad 锁屏横 2732×2048 (12.9")</option>
           </optgroup>
           <optgroup label="iPhone 壁纸">
+            <option value="1320,2868">iPhone 1320×2868 (16/17/18 Pro Max)</option>
+            <option value="1206,2622">iPhone 1206×2622 (16/17/18 Pro)</option>
+            <option value="1260,2736">iPhone 1260×2736 (Air)</option>
+            <option value="1290,2796">iPhone 1290×2796 (16 Plus)</option>
+            <option value="1179,2556">iPhone 1179×2556 (14 Pro/15/16)</option>
+            <option value="1170,2532">iPhone 1170×2532 (12/13/14/17e)</option>
             <option value="1080,1920">iPhone 1080×1920</option>
-            <option value="1179,2556">iPhone 1179×2556</option>
-            <option value="1290,2796">iPhone 1290×2796</option>
           </optgroup>
           <optgroup label="iPad 竖屏壁纸">
             <option value="1668,2388">iPad 竖 1668×2388</option>
@@ -274,6 +281,9 @@ input[type=file]{font-size:11px}
           <optgroup label="3:4 竖版">
             <option value="1500,2000">3:4 竖 1500×2000</option>
             <option value="1200,1600">3:4 竖 1200×1600</option>
+          </optgroup>
+          <optgroup label="大尺寸">
+            <option value="4000,4000">正方形 4000×4000 (高清)</option>
           </optgroup>
         </select>
         <button onclick="resizeCanvas()">切换尺寸</button>
@@ -296,56 +306,56 @@ input[type=file]{font-size:11px}
 
         <h3 class="tool-h">③ 背景</h3>
         <label>背景类型</label>
-        <select id="bgType" onchange="draw()">
+        <select id="bgType" onchange="requestDraw()">
           <option value="solid">纯色</option>
           <option value="gradient" selected>渐变（暖色调）</option>
           <option value="dark">深色</option>
         </select>
         <label>主色</label>
-        <input type="color" id="bgColor1" value="#f0e6d0" onchange="draw()">
+        <input type="color" id="bgColor1" value="#f0e6d0" onchange="requestDraw()">
         <label>副色（渐变用）</label>
-        <input type="color" id="bgColor2" value="#e8d5b5" onchange="draw()">
+        <input type="color" id="bgColor2" value="#e8d5b5" onchange="requestDraw()">
         <label>渐变方向</label>
-        <select id="bgDir" onchange="draw()">
+        <select id="bgDir" onchange="requestDraw()">
           <option value="v" selected>上→下</option>
           <option value="h">左→右</option>
           <option value="d">左上→右下</option>
           <option value="r">径向</option>
         </select>
         <label>背景高斯模糊强度: <span id="blurVal">0</span>px</label>
-        <input type="range" id="bgBlur" min="0" max="80" value="0" oninput="document.getElementById('blurVal').textContent=this.value;draw()">
+        <input type="range" id="bgBlur" min="0" max="80" value="0" oninput="document.getElementById('blurVal').textContent=this.value;requestDraw()">
 
         <h3 class="tool-h">④ 作品图</h3>
         <input type="file" id="upload" accept="image/*">
-        <button class="ms-btn" onclick="extractColors()" style="margin:4px 0">✦ 从图片提取主色填入背景</button>
+        <button class="warn small" onclick="removeArt()">× 删除图片</button>
+        <button class="ms-btn" onclick="extractColors()" style="margin-top:4px">✦ 从图片提取主色填入背景</button>
         <label>缩放比例: <span id="scaleVal">100</span>%</label>
-        <input type="range" id="artScale" min="20" max="150" value="100" oninput="document.getElementById('scaleVal').textContent=this.value;draw()">
+        <input type="range" id="artScale" min="20" max="150" value="100" oninput="document.getElementById('scaleVal').textContent=this.value;requestDraw()">
+        <div class="checkbox-row"><input type="checkbox" id="fillWidth" onchange="requestDraw()"><span>填满宽度（上下可调）</span></div>
+        <label>图片位置（上下）: <span id="fillWidthYVal">50</span>%</label>
+        <input type="range" id="fillWidthY" min="0" max="100" value="50" oninput="document.getElementById('fillWidthYVal').textContent=this.value;requestDraw()">
+        <div class="hint">开启后图片填满画布宽度，Y滑块控制上下位置（配合羽化效果）</div>
         <label>描边颜色</label>
-        <input type="color" id="borderColor" value="#ffffff" onchange="draw()">
+        <input type="color" id="borderColor" value="#ffffff" onchange="requestDraw()">
         <label>描边宽度: <span id="borderVal">24</span>px</label>
-        <input type="range" id="artBorder" min="0" max="80" value="24" oninput="document.getElementById('borderVal').textContent=this.value;draw()">
+        <input type="range" id="artBorder" min="0" max="80" value="24" oninput="document.getElementById('borderVal').textContent=this.value;requestDraw()">
         <label>向下投影距离: <span id="shadowDVal">20</span>px</label>
-        <input type="range" id="shadowDist" min="0" max="80" value="20" oninput="document.getElementById('shadowDVal').textContent=this.value;draw()">
+        <input type="range" id="shadowDist" min="0" max="80" value="20" oninput="document.getElementById('shadowDVal').textContent=this.value;requestDraw()">
         <label>投影模糊: <span id="shadowBVal">25</span>px</label>
-        <input type="range" id="shadowBlur" min="0" max="60" value="25" oninput="document.getElementById('shadowBVal').textContent=this.value;draw()">
+        <input type="range" id="shadowBlur" min="0" max="60" value="25" oninput="document.getElementById('shadowBVal').textContent=this.value;requestDraw()">
         <label>投影透明度: <span id="shadowOVal">45</span>%</label>
-        <input type="range" id="shadowOp" min="0" max="100" value="45" oninput="document.getElementById('shadowOVal').textContent=this.value;draw()">
+        <input type="range" id="shadowOp" min="0" max="100" value="45" oninput="document.getElementById('shadowOVal').textContent=this.value;requestDraw()">
         <label>投影角度（偏移方向）</label>
-        <select id="shadowAngle" onchange="draw()">
+        <select id="shadowAngle" onchange="requestDraw()">
           <option value="90" selected>正下方</option>
           <option value="120">左下</option>
           <option value="60">右下</option>
           <option value="0">无偏移（光晕）</option>
         </select>
-        <div class="row">
-          <button class="small" onclick="front()">置顶</button>
-          <button class="small" onclick="back()">置底</button>
-          <button class="small" onclick="removeArt()">删除</button>
-        </div>
 
         <h3 class="tool-h">⑤ 羽化蒙版（作品图边缘）</h3>
         <label>羽化模式</label>
-        <select id="featherMode" onchange="draw()">
+        <select id="featherMode" onchange="requestDraw()">
           <option value="none" selected>无羽化</option>
           <option value="top">上方羽化</option>
           <option value="bottom">下方羽化</option>
@@ -353,7 +363,7 @@ input[type=file]{font-size:11px}
           <option value="all">四周羽化</option>
         </select>
         <label>羽化宽度: <span id="featherVal">120</span>px</label>
-        <input type="range" id="featherW" min="20" max="400" value="120" oninput="document.getElementById('featherVal').textContent=this.value;draw()">
+        <input type="range" id="featherW" min="20" max="400" value="120" oninput="document.getElementById('featherVal').textContent=this.value;requestDraw()">
         <div class="hint">作品图边缘会渐变透明，融合到背景中。</div>
 
         <h3 class="tool-h">⑥ 纸张纹理 / 撕纸效果</h3>
@@ -376,16 +386,16 @@ input[type=file]{font-size:11px}
           <input type="file" id="texUpload" accept="image/*">
         </div>
         <label>纹理透明度: <span id="texOpVal">35</span>%</label>
-        <input type="range" id="texOpacity" min="0" max="100" value="35" oninput="document.getElementById('texOpVal').textContent=this.value;draw()">
-        <div class="checkbox-row"><input type="checkbox" id="tornEdge" onchange="draw()" checked><span>启用撕纸边缘效果</span></div>
+        <input type="range" id="texOpacity" min="0" max="100" value="35" oninput="document.getElementById('texOpVal').textContent=this.value;requestDraw()">
+        <div class="checkbox-row"><input type="checkbox" id="tornEdge" onchange="requestDraw()" checked><span>启用撕纸边缘效果</span></div>
         <label>撕纸强度: <span id="tornVal">15</span></label>
-        <input type="range" id="tornAmount" min="5" max="40" value="15" oninput="document.getElementById('tornVal').textContent=this.value;draw()">
+        <input type="range" id="tornAmount" min="5" max="40" value="15" oninput="document.getElementById('tornVal').textContent=this.value;requestDraw()">
 
         <h3 class="tool-h">⑦ 文字</h3>
         <label>英文标题</label>
-        <input type="text" id="textEN" value="Preview" oninput="draw()">
+        <input type="text" id="textEN" value="Preview" oninput="requestDraw()">
         <label>英文字体</label>
-        <select id="fontEN" onchange="draw()">
+        <select id="fontEN" onchange="requestDraw()">
           <option value="'Great Vibes',cursive" selected>Great Vibes 手写</option>
           <option value="'Snell Roundhand','Apple Chancery',cursive">Snell 圆体</option>
           <option value="'Dancing Script',cursive">Dancing Script 手写</option>
@@ -395,18 +405,18 @@ input[type=file]{font-size:11px}
           <option value="'Montserrat',sans-serif">Montserrat 无衬线</option>
         </select>
         <label>英文颜色</label>
-        <input type="color" id="colorEN" value="#5a4a3a" onchange="draw()">
+        <input type="color" id="colorEN" value="#5a4a3a" onchange="requestDraw()">
         <label>英文大小: <span id="textENSizeVal">9</span>%</label>
-        <input type="range" id="textENSize" min="2" max="30" value="9" oninput="document.getElementById('textENSizeVal').textContent=this.value;draw()">
+        <input type="range" id="textENSize" min="2" max="30" value="9" oninput="document.getElementById('textENSizeVal').textContent=this.value;requestDraw()">
         <div class="row-2">
-          <div><label>X: <span id="textENXVal">50</span>%</label><input type="range" id="textENX" min="0" max="100" value="50" oninput="document.getElementById('textENXVal').textContent=this.value;draw()"></div>
-          <div><label>Y: <span id="textENYVal">12</span>%</label><input type="range" id="textENY" min="0" max="100" value="12" oninput="document.getElementById('textENYVal').textContent=this.value;draw()"></div>
+          <div><label>X: <span id="textENXVal">50</span>%</label><input type="range" id="textENX" min="0" max="100" value="50" oninput="document.getElementById('textENXVal').textContent=this.value;requestDraw()"></div>
+          <div><label>Y: <span id="textENYVal">12</span>%</label><input type="range" id="textENY" min="0" max="100" value="12" oninput="document.getElementById('textENYVal').textContent=this.value;requestDraw()"></div>
         </div>
         <label>中文内容（可多行）</label>
-        <textarea id="textCN" rows="3" oninput="draw()">营业时间 9:00-18:00
+        <textarea id="textCN" rows="3" oninput="requestDraw()">营业时间 9:00-18:00
 版权所有 © 2026</textarea>
         <label>中文字体</label>
-        <select id="fontCN" onchange="draw()">
+        <select id="fontCN" onchange="requestDraw()">
           <option value="'KaiTi','Kaiti SC','STKaiti',serif" selected>楷体</option>
           <option value="'Ma Shan Zheng',cursive">马善政毛笔</option>
           <option value="'Long Cang',cursive">龙藏手写</option>
@@ -418,59 +428,94 @@ input[type=file]{font-size:11px}
           <option value="'PingFang SC','Microsoft YaHei',sans-serif">苹方黑体</option>
         </select>
         <label>中文颜色</label>
-        <input type="color" id="colorCN" value="#4a3a2a" onchange="draw()">
+        <input type="color" id="colorCN" value="#4a3a2a" onchange="requestDraw()">
         <label>中文大小: <span id="textCNSizeVal">3.4</span>%</label>
-        <input type="range" id="textCNSize" min="1" max="15" value="3.4" step="0.1" oninput="document.getElementById('textCNSizeVal').textContent=this.value;draw()">
+        <input type="range" id="textCNSize" min="1" max="15" value="3.4" step="0.1" oninput="document.getElementById('textCNSizeVal').textContent=this.value;requestDraw()">
         <div class="row-2">
-          <div><label>X: <span id="textCNXVal">50</span>%</label><input type="range" id="textCNX" min="0" max="100" value="50" oninput="document.getElementById('textCNXVal').textContent=this.value;draw()"></div>
-          <div><label>Y: <span id="textCNYVal">88</span>%</label><input type="range" id="textCNY" min="0" max="100" value="88" oninput="document.getElementById('textCNYVal').textContent=this.value;draw()"></div>
+          <div><label>X: <span id="textCNXVal">50</span>%</label><input type="range" id="textCNX" min="0" max="100" value="50" oninput="document.getElementById('textCNXVal').textContent=this.value;requestDraw()"></div>
+          <div><label>Y: <span id="textCNYVal">88</span>%</label><input type="range" id="textCNY" min="0" max="100" value="88" oninput="document.getElementById('textCNYVal').textContent=this.value;requestDraw()"></div>
         </div>
         <div class="hint">💡 也可直接拖动画布上的文字移动位置</div>
 
         <h3 class="tool-h">⑧ 装饰</h3>
         <label>外框颜色</label>
-        <input type="color" id="strokeColor" value="#ffffff" onchange="draw()">
-        <div class="checkbox-row"><input type="checkbox" id="decBorder" onchange="draw()"><span>绘制外框</span></div>
-        <div class="checkbox-row"><input type="checkbox" id="decSilk" onchange="draw()"><span>丝质曲线</span></div>
-        <div class="checkbox-row"><input type="checkbox" id="decDots" onchange="draw()"><span>点阵装饰</span></div>
+        <input type="color" id="strokeColor" value="#ffffff" onchange="requestDraw()">
+        <div class="checkbox-row"><input type="checkbox" id="decBorder" onchange="requestDraw()"><span>绘制外框</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="decSilk" onchange="requestDraw()"><span>丝质曲线</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="decDots" onchange="requestDraw()"><span>点阵装饰</span></div>
 
         <h3 class="tool-h">⑨ 字稿风模式（IMG_6729 暖金风）</h3>
-        <div class="checkbox-row"><input type="checkbox" id="msMode" onchange="draw()"><span>启用字稿风（图片模糊铺满 + 暖金叠加）</span></div>
-        <div class="checkbox-row"><input type="checkbox" id="msStars" onchange="draw()"><span>✦ 装饰符号</span></div>
-        <div class="checkbox-row"><input type="checkbox" id="msInfoBar" onchange="draw()"><span>顶部信息栏（头像 + 版权 + 营业时间）</span></div>
-        <div class="checkbox-row"><input type="checkbox" id="msTornDivider" onchange="draw()"><span>中间撕纸过渡边缘</span></div>
-        <div class="checkbox-row"><input type="checkbox" id="msRoundedCard" onchange="draw()"><span>圆角卡片容器</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="msMode" onchange="requestDraw()"><span>启用字稿风（图片模糊铺满 + 暖金叠加）</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="msStars" onchange="requestDraw()"><span>✦ 装饰符号</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="msInfoBar" onchange="requestDraw()"><span>顶部信息栏（头像 + 版权 + 营业时间）</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="msTornDivider" onchange="requestDraw()"><span>中间撕纸过渡边缘</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="msRoundedCard" onchange="requestDraw()"><span>圆角卡片容器</span></div>
         <label>头像（圆形裁切到顶部信息栏）</label>
         <input type="file" id="avatarUpload" accept="image/*">
         <label>作者署名（手写体，画面左下）</label>
-        <input type="text" id="msAuthor" value="裴砚" oninput="draw()">
+        <input type="text" id="msAuthor" value="裴砚" oninput="requestDraw()">
+        <label>署名字体</label>
+        <select id="msAuthorFont" onchange="requestDraw()">
+          <option value="'KaiTi','Kaiti SC','STKaiti',serif" selected>楷体</option>
+          <option value="'Ma Shan Zheng',cursive">马善政毛笔</option>
+          <option value="'Long Cang',cursive">龙藏手写</option>
+          <option value="'Liu Jian Mao Cao',cursive">刘建毛草</option>
+          <option value="'ZCOOL XiaoWei',serif">站酷小薇</option>
+          <option value="'ZCOOL QingKe HuangYou',sans-serif">站酷庆科黄油</option>
+          <option value="'Noto Serif SC',serif">思源宋体</option>
+          <option value="'PingFang SC','Microsoft YaHei',sans-serif">苹方黑体</option>
+        </select>
+        <label>署名颜色</label>
+        <input type="color" id="msAuthorColor" value="#d4a574" onchange="requestDraw()">
+        <div class="hint">控制左下角作者署名的文字颜色</div>
         <label>营业时间</label>
-        <input type="text" id="msPrice" value="营业时间:10:00-22:00" oninput="draw()">
+        <input type="text" id="msPrice" value="营业时间:10:00-22:00" oninput="requestDraw()">
+        <label>营业时间文字颜色</label>
+        <input type="color" id="msPriceColor" value="#64503c" onchange="requestDraw()">
         <label>版权声明（全大写英文，顶部右侧）</label>
-        <textarea id="msCopyright" rows="2" oninput="draw()">DO NOT STEAL IMAGES, IMITATE OR PLAGIARIZE</textarea>
+        <textarea id="msCopyright" rows="2" oninput="requestDraw()">DO NOT STEAL IMAGES, IMITATE OR PLAGIARIZE</textarea>
+        <label>版权声明文字颜色</label>
+        <input type="color" id="msCopyrightColor" value="#64503c" onchange="requestDraw()">
         <label>素材来源（Material source 下方）</label>
-        <input type="text" id="msMaterial" value="@底素网络 素材xxx" oninput="draw()">
+        <input type="text" id="msMaterial" value="@底素网络 素材xxx" oninput="requestDraw()">
+        <label>素材来源文字颜色</label>
+        <input type="color" id="msMaterialColor" value="#64503c" onchange="requestDraw()">
         <label>右侧英文花体大字（Preview 标识）</label>
-        <input type="text" id="msPreviewText" value="Preview" oninput="draw()">
+        <input type="text" id="msPreviewText" value="Preview" oninput="requestDraw()">
+        <label>Preview 大字颜色（渐变基色）</label>
+        <input type="color" id="msPreviewColor" value="#d4a574" onchange="requestDraw()">
         <label>中文手写主文字（多行，金色+虚影双层）</label>
-        <textarea id="msVerticalText" rows="3" oninput="draw()">我很爱我普通的生活
+        <textarea id="msVerticalText" rows="3" oninput="requestDraw()">我很爱我普通的生活
 我们都是走向幸福的人</textarea>
         <label>主文字颜色（金色渐变）</label>
-        <input type="color" id="msTitleColor" value="#d4a574" onchange="draw()">
+        <input type="color" id="msTitleColor" value="#d4a574" onchange="requestDraw()">
         <label>虚影颜色（白色半透明）</label>
-        <input type="color" id="msSubtitleColor" value="#ffffff" onchange="draw()">
+        <input type="color" id="msSubtitleColor" value="#ffffff" onchange="requestDraw()">
         <label>散落小字装饰（中日英混排，每行一句）</label>
-        <textarea id="msScatterText" rows="3" oninput="draw()">Harris, I miss you.
+        <textarea id="msScatterText" rows="3" oninput="requestDraw()">Harris, I miss you.
 love
 私は幸せ</textarea>
+        <label>散落小字颜色</label>
+        <input type="color" id="msScatterColor" value="#fff0d2" onchange="requestDraw()">
+        <label>散落小字字体</label>
+        <select id="msScatterFont" onchange="requestDraw()">
+          <option value='"Cormorant Garamond","Great Vibes",serif"' selected>手写衬线（默认）</option>
+          <option value="'KaiTi','Kaiti SC','STKaiti',serif">楷体</option>
+          <option value="'Ma Shan Zheng',cursive">马善政毛笔</option>
+          <option value="'Long Cang',cursive">龙藏手写</option>
+          <option value="'ZCOOL XiaoWei',serif">站酷小薇</option>
+          <option value="'Noto Serif SC',serif">思源宋体</option>
+          <option value="'PingFang SC','Microsoft YaHei',sans-serif">苹方黑体</option>
+          <option value="'Inter','Helvetica',sans-serif">无衬线</option>
+        </select>
         <label>背景图模糊强度: <span id="msBlurVal">12</span>px</label>
-        <input type="range" id="msBlur" min="0" max="40" value="12" oninput="document.getElementById('msBlurVal').textContent=this.value;draw()">
+        <input type="range" id="msBlur" min="0" max="40" value="12" oninput="document.getElementById('msBlurVal').textContent=this.value;requestDraw()">
 
         <h3 class="tool-h" style="margin-top:14px">⑨½ 元素大小与位置调节</h3>
         <label>主文字字号: <span id="msMainSizeVal">55</span>‰</label>
-        <input type="range" id="msMainSize" min="20" max="100" value="55" oninput="document.getElementById('msMainSizeVal').textContent=this.value;draw()">
+        <input type="range" id="msMainSize" min="20" max="100" value="55" oninput="document.getElementById('msMainSizeVal').textContent=this.value;requestDraw()">
         <label>主文字字体</label>
-        <select id="msMainFont" onchange="draw()">
+        <select id="msMainFont" onchange="requestDraw()">
           <option value="'KaiTi','Kaiti SC','STKaiti',serif" selected>楷体</option>
           <option value="'Ma Shan Zheng',cursive">马善政毛笔</option>
           <option value="'Long Cang',cursive">龙藏手写</option>
@@ -481,13 +526,13 @@ love
           <option value="'PingFang SC','Microsoft YaHei',sans-serif">苹方黑体</option>
         </select>
         <div class="row-2">
-          <div><label>主文字 X: <span id="msMainXVal">50</span>%</label><input type="range" id="msMainX" min="0" max="100" value="50" oninput="document.getElementById('msMainXVal').textContent=this.value;draw()"></div>
-          <div><label>主文字 Y: <span id="msMainYVal">60</span>%</label><input type="range" id="msMainY" min="0" max="100" value="60" oninput="document.getElementById('msMainYVal').textContent=this.value;draw()"></div>
+          <div><label>主文字 X: <span id="msMainXVal">50</span>%</label><input type="range" id="msMainX" min="0" max="100" value="50" oninput="document.getElementById('msMainXVal').textContent=this.value;requestDraw()"></div>
+          <div><label>主文字 Y: <span id="msMainYVal">60</span>%</label><input type="range" id="msMainY" min="0" max="100" value="60" oninput="document.getElementById('msMainYVal').textContent=this.value;requestDraw()"></div>
         </div>
         <label>Preview 花体字号: <span id="msPreviewSizeVal">45</span>‰</label>
-        <input type="range" id="msPreviewSize" min="20" max="80" value="45" oninput="document.getElementById('msPreviewSizeVal').textContent=this.value;draw()">
+        <input type="range" id="msPreviewSize" min="20" max="80" value="45" oninput="document.getElementById('msPreviewSizeVal').textContent=this.value;requestDraw()">
         <label>Preview 字体</label>
-        <select id="msPreviewFont" onchange="draw()">
+        <select id="msPreviewFont" onchange="requestDraw()">
           <option value="'Great Vibes',cursive" selected>Great Vibes 手写</option>
           <option value="'Snell Roundhand','Apple Chancery',cursive">Snell 圆体</option>
           <option value="'Dancing Script',cursive">Dancing Script</option>
@@ -495,63 +540,67 @@ love
           <option value="'Playfair Display',serif">Playfair</option>
         </select>
         <div class="row-2">
-          <div><label>Preview X: <span id="msPreviewXVal">82</span>%</label><input type="range" id="msPreviewX" min="0" max="100" value="82" oninput="document.getElementById('msPreviewXVal').textContent=this.value;draw()"></div>
-          <div><label>Preview Y: <span id="msPreviewYVal">12</span>%</label><input type="range" id="msPreviewY" min="0" max="100" value="12" oninput="document.getElementById('msPreviewYVal').textContent=this.value;draw()"></div>
+          <div><label>Preview X: <span id="msPreviewXVal">82</span>%</label><input type="range" id="msPreviewX" min="0" max="100" value="82" oninput="document.getElementById('msPreviewXVal').textContent=this.value;requestDraw()"></div>
+          <div><label>Preview Y: <span id="msPreviewYVal">12</span>%</label><input type="range" id="msPreviewY" min="0" max="100" value="12" oninput="document.getElementById('msPreviewYVal').textContent=this.value;requestDraw()"></div>
         </div>
         <label>头像大小: <span id="msAvatarSizeVal">32</span>%</label>
-        <input type="range" id="msAvatarSize" min="10" max="50" value="32" oninput="document.getElementById('msAvatarSizeVal').textContent=this.value;draw()">
+        <input type="range" id="msAvatarSize" min="10" max="50" value="32" oninput="document.getElementById('msAvatarSizeVal').textContent=this.value;requestDraw()">
         <label>散落小字字号: <span id="msScatterSizeVal">16</span>‰</label>
-        <input type="range" id="msScatterSize" min="8" max="30" value="16" oninput="document.getElementById('msScatterSizeVal').textContent=this.value;draw()">
+        <input type="range" id="msScatterSize" min="8" max="30" value="16" oninput="document.getElementById('msScatterSizeVal').textContent=this.value;requestDraw()">
         <div class="row-2">
-          <div><label>散落小字 X: <span id="msScatterXVal">92</span>%</label><input type="range" id="msScatterX" min="0" max="100" value="92" oninput="document.getElementById('msScatterXVal').textContent=this.value;draw()"></div>
-          <div><label>散落小字 Y: <span id="msScatterYVal">45</span>%</label><input type="range" id="msScatterY" min="0" max="100" value="45" oninput="document.getElementById('msScatterYVal').textContent=this.value;draw()"></div>
+          <div><label>散落小字 X: <span id="msScatterXVal">92</span>%</label><input type="range" id="msScatterX" min="0" max="100" value="92" oninput="document.getElementById('msScatterXVal').textContent=this.value;requestDraw()"></div>
+          <div><label>散落小字 Y: <span id="msScatterYVal">45</span>%</label><input type="range" id="msScatterY" min="0" max="100" value="45" oninput="document.getElementById('msScatterYVal').textContent=this.value;requestDraw()"></div>
         </div>
         <label>署名字号: <span id="msAuthorSizeVal">28</span>‰</label>
-        <input type="range" id="msAuthorSize" min="12" max="50" value="28" oninput="document.getElementById('msAuthorSizeVal').textContent=this.value;draw()">
+        <input type="range" id="msAuthorSize" min="12" max="50" value="28" oninput="document.getElementById('msAuthorSizeVal').textContent=this.value;requestDraw()">
         <div class="row-2">
-          <div><label>署名 X: <span id="msAuthorXVal">8</span>%</label><input type="range" id="msAuthorX" min="0" max="100" value="8" oninput="document.getElementById('msAuthorXVal').textContent=this.value;draw()"></div>
-          <div><label>署名 Y: <span id="msAuthorYVal">88</span>%</label><input type="range" id="msAuthorY" min="0" max="100" value="88" oninput="document.getElementById('msAuthorYVal').textContent=this.value;draw()"></div>
+          <div><label>署名 X: <span id="msAuthorXVal">8</span>%</label><input type="range" id="msAuthorX" min="0" max="100" value="8" oninput="document.getElementById('msAuthorXVal').textContent=this.value;requestDraw()"></div>
+          <div><label>署名 Y: <span id="msAuthorYVal">88</span>%</label><input type="range" id="msAuthorY" min="0" max="100" value="88" oninput="document.getElementById('msAuthorYVal').textContent=this.value;requestDraw()"></div>
         </div>
         <label>✦ 装饰大小: <span id="msStarSizeVal">25</span>‰</label>
-        <input type="range" id="msStarSize" min="10" max="50" value="25" oninput="document.getElementById('msStarSizeVal').textContent=this.value;draw()">
+        <input type="range" id="msStarSize" min="10" max="50" value="25" oninput="document.getElementById('msStarSizeVal').textContent=this.value;requestDraw()">
         <label>信息栏高度: <span id="msBarHVal">22</span>%</label>
-        <input type="range" id="msBarH" min="10" max="35" value="22" oninput="document.getElementById('msBarHVal').textContent=this.value;draw()">
+        <input type="range" id="msBarH" min="10" max="35" value="22" oninput="document.getElementById('msBarHVal').textContent=this.value;requestDraw()">
         <label>✦ 装饰数量: <span id="msStarCountVal">7</span></label>
-        <input type="range" id="msStarCount" min="0" max="20" value="7" oninput="document.getElementById('msStarCountVal').textContent=this.value;draw()">
+        <input type="range" id="msStarCount" min="0" max="20" value="7" oninput="document.getElementById('msStarCountVal').textContent=this.value;requestDraw()">
 
         <h3 class="tool-h" style="margin-top:14px">⑩ 苹果锁屏预览</h3>
-        <div class="checkbox-row"><input type="checkbox" id="lockScreen" onchange="draw()"><span>显示锁屏 UI（时间/日期/按钮）</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="lockScreen" onchange="requestDraw()"><span>显示锁屏 UI（时间/日期/按钮）</span></div>
         <label>时间文字</label>
-        <input type="text" id="lockTime" value="9:41" oninput="draw()">
+        <input type="text" id="lockTime" value="9:41" oninput="requestDraw()">
         <label>日期文字</label>
-        <input type="text" id="lockDate" value="10月6日 星期一" oninput="draw()">
+        <input type="text" id="lockDate" value="10月6日 星期一" oninput="requestDraw()">
         <label>时间字号: <span id="lockTimeSizeVal">18</span>%</label>
-        <input type="range" id="lockTimeSize" min="5" max="35" value="18" oninput="document.getElementById('lockTimeSizeVal').textContent=this.value;draw()">
+        <input type="range" id="lockTimeSize" min="5" max="35" value="18" oninput="document.getElementById('lockTimeSizeVal').textContent=this.value;requestDraw()">
         <div class="row-2">
-          <div><label>时间 X: <span id="lockTimeXVal">50</span>%</label><input type="range" id="lockTimeX" min="0" max="100" value="50" oninput="document.getElementById('lockTimeXVal').textContent=this.value;draw()"></div>
-          <div><label>时间 Y: <span id="lockTimeYVal">20</span>%</label><input type="range" id="lockTimeY" min="0" max="100" value="20" oninput="document.getElementById('lockTimeYVal').textContent=this.value;draw()"></div>
+          <div><label>时间 X: <span id="lockTimeXVal">50</span>%</label><input type="range" id="lockTimeX" min="0" max="100" value="50" oninput="document.getElementById('lockTimeXVal').textContent=this.value;requestDraw()"></div>
+          <div><label>时间 Y: <span id="lockTimeYVal">20</span>%</label><input type="range" id="lockTimeY" min="0" max="100" value="20" oninput="document.getElementById('lockTimeYVal').textContent=this.value;requestDraw()"></div>
         </div>
         <label>时间/日期颜色</label>
-        <input type="color" id="lockColor" value="#ffffff" onchange="draw()">
-        <div class="checkbox-row"><input type="checkbox" id="lockButtons" onchange="draw()" checked><span>底部手电筒 / 相机按钮</span></div>
+        <input type="color" id="lockColor" value="#ffffff" onchange="requestDraw()">
+        <label>时间阴影透明度: <span id="lockShadowOpVal">40</span>%</label>
+        <input type="range" id="lockShadowOp" min="0" max="100" value="40" oninput="document.getElementById('lockShadowOpVal').textContent=this.value;requestDraw()">
+        <label>阴影模糊: <span id="lockShadowBlurVal">14</span></label>
+        <input type="range" id="lockShadowBlur" min="0" max="50" value="14" oninput="document.getElementById('lockShadowBlurVal').textContent=this.value;requestDraw()">
+        <div class="checkbox-row"><input type="checkbox" id="lockButtons" onchange="requestDraw()" checked><span>底部手电筒 / 相机按钮</span></div>
         <label>按钮大小: <span id="lockBtnSizeVal">4.5</span>%</label>
-        <input type="range" id="lockBtnSize" min="2" max="10" value="4.5" step="0.1" oninput="document.getElementById('lockBtnSizeVal').textContent=this.value;draw()">
+        <input type="range" id="lockBtnSize" min="2" max="10" value="4.5" step="0.1" oninput="document.getElementById('lockBtnSizeVal').textContent=this.value;requestDraw()">
         <label>按钮高度(距底部): <span id="lockBtnYVal">94</span>%</label>
-        <input type="range" id="lockBtnY" min="80" max="98" value="94" oninput="document.getElementById('lockBtnYVal').textContent=this.value;draw()">
+        <input type="range" id="lockBtnY" min="80" max="98" value="94" oninput="document.getElementById('lockBtnYVal').textContent=this.value;requestDraw()">
         <label>按钮间距(距边缘): <span id="lockBtnGapVal">14</span>%</label>
-        <input type="range" id="lockBtnGap" min="5" max="30" value="14" oninput="document.getElementById('lockBtnGapVal').textContent=this.value;draw()">
+        <input type="range" id="lockBtnGap" min="5" max="30" value="14" oninput="document.getElementById('lockBtnGapVal').textContent=this.value;requestDraw()">
         <label>左侧图标（默认手电筒，可输入颜文字/emoji）</label>
-        <input type="text" id="lockLeftIcon" value="" placeholder="留空=矢量手电筒" oninput="draw()">
+        <input type="text" id="lockLeftIcon" value="" placeholder="留空=矢量手电筒" oninput="requestDraw()">
         <label>右侧图标（默认相机，可输入颜文字/emoji）</label>
-        <input type="text" id="lockRightIcon" value="" placeholder="留空=矢量相机" oninput="draw()">
+        <input type="text" id="lockRightIcon" value="" placeholder="留空=矢量相机" oninput="requestDraw()">
         <div class="hint">彩色表情会自动栅格化为白色剪影</div>
-        <div class="checkbox-row"><input type="checkbox" id="lockHomeBar" onchange="draw()" checked><span>底部 Home 指示条</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="lockHomeBar" onchange="requestDraw()" checked><span>底部 Home 指示条</span></div>
 
         <h3 class="tool-h" style="margin-top:14px">⑪ 全屏水印</h3>
-        <div class="checkbox-row"><input type="checkbox" id="wmEnable" onchange="draw()"><span>启用全屏水印</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="wmEnable" onchange="requestDraw()"><span>启用全屏水印</span></div>
         <input type="file" id="wmUpload" accept="image/*">
         <label>混合模式</label>
-        <select id="wmBlend" onchange="draw()">
+        <select id="wmBlend" onchange="requestDraw()">
           <option value="overlay" selected>叠加 (overlay)</option>
           <option value="soft-light">柔光 (soft-light)</option>
           <option value="hard-light">强光 (hard-light)</option>
@@ -562,16 +611,16 @@ love
           <option value="normal">正常 (normal)</option>
         </select>
         <label>水印缩放: <span id="wmScaleVal">40</span>%</label>
-        <input type="range" id="wmScale" min="10" max="300" value="40" oninput="document.getElementById('wmScaleVal').textContent=this.value;draw()">
+        <input type="range" id="wmScale" min="10" max="300" value="40" oninput="document.getElementById('wmScaleVal').textContent=this.value;requestDraw()">
         <label>水印透明度: <span id="wmOpacityVal">35</span>%</label>
-        <input type="range" id="wmOpacity" min="0" max="100" value="35" oninput="document.getElementById('wmOpacityVal').textContent=this.value;draw()">
+        <input type="range" id="wmOpacity" min="0" max="100" value="35" oninput="document.getElementById('wmOpacityVal').textContent=this.value;requestDraw()">
         <div class="row-2">
-          <div><label>X: <span id="wmXVal">50</span>%</label><input type="range" id="wmX" min="0" max="100" value="50" oninput="document.getElementById('wmXVal').textContent=this.value;draw()"></div>
-          <div><label>Y: <span id="wmYVal">50</span>%</label><input type="range" id="wmY" min="0" max="100" value="50" oninput="document.getElementById('wmYVal').textContent=this.value;draw()"></div>
+          <div><label>X: <span id="wmXVal">50</span>%</label><input type="range" id="wmX" min="0" max="100" value="50" oninput="document.getElementById('wmXVal').textContent=this.value;requestDraw()"></div>
+          <div><label>Y: <span id="wmYVal">50</span>%</label><input type="range" id="wmY" min="0" max="100" value="50" oninput="document.getElementById('wmYVal').textContent=this.value;requestDraw()"></div>
         </div>
-        <div class="checkbox-row"><input type="checkbox" id="wmTile" onchange="draw()" checked><span>全屏平铺</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="wmTile" onchange="requestDraw()" checked><span>全屏平铺</span></div>
         <label>平铺间距: <span id="wmGapVal">60</span>%</label>
-        <input type="range" id="wmGap" min="0" max="150" value="60" oninput="document.getElementById('wmGapVal').textContent=this.value;draw()">
+        <input type="range" id="wmGap" min="0" max="150" value="60" oninput="document.getElementById('wmGapVal').textContent=this.value;requestDraw()">
         <div class="hint">水印图会以所选混合模式叠加在作品图上</div>
 
         <h3 class="tool-h" style="margin-top:14px">⑫ 分享预设</h3>
@@ -797,43 +846,152 @@ let presetTextureImg=null;
 let avatarImg=null;
 let watermarkImg=null;
 
+// R9 性能优化：预览/导出解耦
+const PREVIEW_MAX=1000;
+let previewScale=1;
+let exportCanvas=null;
+let exportCtx=null;
+let rafPending=false;
+let rafFrame=null;
+
+// ============ IndexedDB 持久化 ============
+function idbOpen(){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open("ps-media",1);
+    req.onupgradeneeded=e=>{e.target.result.createObjectStore("files");};
+    req.onsuccess=e=>resolve(e.target.result);
+    req.onerror=e=>reject(e.target.error);
+  });
+}
+function idbPut(key,blob){
+  idbOpen().then(db=>{const tx=db.transaction("files","readwrite");tx.objectStore("files").put(blob,key);});
+}
+function idbGet(key){
+  return new Promise((resolve,reject)=>{
+    idbOpen().then(db=>{
+      const tx=db.transaction("files","readonly");
+      const req=tx.objectStore("files").get(key);
+      req.onsuccess=e=>resolve(e.target.result);
+      req.onerror=e=>reject(e.target.error);
+    });
+  });
+}
+
+// ============ 自动保存/恢复 ============
+const AUTOSAVE_KEY="ps-autosave-v1";
+let autosaveTimer=null;
+function scheduleAutosave(){
+  clearTimeout(autosaveTimer);
+  autosaveTimer=setTimeout(()=>{
+    const s=getSettings();
+    delete s.msAuthor;s.msAuthor=document.getElementById("msAuthor").value;
+    localStorage.setItem(AUTOSAVE_KEY,JSON.stringify(s));
+    const indicator=document.getElementById("autosaveIndicator");
+    if(indicator){indicator.textContent="已保存";setTimeout(()=>{if(indicator)indicator.textContent="已自动保存";},2000);}
+  },600);
+}
+function restoreAutosave(){
+  const raw=localStorage.getItem(AUTOSAVE_KEY);
+  if(!raw)return;
+  try{
+    const s=JSON.parse(raw);
+    applySettings(s);
+  }catch(e){}
+}
+
+// ============ rAF 节流渲染 ============
+function requestDraw(){
+  if(rafPending)return;
+  rafPending=true;
+  rafFrame=requestAnimationFrame(()=>{
+    rafPending=false;
+    requestDraw();
+  });
+}
+
+// ============ 导出用全分辨率 Canvas ============
+function ensureExportCanvas(w,h){
+  if(!exportCanvas||exportCanvas.width!==w||exportCanvas.height!==h){
+    exportCanvas=document.createElement("canvas");
+    exportCanvas.width=w;exportCanvas.height=h;
+    exportCtx=exportCanvas.getContext("2d");
+  }
+}
+
 // ============ 画布尺寸 ============
 function resizeCanvas(){
   const s=document.getElementById("size").value.split(",");
-  c.width=parseInt(s[0]);c.height=parseInt(s[1]);
-  draw();
+  const w=parseInt(s[0]),h=parseInt(s[1]);
+  previewScale=Math.min(1,PREVIEW_MAX/Math.max(w,h));
+  c.width=Math.round(w*previewScale);
+  c.height=Math.round(h*previewScale);
+  c.style.width=Math.round(w*previewScale)+"px";
+  c.style.height=Math.round(h*previewScale)+"px";
+  requestDraw();
 }
 
-// ============ 图片上传 ============
-document.getElementById("upload").onchange=e=>{
-  const f=e.target.files[0];if(!f)return;
+// ============ 图片上传（支持多选） ============
+function addImageFiles(files){
+  const f=Array.from(files).filter(x=>x.type.startsWith("image/"))[0];
+  if(!f)return;
   const img=new Image();
-  img.onload=()=>{layers.push(img);draw();};
+  img.onload=()=>{
+    layers.length=0;
+    layers.push({img,x:0.5,y:0.5,w:1,h:1,fitMode:"cover"});
+    requestDraw();
+  };
   img.src=URL.createObjectURL(f);
+}
+
+document.getElementById("upload").onchange=e=>{
+  addImageFiles(e.target.files);
+  e.target.value="";
 };
+
+// ============ 拖拽文件到画布上传 ============
+document.querySelector(".stage").addEventListener("dragover",e=>{e.preventDefault();});
+document.querySelector(".stage").addEventListener("drop",e=>{
+  e.preventDefault();
+  const files=e.dataTransfer.files;
+  if(files.length)addImageFiles(files);
+});
+
+// ============ 粘贴图片上传 ============
+document.addEventListener("paste",e=>{
+  const items=e.clipboardData.items;
+  for(let i=0;i<items.length;i++){
+    if(items[i].type.startsWith("image/")){
+      addImageFiles([items[i].getAsFile()]);
+      break;
+    }
+  }
+});
 document.getElementById("texUpload").onchange=e=>{
   const f=e.target.files[0];if(!f)return;
+  idbPut("ps-texture",f);
   const img=new Image();
-  img.onload=()=>{textureImg=img;draw();};
+  img.onload=()=>{textureImg=img;requestDraw();};
   img.src=URL.createObjectURL(f);
 };
 document.getElementById("avatarUpload").onchange=e=>{
   const f=e.target.files[0];if(!f)return;
+  idbPut("ps-avatar",f);
   const img=new Image();
-  img.onload=()=>{avatarImg=img;draw();};
+  img.onload=()=>{avatarImg=img;requestDraw();};
   img.src=URL.createObjectURL(f);
 };
 document.getElementById("wmUpload").onchange=e=>{
   const f=e.target.files[0];if(!f)return;
+  idbPut("ps-watermark",f);
   const img=new Image();
-  img.onload=()=>{watermarkImg=img;draw();};
+  img.onload=()=>{watermarkImg=img;requestDraw();};
   img.src=URL.createObjectURL(f);
 };
 
 // ============ 智能取色：从上传图片提取主色+副色 ============
 function extractColors(){
-  if(!layers.length){alert("请先在「④ 作品图」上传一张图片");return;}
-  const img=layers[layers.length-1];
+  if(!layers.length||!layers[0].img){alert("请先在「④ 作品图」上传一张图片");return;}
+  const img=layers[0].img;
   // 离屏采样：缩到 100×100 加速
   const sw=100,sh=100;
   const off=document.createElement("canvas");
@@ -882,7 +1040,7 @@ function extractColors(){
   document.getElementById("colorCN").value=txtC;
   document.getElementById("msTitleColor").value=txtC;
   document.getElementById("msSubtitleColor").value=hex(lighten(sub,60));
-  draw();
+  requestDraw();
   alert("已提取主色 "+c1+" / 副色 "+c2+" 并填入背景渐变");
 }
 
@@ -976,19 +1134,21 @@ function onTexSourceChange(){
   document.getElementById("presetTexRow").style.display=src==="preset"?"block":"none";
   document.getElementById("uploadTexRow").style.display=src==="upload"?"block":"none";
   if(src==="preset"){onTexPresetChange();}
-  else if(src==="upload"){presetTextureImg=null;if(!textureImg) draw();}
-  else{presetTextureImg=null;textureImg=null;draw();}
+  else if(src==="upload"){presetTextureImg=null;if(!textureImg) requestDraw();}
+  else{presetTextureImg=null;textureImg=null;requestDraw();}
 }
 function onTexPresetChange(){
   const type=document.getElementById("texPreset").value;
   presetTextureImg=generatePaperTexture(type);
-  draw();
+  requestDraw();
 }
 
-// ============ 图层操作 ============
-function front(){if(layers.length){layers.push(layers.shift());draw();}}
-function back(){if(layers.length){layers.unshift(layers.pop());draw();}}
-function removeArt(){layers=[];draw();}
+// ============ 删除图片 ============
+function removeArt(){
+  if(layers.length===0)return;
+  layers.splice(0,layers.length);
+  requestDraw();
+}
 
 // ============ 背景绘制 ============
 function drawBackground(){
@@ -1047,11 +1207,15 @@ function drawTexture(){
   ctx.restore();
 }
 
-// ============ 作品图绘制 ============
+// ============ 作品图绘制（支持 fillWidth 模式） ============
 function drawArtwork(){
+  if(layers.length===0)return;
+  const img=layers[0].img;
+  if(!img||!img.complete||!img.naturalWidth)return;
   const msMode=document.getElementById("msMode").checked;
   const lockScreen=document.getElementById("lockScreen").checked;
-  const coverMode=msMode||lockScreen; // 字稿风/锁屏模式：图片铺满不留白
+  const coverMode=msMode||lockScreen;
+  const fillWidth=document.getElementById("fillWidth")&&document.getElementById("fillWidth").checked;
   const scale=parseInt(document.getElementById("artScale").value)/100;
   const border=parseInt(document.getElementById("artBorder").value);
   const borderColor=document.getElementById("borderColor").value;
@@ -1062,143 +1226,132 @@ function drawArtwork(){
   const featherMode=document.getElementById("featherMode").value;
   const featherW=parseInt(document.getElementById("featherW").value);
 
-  layers.forEach(img=>{
-    let w,h,x,y;
-    if(coverMode){
-      // 铺满画布（cover 模式，不留白边）
-      const r=Math.max(c.width/img.width,c.height/img.height)*scale;
-      w=img.width*r;h=img.height*r;
-      x=(c.width-w)/2;y=(c.height-h)/2;
+  let w,h,x,y;
+  if(fillWidth){
+    w=c.width;
+    const ratio=w/img.width;
+    h=img.height*ratio;
+    x=0;
+    const fy=parseInt(document.getElementById("fillWidthY")?document.getElementById("fillWidthY").value:50)/100;
+    y=c.height*fy - h*fy;
+  }else if(coverMode){
+    const r=Math.max(c.width/img.width,c.height/img.height)*scale;
+    w=img.width*r;h=img.height*r;
+    x=(c.width-w)/2;y=(c.height-h)/2;
+  }else{
+    const ratio=Math.min(c.width/img.width,c.height/img.height);
+    w=img.width*ratio*scale;h=img.height*ratio*scale;
+    x=(c.width-w)/2;y=(c.height-h)/2;
+  }
+
+  if(sDist>0||sBlur>0){
+    ctx.save();
+    ctx.shadowColor=`rgba(0,0,0,${sOp})`;
+    ctx.shadowBlur=sBlur;
+    ctx.shadowOffsetX=Math.cos(sAng)*sDist;
+    ctx.shadowOffsetY=Math.max(0,Math.sin(sAng)*sDist);
+    ctx.fillStyle=`rgba(0,0,0,${sOp})`;
+    ctx.fillRect(x-border,y-border,w+border*2,h+border*2);
+    ctx.restore();
+  }
+
+  if(border>0){
+    ctx.fillStyle=borderColor;
+    ctx.fillRect(x-border,y-border,w+border*2,h+border*2);
+  }
+
+  if(featherMode==="none"){
+    ctx.drawImage(img,x,y,w,h);
+  }else{
+    if(!offscreenCache.feather || offscreenCache.feather.width!==Math.ceil(w)|| offscreenCache.feather.height!==Math.ceil(h)){
+      offscreenCache.feather=document.createElement("canvas");
+      offscreenCache.feather.width=Math.ceil(w);offscreenCache.feather.height=Math.ceil(h);
+    }
+    const tmp=offscreenCache.feather;
+    const tctx=tmp.getContext("2d");
+    tctx.clearRect(0,0,tmp.width,tmp.height);
+    tctx.drawImage(img,0,0,w,h);
+    tctx.globalCompositeOperation="destination-in";
+    let grad;
+    const fw=Math.min(featherW,w*0.8);
+    const ratio=fw/h;
+    if(featherMode==="top"){
+      grad=tctx.createLinearGradient(0,0,0,h);
+      grad.addColorStop(0,"rgba(0,0,0,0)");
+      grad.addColorStop(Math.min(.99,ratio),"rgba(0,0,0,1)");
+      grad.addColorStop(1,"rgba(0,0,0,1)");
+    }else if(featherMode==="bottom"){
+      grad=tctx.createLinearGradient(0,0,0,h);
+      grad.addColorStop(0,"rgba(0,0,0,1)");
+      grad.addColorStop(Math.max(.01,1-ratio),"rgba(0,0,0,1)");
+      grad.addColorStop(1,"rgba(0,0,0,0)");
+    }else if(featherMode==="both"){
+      grad=tctx.createLinearGradient(0,0,0,h);
+      const half=Math.min(.49,ratio/2);
+      const halfEnd=Math.max(.51,1-half);
+      grad.addColorStop(0,"rgba(0,0,0,0)");
+      grad.addColorStop(half,"rgba(0,0,0,1)");
+      grad.addColorStop(halfEnd,"rgba(0,0,0,1)");
+      grad.addColorStop(1,"rgba(0,0,0,0)");
     }else{
-      // 默认：contain 模式（居中留白）
-      const ratio=Math.min(c.width/img.width,c.height/img.height);
-      w=img.width*ratio*scale;h=img.height*ratio*scale;
-      x=(c.width-w)/2;y=(c.height-h)/2;
+      const minDim=Math.min(w,h);
+      grad=tctx.createRadialGradient(w/2,h/2,Math.max(0,minDim/2-fw),w/2,h/2,minDim/2);
+      grad.addColorStop(0,"rgba(0,0,0,1)");
+      grad.addColorStop(1,"rgba(0,0,0,0)");
     }
+    tctx.fillStyle=grad;
+    tctx.fillRect(0,0,tmp.width,tmp.height);
+    ctx.drawImage(tmp,x,y,w,h);
+  }
 
-    // 1) 向下投影
-    if((sDist>0||sBlur>0)&&!coverMode){
-      ctx.save();
-      const offX=Math.cos(sAng)*sDist;
-      const offY=Math.sin(sAng)*sDist;
-      ctx.shadowColor=`rgba(0,0,0,${sOp})`;
-      ctx.shadowBlur=sBlur;
-      ctx.shadowOffsetX=offX;
-      ctx.shadowOffsetY=Math.max(0,offY);
-      ctx.fillStyle=`rgba(0,0,0,${sOp})`;
-      ctx.fillRect(x-border,y-border,w+border*2,h+border*2);
-      ctx.restore();
-    }
-
-    // 2) 描边（铺满模式下不画描边）
-    if(border>0&&!coverMode){
-      ctx.fillStyle=borderColor;
-      ctx.fillRect(x-border,y-border,w+border*2,h+border*2);
-    }
-
-    // 3) 作品图本体
-    if(featherMode==="none"){
-      ctx.drawImage(img,x,y,w,h);
-    }else{
-      // 复用离屏 canvas，避免每次 draw 重建
-      if(!offscreenCache.feather || offscreenCache.feather.width!==w || offscreenCache.feather.height!==h){
-        offscreenCache.feather=document.createElement("canvas");
-        offscreenCache.feather.width=w;offscreenCache.feather.height=h;
+  // 字稿风效果（整张画布，只执行一次）
+  if(msMode){
+    ctx.save();
+    ctx.globalCompositeOperation="soft-light";
+    const warmGrad=ctx.createLinearGradient(0,0,0,c.height);
+    warmGrad.addColorStop(0,"rgba(212,165,116,0.55)");
+    warmGrad.addColorStop(0.5,"rgba(201,169,110,0.4)");
+    warmGrad.addColorStop(1,"rgba(180,140,90,0.5)");
+    ctx.fillStyle=warmGrad;
+    ctx.fillRect(0,0,c.width,c.height);
+    ctx.restore();
+    if(!offscreenCache.noise || offscreenCache.noiseW!==c.width || offscreenCache.noiseH!==c.height){
+      offscreenCache.noise=document.createElement("canvas");
+      offscreenCache.noise.width=c.width;offscreenCache.noise.height=c.height;
+      const nctx=offscreenCache.noise.getContext("2d");
+      nctx.fillStyle="rgba(0,0,0,0)";nctx.fillRect(0,0,c.width,c.height);
+      const count=Math.max(500,Math.floor(c.width*c.height/6000));
+      for(let i=0;i<count;i++){
+        const g=Math.random()*60+100;
+        nctx.fillStyle=`rgb(${g},${g-10},${g-30})`;
+        nctx.globalAlpha=0.08;
+        nctx.fillRect(Math.random()*c.width,Math.random()*c.height,1.5,1.5);
       }
-      const tmp=offscreenCache.feather;
-      const tctx=tmp.getContext("2d");
-      tctx.clearRect(0,0,w,h);
-      tctx.drawImage(img,0,0,w,h);
-      tctx.globalCompositeOperation="destination-in";
-      let grad;
-      if(featherMode==="top"){
-        grad=tctx.createLinearGradient(0,0,0,h);
-        grad.addColorStop(0,"rgba(0,0,0,0)");
-        grad.addColorStop(Math.min(.99,featherW/h),"rgba(0,0,0,1)");
-        grad.addColorStop(1,"rgba(0,0,0,1)");
-      }else if(featherMode==="bottom"){
-        grad=tctx.createLinearGradient(0,0,0,h);
-        grad.addColorStop(0,"rgba(0,0,0,1)");
-        grad.addColorStop(Math.max(.01,1-featherW/h),"rgba(0,0,0,1)");
-        grad.addColorStop(1,"rgba(0,0,0,0)");
-      }else if(featherMode==="both"){
-        grad=tctx.createLinearGradient(0,0,0,h);
-        const half=Math.min(.49,featherW/h/2);
-        grad.addColorStop(0,"rgba(0,0,0,0)");
-        grad.addColorStop(half,"rgba(0,0,0,1)");
-        grad.addColorStop(1-half,"rgba(0,0,0,1)");
-        grad.addColorStop(1,"rgba(0,0,0,0)");
-      }else{
-        grad=tctx.createRadialGradient(w/2,h/2,Math.min(w,h)/2-featherW,w/2,h/2,Math.min(w,h)/2);
-        grad.addColorStop(0,"rgba(0,0,0,1)");
-        grad.addColorStop(1,"rgba(0,0,0,0)");
-      }
-      tctx.fillStyle=grad;
-      tctx.fillRect(0,0,w,h);
-      ctx.drawImage(tmp,x,y,w,h);
+      nctx.globalAlpha=1;
+      offscreenCache.noiseW=c.width;offscreenCache.noiseH=c.height;
     }
-
-    // 字稿风模式：高斯模糊背景 + 暖金胶片滤镜叠加
-    if(msMode){
-      const msBlur=parseInt(document.getElementById("msBlur").value)||12;
-      // 重新绘制带模糊的背景图（覆盖之前的清晰版本）
-      ctx.save();
-      ctx.filter=`blur(${msBlur}px)`;
-      ctx.drawImage(img,x,y,w,h);
-      ctx.restore();
-      // 暖金色调叠加（soft-light 让暖色融入）
-      ctx.save();
-      ctx.globalCompositeOperation="soft-light";
-      const warmGrad=ctx.createLinearGradient(0,0,0,c.height);
-      warmGrad.addColorStop(0,"rgba(212,165,116,0.55)");
-      warmGrad.addColorStop(0.5,"rgba(201,169,110,0.4)");
-      warmGrad.addColorStop(1,"rgba(180,140,90,0.5)");
-      ctx.fillStyle=warmGrad;
-      ctx.fillRect(0,0,c.width,c.height);
-      ctx.restore();
-      // 颗粒噪点（缓存到离屏 canvas，避免每次 draw 重算）
-      if(!offscreenCache.noise || offscreenCache.noiseW!==c.width || offscreenCache.noiseH!==c.height){
-        offscreenCache.noise=document.createElement("canvas");
-        offscreenCache.noise.width=c.width;offscreenCache.noise.height=c.height;
-        const nctx=offscreenCache.noise.getContext("2d");
-        nctx.fillStyle="rgba(0,0,0,0)";nctx.fillRect(0,0,c.width,c.height);
-        // 噪点密度：从3000降到画布面积的 0.15px²/点，大画布不会卡死
-        const count=Math.max(500,Math.floor(c.width*c.height/6000));
-        for(let i=0;i<count;i++){
-          const g=Math.random()*60+100;
-          nctx.fillStyle=`rgb(${g},${g-10},${g-30})`;
-          nctx.globalAlpha=0.08;
-          nctx.fillRect(Math.random()*c.width,Math.random()*c.height,1.5,1.5);
-        }
-        nctx.globalAlpha=1;
-        offscreenCache.noiseW=c.width;offscreenCache.noiseH=c.height;
-      }
-      ctx.save();
-      ctx.globalCompositeOperation="overlay";
-      ctx.drawImage(offscreenCache.noise,0,0);
-      ctx.restore();
-      // 镜头光晕（左下角柔和光斑）
-      ctx.save();
-      ctx.globalCompositeOperation="screen";
-      const flare=ctx.createRadialGradient(c.width*0.2,c.height*0.85,0,c.width*0.2,c.height*0.85,c.width*0.4);
-      flare.addColorStop(0,"rgba(255,230,180,0.35)");
-      flare.addColorStop(0.5,"rgba(255,210,150,0.15)");
-      flare.addColorStop(1,"rgba(255,200,120,0)");
-      ctx.fillStyle=flare;
-      ctx.fillRect(0,0,c.width,c.height);
-      ctx.restore();
-      // 底部柔光过渡（如果开了底部信息栏，做柔和过渡）
-      if(document.getElementById("msInfoBar").checked){
-        // 顶部信息栏底部柔化
-        const barH=c.height*(parseInt(document.getElementById("msBarH").value)/100);
-        const grad=ctx.createLinearGradient(0,barH-80,0,barH+30);
-        grad.addColorStop(0,"rgba(255,240,220,0)");
-        grad.addColorStop(1,"rgba(255,240,220,0.25)");
-        ctx.fillStyle=grad;
-        ctx.fillRect(0,barH-80,c.width,110);
-      }
+    ctx.save();
+    ctx.globalCompositeOperation="overlay";
+    ctx.drawImage(offscreenCache.noise,0,0);
+    ctx.restore();
+    ctx.save();
+    ctx.globalCompositeOperation="screen";
+    const flare=ctx.createRadialGradient(c.width*0.2,c.height*0.85,0,c.width*0.2,c.height*0.85,c.width*0.4);
+    flare.addColorStop(0,"rgba(255,230,180,0.35)");
+    flare.addColorStop(0.5,"rgba(255,210,150,0.15)");
+    flare.addColorStop(1,"rgba(255,200,120,0)");
+    ctx.fillStyle=flare;
+    ctx.fillRect(0,0,c.width,c.height);
+    ctx.restore();
+    if(document.getElementById("msInfoBar").checked){
+      const barH=c.height*(parseInt(document.getElementById("msBarH").value)/100);
+      const grad=ctx.createLinearGradient(0,barH-80,0,barH+30);
+      grad.addColorStop(0,"rgba(255,240,220,0)");
+      grad.addColorStop(1,"rgba(255,240,220,0.25)");
+      ctx.fillStyle=grad;
+      ctx.fillRect(0,barH-80,c.width,110);
     }
-  });
+  }
 }
 
 // ============ 四角星✦装饰 ============
@@ -1293,21 +1446,27 @@ function drawManuscriptTitle(){
   if(scatter){
     const sLines=scatter.split("\n").filter(l=>l.trim());
     const fs2=Math.floor(c.width*(parseInt(document.getElementById("msScatterSize").value)/1000));
-    ctx.font=`italic ${fs2}px ${fontEN}`;
-    ctx.fillStyle="rgba(255,240,210,0.7)";
+    const scatterFont=document.getElementById("msScatterFont").value;
+    const scatterColor=document.getElementById("msScatterColor").value;
+    ctx.font=`italic ${fs2}px ${scatterFont}`;
+    ctx.fillStyle=scatterColor;
+    ctx.globalAlpha=0.7;
     ctx.textAlign="right";
     sLines.forEach((line,i)=>{
       const x=c.width*scatterX;
       const y=c.height*scatterY+i*fs2*1.8;
       ctx.fillText(line,x,y);
     });
+    ctx.globalAlpha=1;
     pushTextHit("msScatter",c.width*scatterX,c.height*scatterY,c.width*0.3,sLines.length*fs2*1.8);
   }
   // 手写署名
   if(author){
     const fs3=Math.floor(c.width*(parseInt(document.getElementById("msAuthorSize").value)/1000));
-    ctx.font=`${fs3}px ${fontCN}`;
-    ctx.fillStyle=tColor;
+    const authorFont=document.getElementById("msAuthorFont").value;
+    const authorColor=document.getElementById("msAuthorColor").value;
+    ctx.font=`${fs3}px ${authorFont}`;
+    ctx.fillStyle=authorColor;
     ctx.textAlign="left";
     ctx.fillText("— "+author,c.width*authorX,c.height*authorY);
     pushTextHit("msAuthor",c.width*authorX,c.height*authorY,c.width*0.3,fs3*1.4);
@@ -1437,31 +1596,41 @@ function drawInfoBar(){
   // 右侧信息文字（头像右侧，全大写无衬线小字）
   const fontEN='"Inter","Helvetica",sans-serif';
   const txtX=avatarX+avatarR+c.width*0.035;
+  const priceColor=document.getElementById("msPriceColor").value;
+  const copyrightColor=document.getElementById("msCopyrightColor").value;
+  const materialColor=document.getElementById("msMaterialColor").value;
   ctx.textAlign="left";ctx.textBaseline="top";
   // 版权声明（全大写，灰色小字）
   if(copyright){
-    ctx.fillStyle="rgba(100,80,60,0.85)";
+    ctx.fillStyle=copyrightColor;
+    ctx.globalAlpha=0.85;
     ctx.font=`${c.width*0.011}px ${fontEN}`;
     const cp=copyright.toUpperCase();
-    // 分行：按逗号断行
     const cpLines=cp.split(/,\s*/);
     cpLines.forEach((line,i)=>ctx.fillText(line,txtX,barH*0.18+i*c.width*0.018));
+    ctx.globalAlpha=1;
   }
   // 营业时间（中文，小字）
   if(price){
-    ctx.fillStyle="rgba(100,80,60,0.9)";
+    ctx.fillStyle=priceColor;
+    ctx.globalAlpha=0.9;
     ctx.font=`${c.width*0.013}px ${fontEN}`;
     ctx.fillText(price,txtX,barH*0.5);
+    ctx.globalAlpha=1;
   }
   // Material source 下拉箭头 UI 拟态
-  ctx.fillStyle="rgba(100,80,60,0.7)";
+  ctx.fillStyle=materialColor;
+  ctx.globalAlpha=0.7;
   ctx.font=`${c.width*0.011}px ${fontEN}`;
   ctx.fillText("▼ Material source",txtX,barH*0.65);
+  ctx.globalAlpha=1;
   // 素材来源
   if(material){
-    ctx.fillStyle="rgba(100,80,60,0.85)";
+    ctx.fillStyle=materialColor;
+    ctx.globalAlpha=0.85;
     ctx.font=`${c.width*0.012}px ${fontEN}`;
     ctx.fillText(material,txtX,barH*0.80);
+    ctx.globalAlpha=1;
   }
 
   // Preview 大字（英文花体，金色+白描边，倾斜）
@@ -1479,17 +1648,27 @@ function drawInfoBar(){
     ctx.strokeStyle="rgba(255,255,255,0.85)";
     ctx.lineWidth=fs*0.12;
     ctx.strokeText(previewText,0,0);
-    // 金色填充
+    // 渐变填充（基于可选基色）
+    const pvColor=document.getElementById("msPreviewColor").value;
     const goldGrad=ctx.createLinearGradient(-fs,0,fs,0);
-    goldGrad.addColorStop(0,"#e8c896");
-    goldGrad.addColorStop(0.5,"#d4a574");
-    goldGrad.addColorStop(1,"#b8895a");
+    goldGrad.addColorStop(0,shadeColor(pvColor,0.12));
+    goldGrad.addColorStop(0.5,pvColor);
+    goldGrad.addColorStop(1,shadeColor(pvColor,-0.18));
     ctx.fillStyle=goldGrad;
     ctx.fillText(previewText,0,0);
     pushTextHit("msPreview",c.width*pvX,c.height*pvY,fs*2,fs*1.4);
     ctx.restore();
   }
   ctx.restore();
+}
+
+// 颜色明度调整（p>0 变亮，p<0 变暗）
+function shadeColor(hex,p){
+  const n=parseInt(hex.slice(1),16);
+  const r=Math.round(Math.min(255,Math.max(0,((n>>16)&255)+255*p)));
+  const g=Math.round(Math.min(255,Math.max(0,((n>>8)&255)+255*p)));
+  const b=Math.round(Math.min(255,Math.max(0,(n&255)+255*p)));
+  return "rgb("+r+","+g+","+b+")";
 }
 
 // ============ 文字绘制（原有）============
@@ -1595,6 +1774,7 @@ function draw(){
   // 苹果锁屏模式：只保留背景 + 铺满图片 + 锁屏UI，跳过一切装饰
   if(lockScreen){
     drawLockScreen();
+    scheduleAutosave();
     return;
   }
   // 字稿风专属元素
@@ -1608,6 +1788,7 @@ function draw(){
     drawText();
     drawDecor();
   }
+  scheduleAutosave();
 }
 
 // ============ 全屏水印 ============
@@ -1715,19 +1896,21 @@ function drawLockScreen(){
   ctx.save();
   ctx.textAlign="center";ctx.textBaseline="middle";
   // 日期（时间正上方，小字）
+  const shOp=parseInt(document.getElementById("lockShadowOp").value)/100;
+  const shBlurRatio=parseInt(document.getElementById("lockShadowBlur").value)/100;
   if(date){
     ctx.font=`500 ${Math.floor(fs*0.2)}px ${fontFamily}`;
     ctx.fillStyle=color;
-    ctx.shadowColor="rgba(0,0,0,0.35)";
-    ctx.shadowBlur=fs*0.06;
+    ctx.shadowColor=`rgba(0,0,0,${shOp*0.88})`;
+    ctx.shadowBlur=fs*shBlurRatio*0.43;
     ctx.fillText(date,c.width*tx,c.height*ty-fs*0.62);
     ctx.shadowBlur=0;
   }
   // 时间（大号粗体数字，SF Pro 风格）
   ctx.font=`700 ${fs}px ${fontFamily}`;
   ctx.fillStyle=color;
-  ctx.shadowColor="rgba(0,0,0,0.4)";
-  ctx.shadowBlur=fs*0.14;
+  ctx.shadowColor=`rgba(0,0,0,${shOp})`;
+  ctx.shadowBlur=fs*shBlurRatio;
   ctx.fillText(time,c.width*tx,c.height*ty);
   ctx.shadowBlur=0;
   pushTextHit("lockTime",c.width*tx,c.height*ty,c.width*0.5,fs*1.3);
@@ -1820,14 +2003,22 @@ function applyManuscriptPreset(){
   chk("msTornDivider",true);
   chk("msRoundedCard",true);
   set("msAuthor","裴砚");
+  set("msAuthorFont","'KaiTi','Kaiti SC','STKaiti',serif");
+  set("msAuthorColor","#d4a574");
   set("msPrice","营业时间:10:00-22:00");
   set("msCopyright","DO NOT STEAL IMAGES, IMITATE OR PLAGIARIZE");
   set("msMaterial","@底素网络 素材xxx");
   set("msPreviewText","Preview");
+  set("msPreviewColor","#d4a574");
   set("msVerticalText","我很爱我普通的生活\n我们都是走向幸福的人");
   set("msTitleColor","#d4a574");
   set("msSubtitleColor","#ffffff");
+  set("msPriceColor","#64503c");
+  set("msCopyrightColor","#64503c");
+  set("msMaterialColor","#64503c");
   set("msScatterText","Harris, I miss you.\nlove\n私は幸せ");
+  set("msScatterColor","#fff0d2");
+  set("msScatterFont",'"Cormorant Garamond","Great Vibes",serif"');
   set("msBlur","12");
   set("msMainSize","55");
   set("msMainFont","'KaiTi','Kaiti SC','STKaiti',serif");
@@ -1851,6 +2042,7 @@ function applyManuscriptPreset(){
   chk("lockButtons",true);chk("lockHomeBar",true);
   set("lockLeftIcon","");set("lockRightIcon","");
   set("lockBtnSize","4.5");set("lockBtnY","94");set("lockBtnGap","14");
+  set("lockShadowOp","40");set("lockShadowBlur","14");
   // 水印默认关闭
   chk("wmEnable",false);
   set("wmBlend","overlay");set("wmScale","40");set("wmOpacity","35");
@@ -1895,6 +2087,8 @@ function applyManuscriptPreset(){
   document.getElementById("lockBtnSizeVal").textContent="4.5";
   document.getElementById("lockBtnYVal").textContent="94";
   document.getElementById("lockBtnGapVal").textContent="14";
+  document.getElementById("lockShadowOpVal").textContent="40";
+  document.getElementById("lockShadowBlurVal").textContent="14";
   document.getElementById("wmScaleVal").textContent="40";
   document.getElementById("wmOpacityVal").textContent="35";
   document.getElementById("wmXVal").textContent="50";
@@ -1917,6 +2111,8 @@ function getSettings(){
     bgDir:document.getElementById("bgDir").value,
     bgBlur:document.getElementById("bgBlur").value,
     artScale:document.getElementById("artScale").value,
+    fillWidth:chk("fillWidth"),
+    fillWidthY:document.getElementById("fillWidthY").value,
     artBorder:document.getElementById("artBorder").value,
     borderColor:document.getElementById("borderColor").value,
     shadowDist:document.getElementById("shadowDist").value,
@@ -1952,14 +2148,22 @@ function getSettings(){
     msTornDivider:chk("msTornDivider"),
     msRoundedCard:chk("msRoundedCard"),
     msAuthor:document.getElementById("msAuthor").value,
+    msAuthorFont:document.getElementById("msAuthorFont").value,
+    msAuthorColor:document.getElementById("msAuthorColor").value,
     msPrice:document.getElementById("msPrice").value,
     msCopyright:document.getElementById("msCopyright").value,
     msMaterial:document.getElementById("msMaterial").value,
     msPreviewText:document.getElementById("msPreviewText").value,
+    msPreviewColor:document.getElementById("msPreviewColor").value,
     msVerticalText:document.getElementById("msVerticalText").value,
     msTitleColor:document.getElementById("msTitleColor").value,
     msSubtitleColor:document.getElementById("msSubtitleColor").value,
+    msPriceColor:document.getElementById("msPriceColor").value,
+    msCopyrightColor:document.getElementById("msCopyrightColor").value,
+    msMaterialColor:document.getElementById("msMaterialColor").value,
     msScatterText:document.getElementById("msScatterText").value,
+    msScatterColor:document.getElementById("msScatterColor").value,
+    msScatterFont:document.getElementById("msScatterFont").value,
     msBlur:document.getElementById("msBlur").value,
     msMainSize:document.getElementById("msMainSize").value,
     msMainFont:document.getElementById("msMainFont").value,
@@ -1993,6 +2197,8 @@ function getSettings(){
     lockBtnSize:document.getElementById("lockBtnSize").value,
     lockBtnY:document.getElementById("lockBtnY").value,
     lockBtnGap:document.getElementById("lockBtnGap").value,
+    lockShadowOp:document.getElementById("lockShadowOp").value,
+    lockShadowBlur:document.getElementById("lockShadowBlur").value,
     wmEnable:chk("wmEnable"),
     wmBlend:document.getElementById("wmBlend").value,
     wmScale:document.getElementById("wmScale").value,
@@ -2009,7 +2215,8 @@ function applySettings(s){
   const chk=(id,val)=>{const el=document.getElementById(id);if(el)el.checked=val;};
   set("size",s.size);set("bgType",s.bgType);set("bgColor1",s.bgColor1);
   set("bgColor2",s.bgColor2);set("bgDir",s.bgDir);set("bgBlur",s.bgBlur);
-  set("artScale",s.artScale);set("artBorder",s.artBorder);set("borderColor",s.borderColor||"#ffffff");
+  set("artScale",s.artScale);
+  chk("fillWidth",s.fillWidth||false);set("fillWidthY",s.fillWidthY||50);set("artBorder",s.artBorder);set("borderColor",s.borderColor||"#ffffff");
   set("shadowDist",s.shadowDist||20);set("shadowBlur",s.shadowBlur||25);
   set("shadowOp",s.shadowOp||45);set("shadowAngle",s.shadowAngle||90);
   set("featherMode",s.featherMode||"none");set("featherW",s.featherW||120);
@@ -2029,14 +2236,22 @@ function applySettings(s){
   chk("msTornDivider",s.msTornDivider||false);
   chk("msRoundedCard",s.msRoundedCard||false);
   set("msAuthor",s.msAuthor||"裴砚");
+  set("msAuthorFont",s.msAuthorFont);
+  set("msAuthorColor",s.msAuthorColor||"#d4a574");
   set("msPrice",s.msPrice||"营业时间:10:00-22:00");
   set("msCopyright",s.msCopyright||"DO NOT STEAL IMAGES, IMITATE OR PLAGIARIZE");
   set("msMaterial",s.msMaterial||"@底素网络 素材xxx");
   set("msPreviewText",s.msPreviewText||"Preview");
+  set("msPreviewColor",s.msPreviewColor||"#d4a574");
   set("msVerticalText",s.msVerticalText||"我很爱我普通的生活\n我们都是走向幸福的人");
   set("msTitleColor",s.msTitleColor||"#d4a574");
   set("msSubtitleColor",s.msSubtitleColor||"#ffffff");
+  set("msPriceColor",s.msPriceColor||s.msInfoBarColor||"#64503c");
+  set("msCopyrightColor",s.msCopyrightColor||s.msInfoBarColor||"#64503c");
+  set("msMaterialColor",s.msMaterialColor||s.msInfoBarColor||"#64503c");
   set("msScatterText",s.msScatterText||"Harris, I miss you.\nlove\n私は幸せ");
+  set("msScatterColor",s.msScatterColor||"#fff0d2");
+  set("msScatterFont",s.msScatterFont||'"Cormorant Garamond","Great Vibes",serif"');
   set("msBlur",s.msBlur||"12");
   set("msMainSize",s.msMainSize||"55");
   set("msMainFont",s.msMainFont);
@@ -2059,6 +2274,7 @@ function applySettings(s){
   chk("lockButtons",s.lockButtons!==false);chk("lockHomeBar",s.lockHomeBar!==false);
   set("lockLeftIcon",s.lockLeftIcon||"");set("lockRightIcon",s.lockRightIcon||"");
   set("lockBtnSize",s.lockBtnSize||"4.5");set("lockBtnY",s.lockBtnY||"94");set("lockBtnGap",s.lockBtnGap||"14");
+  set("lockShadowOp",s.lockShadowOp||"40");set("lockShadowBlur",s.lockShadowBlur||"14");
   chk("wmEnable",s.wmEnable||false);
   set("wmBlend",s.wmBlend||"overlay");
   set("wmScale",s.wmScale||"40");set("wmOpacity",s.wmOpacity||"35");
@@ -2103,6 +2319,8 @@ function applySettings(s){
   document.getElementById("lockBtnSizeVal").textContent=s.lockBtnSize||4.5;
   document.getElementById("lockBtnYVal").textContent=s.lockBtnY||94;
   document.getElementById("lockBtnGapVal").textContent=s.lockBtnGap||14;
+  document.getElementById("lockShadowOpVal").textContent=s.lockShadowOp||40;
+  document.getElementById("lockShadowBlurVal").textContent=s.lockShadowBlur||14;
   document.getElementById("wmScaleVal").textContent=s.wmScale||40;
   document.getElementById("wmOpacityVal").textContent=s.wmOpacity||35;
   document.getElementById("wmXVal").textContent=s.wmX||50;
@@ -2131,7 +2349,7 @@ function resetAll(){
   document.getElementById("texUpload").value="";
   document.getElementById("avatarUpload").value="";
   document.getElementById("wmUpload").value="";
-  draw();
+  requestDraw();
 }
 
 // ============ LZString 压缩（内联，用于短链接） ============
@@ -2414,7 +2632,7 @@ c.addEventListener("mousemove",e=>{
   document.getElementById(m.yId).value=Math.round(ny);
   document.getElementById(m.xVal).textContent=Math.round(nx);
   document.getElementById(m.yVal).textContent=Math.round(ny);
-  draw();
+  requestDraw();
 });
 c.addEventListener("mouseup",()=>{
   dragTarget=null;c.style.cursor="";
@@ -2452,7 +2670,7 @@ c.addEventListener("touchmove",e=>{
   document.getElementById(m.yId).value=Math.round(ny);
   document.getElementById(m.xVal).textContent=Math.round(nx);
   document.getElementById(m.yVal).textContent=Math.round(ny);
-  draw();
+  requestDraw();
   e.preventDefault();
 },{passive:false});
 c.addEventListener("touchend",()=>{dragTarget=null;});
@@ -2477,7 +2695,7 @@ function enablePicker(){
       const target=document.getElementById("pickerTarget").value;
       const el=document.getElementById(target);
       if(el){el.value=hex;}
-      draw();
+      requestDraw();
       alert("已吸取颜色 "+hex+" → 填入「"+document.querySelector('#pickerTarget option:checked').textContent+"」");
     }catch(err){
       alert("吸取失败："+err.message);
@@ -2490,17 +2708,51 @@ function enablePicker(){
   c.addEventListener("click",pickerClick);
 }
 
-// ============ 导出 ============
+// ============ 导出（使用全分辨率） ============
 function exportPNG(){
-  const a=document.createElement("a");
-  a.download="preview-studio.png";
-  a.href=c.toDataURL("image/png");
-  a.click();
+  const s=document.getElementById("size").value.split(",");
+  const ew=parseInt(s[0]),eh=parseInt(s[1]);
+  ensureExportCanvas(ew,eh);
+  const origC=c,origCtx=ctx;
+  c=exportCanvas;ctx=exportCtx;
+  const origScale=previewScale;
+  previewScale=1;
+  c.width=ew;c.height=eh;
+  draw();
+  previewScale=origScale;
+  c=origC;ctx=origCtx;
+  exportCanvas.toBlob(blob=>{
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.download="preview-studio.png";
+    a.href=url;
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+  },"image/png");
 }
 
-// 初始化：生成默认牛皮纸纹理
+// 初始化：恢复自动保存 + 恢复图片 + 生成纹理
+restoreAutosave();
+idbGet("ps-avatar").then(blob=>{
+  if(!blob)return;
+  const img=new Image();
+  img.onload=()=>{avatarImg=img;requestDraw();};
+  img.src=URL.createObjectURL(blob);
+});
+idbGet("ps-watermark").then(blob=>{
+  if(!blob)return;
+  const img=new Image();
+  img.onload=()=>{watermarkImg=img;requestDraw();};
+  img.src=URL.createObjectURL(blob);
+});
+idbGet("ps-texture").then(blob=>{
+  if(!blob)return;
+  const img=new Image();
+  img.onload=()=>{textureImg=img;document.getElementById("texSource").value="upload";requestDraw();};
+  img.src=URL.createObjectURL(blob);
+});
 onTexPresetChange();
-draw();
+requestDraw();
 </script>
 </body>
 </html>
