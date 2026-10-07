@@ -1100,9 +1100,14 @@ function drawArtwork(){
     if(featherMode==="none"){
       ctx.drawImage(img,x,y,w,h);
     }else{
-      const tmp=document.createElement("canvas");
-      tmp.width=w;tmp.height=h;
+      // 复用离屏 canvas，避免每次 draw 重建
+      if(!offscreenCache.feather || offscreenCache.feather.width!==w || offscreenCache.feather.height!==h){
+        offscreenCache.feather=document.createElement("canvas");
+        offscreenCache.feather.width=w;offscreenCache.feather.height=h;
+      }
+      const tmp=offscreenCache.feather;
       const tctx=tmp.getContext("2d");
+      tctx.clearRect(0,0,w,h);
       tctx.drawImage(img,0,0,w,h);
       tctx.globalCompositeOperation="destination-in";
       let grad;
@@ -1151,15 +1156,26 @@ function drawArtwork(){
       ctx.fillStyle=warmGrad;
       ctx.fillRect(0,0,c.width,c.height);
       ctx.restore();
-      // 颗粒噪点（模拟胶片质感）
+      // 颗粒噪点（缓存到离屏 canvas，避免每次 draw 重算）
+      if(!offscreenCache.noise || offscreenCache.noiseW!==c.width || offscreenCache.noiseH!==c.height){
+        offscreenCache.noise=document.createElement("canvas");
+        offscreenCache.noise.width=c.width;offscreenCache.noise.height=c.height;
+        const nctx=offscreenCache.noise.getContext("2d");
+        nctx.fillStyle="rgba(0,0,0,0)";nctx.fillRect(0,0,c.width,c.height);
+        // 噪点密度：从3000降到画布面积的 0.15px²/点，大画布不会卡死
+        const count=Math.max(500,Math.floor(c.width*c.height/6000));
+        for(let i=0;i<count;i++){
+          const g=Math.random()*60+100;
+          nctx.fillStyle=`rgb(${g},${g-10},${g-30})`;
+          nctx.globalAlpha=0.08;
+          nctx.fillRect(Math.random()*c.width,Math.random()*c.height,1.5,1.5);
+        }
+        nctx.globalAlpha=1;
+        offscreenCache.noiseW=c.width;offscreenCache.noiseH=c.height;
+      }
       ctx.save();
       ctx.globalCompositeOperation="overlay";
-      ctx.globalAlpha=0.08;
-      for(let i=0;i<3000;i++){
-        const g=Math.random()*60+100;
-        ctx.fillStyle=`rgb(${g},${g-10},${g-30})`;
-        ctx.fillRect(Math.random()*c.width,Math.random()*c.height,1.5,1.5);
-      }
+      ctx.drawImage(offscreenCache.noise,0,0);
       ctx.restore();
       // 镜头光晕（左下角柔和光斑）
       ctx.save();
@@ -1549,19 +1565,33 @@ function pushTextHit(id,x,y,w,h){
 let dragTarget=null;
 let dragOffX=0,dragOffY=0;
 
+// ============ 离屏 canvas 缓存（避免每次 draw 重建导致内存压力） ============
+const offscreenCache={ feather:null, noise:null, noiseW:0, noiseH:0 };
+
 // ============ 主渲染 ============
 function draw(){
   ctx.clearRect(0,0,c.width,c.height);
   textHitRects.length=0;
   const blurAmt=parseInt(document.getElementById("bgBlur").value);
   const lockScreen=document.getElementById("lockScreen").checked;
-  drawBackground();
-  ctx.save();
-  if(blurAmt>0) ctx.filter=`blur(${blurAmt}px)`;
-  if(!lockScreen) drawTexture(); // 锁屏模式跳过纹理装饰
+  const msMode=document.getElementById("msMode").checked;
+
+  // 背景层：只在这一层应用背景模糊，不穿透到作品图
+  if(blurAmt>0){
+    ctx.save();
+    ctx.filter=`blur(${blurAmt}px)`;
+    drawBackground();
+    ctx.restore();
+  }else{
+    drawBackground();
+  }
+
+  // 纹理和作品图不受背景模糊影响
+  if(!lockScreen) drawTexture();
   drawArtwork();
-  ctx.restore();
+
   drawWatermark(); // 全屏水印（独立混合模式，叠加在图片上）
+
   // 苹果锁屏模式：只保留背景 + 铺满图片 + 锁屏UI，跳过一切装饰
   if(lockScreen){
     drawLockScreen();
@@ -1574,7 +1604,6 @@ function draw(){
   drawInfoBar();
   drawRoundedCard();
   // 原有文字和装饰（字稿风模式下跳过，避免冲突）
-  const msMode=document.getElementById("msMode").checked;
   if(!msMode){
     drawText();
     drawDecor();
