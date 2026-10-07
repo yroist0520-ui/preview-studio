@@ -1269,6 +1269,7 @@ function drawArtwork(){
     }
     const tmp=offscreenCache.feather;
     const tctx=tmp.getContext("2d");
+    tctx.globalCompositeOperation="source-over";
     tctx.clearRect(0,0,tmp.width,tmp.height);
     tctx.drawImage(img,0,0,w,h);
     tctx.globalCompositeOperation="destination-in";
