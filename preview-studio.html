@@ -905,7 +905,7 @@ function requestDraw(){
   rafPending=true;
   rafFrame=requestAnimationFrame(()=>{
     rafPending=false;
-    requestDraw();
+    draw();
   });
 }
 
