@@ -332,16 +332,17 @@ input[type=file]{font-size:11px}
           <button class="small warn" onclick="removeArt()">×删除</button>
         </div>
         <label>布局模式</label>
-        <select id="layoutMode" onchange="layoutMode=this.value;if(layers.length>0)layoutAuto();updateLayerPanel();draw()">
+        <select id="layoutMode" onchange="layoutMode=this.value;if(layers.length>0){if(layoutMode==='fillWidth'){layers.forEach(l=>{l.fitMode='fillWidth';l.imgY=0.5;});document.getElementById('layerY').max=100;document.getElementById('layerY').value=50;document.getElementById('layerYVal').textContent=50;}else{layoutAuto();}updateLayerPanel();}draw()">
           <option value="auto" selected>自动横向并排</option>
           <option value="free">自由定位</option>
+          <option value="fillWidth">填满宽度（上下可调）</option>
         </select>
         <label>图片间距: <span id="gapVal">0</span>px</label>
-        <input type="range" id="imgGap" min="0" max="40" value="0" oninput="document.getElementById('gapVal').textContent=this.value;if(layers.length>0)layoutAuto();draw()">
+        <input type="range" id="imgGap" min="0" max="40" value="0" oninput="document.getElementById('gapVal').textContent=this.value;if(layers.length>0&&layoutMode==='auto')layoutAuto();draw()">
         <div class="hint" id="layoutHint">自动模式：图片左右对齐画布，上下可拖动调整位置</div>
         <div id="layerPosCtrl" style="margin-top:6px">
           <label>图片 Y 位置: <span id="layerYVal">50</span>%</label>
-          <input type="range" id="layerY" min="0" max="100" value="50" oninput="var v=parseInt(this.value);document.getElementById('layerYVal').textContent=v;if(activeLayerIndex>=0&&layers[activeLayerIndex]){layers[activeLayerIndex].y=v/100;layers[activeLayerIndex].fitMode='free';document.getElementById('layoutMode').value='free';layoutMode='free';updateLayerPanel();draw();}">
+          <input type="range" id="layerY" min="0" max="100" value="50" oninput="var v=parseInt(this.value);document.getElementById('layerYVal').textContent=v;if(activeLayerIndex>=0&&layers[activeLayerIndex]){layers[activeLayerIndex].imgY=v/100;layers[activeLayerIndex].fitMode='fillWidth';document.getElementById('layoutMode').value='fillWidth';layoutMode='fillWidth';updateLayerPanel();draw();}">
         </div>
         <button class="ms-btn" onclick="extractColors()" style="margin:4px 0">✦ 从图片提取主色填入背景</button>
         <label>缩放比例: <span id="scaleVal">100</span>%</label>
@@ -886,12 +887,13 @@ function layoutAuto(){
   const totalGap=gap*(layers.length-1);
   const availableW=c.width-totalGap;
   let totalAspect=0;
-  layers.forEach(l=>totalAspect+=l.img.width/l.img.height);
+  layers.forEach(l=>{if(l.fitMode!=="fillWidth")totalAspect+=l.img.width/l.img.height;});
   const baseH=c.height;
   const totalW=baseH*totalAspect;
   const scale=availableW/totalW;
   let curX=0;
   layers.forEach(l=>{
+    if(l.fitMode==="fillWidth")return;
     const w=l.img.width*baseH*scale/l.img.height;
     l.nx=curX/c.width;
     l.nw=w/c.width;
@@ -1248,6 +1250,82 @@ function drawArtwork(){
       const r=Math.max(c.width/img.width,c.height/img.height)*scale;
       w=img.width*r;h=img.height*r;
       x=(c.width-w)/2;y=(c.height-h)/2;
+    }else if(layer.fitMode==="fillWidth"){
+      w=c.width;
+      const imgAspect=img.width/img.height;
+      const canvasAspect=c.width/c.height;
+      h=w/imgAspect;
+      x=0;
+      const imgY=(layer.imgY!==undefined?layer.imgY:0.5);
+      const scaledH=h;
+      const scaledW=w;
+      const topCrop=scaledH>c.height?(scaledH-c.height)*imgY:0;
+      y=-topCrop;
+      if(featherMode==="none"){
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0,0,c.width,c.height);
+        ctx.clip();
+        ctx.drawImage(img,x,y,scaledW,scaledH);
+        ctx.restore();
+      }else{
+        const fw=Math.min(featherW,w*0.8);
+        const oc=document.createElement("canvas");
+        oc.width=Math.ceil(scaledW);oc.height=Math.ceil(scaledH);
+        const octx=oc.getContext("2d");
+        octx.drawImage(img,0,0,scaledW,scaledH);
+        octx.globalCompositeOperation="destination-in";
+        let grad;
+        const topCropPx=scaledH>c.height?(scaledH-c.height)*imgY:0;
+        const botCropPx=scaledH>c.height?scaledH-c.height-topCropPx:0;
+        if(featherMode==="top"||featherMode==="both"){
+          const feathH=Math.min(fw,scaledH*0.5);
+          if(scaledH>c.height){
+            grad=octx.createLinearGradient(0,topCropPx,0,topCropPx+feathH);
+          }else{
+            grad=octx.createLinearGradient(0,0,0,feathH);
+          }
+          grad.addColorStop(0,"rgba(0,0,0,0)");
+          grad.addColorStop(1,"rgba(0,0,0,1)");
+          octx.fillStyle=grad;
+          if(scaledH>c.height){
+            octx.fillRect(0,topCropPx,scaledW,feathH);
+          }else{
+            octx.fillRect(0,0,scaledW,feathH);
+          }
+        }
+        if(featherMode==="bottom"||featherMode==="both"){
+          const feathH=Math.min(fw,scaledH*0.5);
+          if(scaledH>c.height){
+            grad=octx.createLinearGradient(0,scaledH-botCropPx-feathH,0,scaledH-botCropPx);
+          }else{
+            grad=octx.createLinearGradient(0,scaledH-feathH,0,scaledH);
+          }
+          grad.addColorStop(0,"rgba(0,0,0,1)");
+          grad.addColorStop(1,"rgba(0,0,0,0)");
+          octx.fillStyle=grad;
+          if(scaledH>c.height){
+            octx.fillRect(0,scaledH-botCropPx-feathH,scaledW,feathH);
+          }else{
+            octx.fillRect(0,scaledH-feathH,scaledW,feathH);
+          }
+        }
+        if(featherMode==="all"){
+          const feathH=Math.min(fw,scaledH*0.4);
+          grad=octx.createRadialGradient(scaledW/2,scaledH/2,Math.min(scaledW,scaledH)/2-feathH,scaledW/2,scaledH/2,Math.min(scaledW,scaledH)/2);
+          grad.addColorStop(0,"rgba(0,0,0,1)");
+          grad.addColorStop(1,"rgba(0,0,0,0)");
+          octx.fillStyle=grad;
+          octx.fillRect(0,0,scaledW,scaledH);
+        }
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(0,0,c.width,c.height);
+        ctx.clip();
+        ctx.drawImage(oc,x,y,scaledW,scaledH);
+        ctx.restore();
+      }
+      return;
     }else if(layer.fitMode==="auto"&&layer.nw!==undefined){
       w=layer.nw*c.width;
       h=layer.nh*c.height;
@@ -2094,6 +2172,9 @@ function getSettings(){
     bgColor2:document.getElementById("bgColor2").value,
     bgDir:document.getElementById("bgDir").value,
     bgBlur:document.getElementById("bgBlur").value,
+    layoutMode:document.getElementById("layoutMode").value,
+    imgGap:document.getElementById("imgGap").value,
+    layerY:document.getElementById("layerY").value,
     artScale:document.getElementById("artScale").value,
     artBorder:document.getElementById("artBorder").value,
     borderColor:document.getElementById("borderColor").value,
@@ -2190,6 +2271,7 @@ function applySettings(s){
   set("size",s.size);set("bgType",s.bgType);set("bgColor1",s.bgColor1);
   set("bgColor2",s.bgColor2);set("bgDir",s.bgDir);set("bgBlur",s.bgBlur);
   set("layoutMode",s.layoutMode||"auto");layoutMode=s.layoutMode||"auto";set("imgGap",s.imgGap||0);
+  set("layerY",s.layerY||50);document.getElementById("layerYVal").textContent=s.layerY||50;
   set("artScale",s.artScale);set("artBorder",s.artBorder);set("borderColor",s.borderColor||"#ffffff");
   set("shadowDist",s.shadowDist||20);set("shadowBlur",s.shadowBlur||25);
   set("shadowOp",s.shadowOp||45);set("shadowAngle",s.shadowAngle||90);
