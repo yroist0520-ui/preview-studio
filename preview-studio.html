@@ -532,6 +532,38 @@ input[type=file]{font-size:11px}
         <input type="text" id="poDateLeft" value="2026" oninput="requestDraw()">
         <label>右侧文字</label>
         <input type="text" id="poDateRight" value="10月7日" oninput="requestDraw()">
+        <label>日期字体</label>
+        <select id="poDateFont" onchange="requestDraw()">
+          <optgroup label="中文 · 宋体 / 黑体 / 圆体">
+          <option value="'PingFang SC','Noto Serif SC',serif" selected>苹方 / 思源宋（系统，默认）</option>
+          <option value="'Noto Serif SC',serif">思源宋体</option>
+          <option value="'Noto Sans SC',sans-serif">思源黑体</option>
+          <option value="'ZCOOL XiaoWei',serif">站酷小薇（宋体）</option>
+          <option value="'ZCOOL QingKe HuangYou',sans-serif">站酷庆科黄油体（圆体）</option>
+          </optgroup>
+          <optgroup label="中文 · 手写 / 毛笔">
+          <option value="'Ma Shan Zheng',cursive">马善政毛笔楷书</option>
+          <option value="'Long Cang',cursive">龙藏手写</option>
+          <option value="'Liu Jian Mao Cao',cursive">刘建毛草</option>
+          <option value="'Zhi Mang Xing',cursive">智芒星手写</option>
+          </optgroup>
+          <optgroup label="英文 · 衬线 / 无衬线">
+          <option value="'Playfair Display',serif">Playfair Display 衬线</option>
+          <option value="'Cormorant Garamond',serif">Cormorant Garamond 衬线</option>
+          <option value="'EB Garamond',serif">EB Garamond 衬线</option>
+          <option value="'Lora',serif">Lora 衬线</option>
+          <option value="'Montserrat',sans-serif">Montserrat 无衬线</option>
+          <option value="'Poppins',sans-serif">Poppins 无衬线</option>
+          <option value="'Inter',sans-serif">Inter 无衬线</option>
+          </optgroup>
+          <optgroup label="英文 · 手写 / 花体">
+          <option value="'Great Vibes',cursive">Great Vibes 花体</option>
+          <option value="'Dancing Script',cursive">Dancing Script 手写</option>
+          <option value="'Caveat',cursive">Caveat 随性</option>
+          <option value="'Sacramento',cursive">Sacramento 细花体</option>
+          <option value="'Parisienne',cursive">Parisienne 优雅花体</option>
+          </optgroup>
+        </select>
         <label>日期文字颜色</label>
         <input type="color" id="poDateColor" value="#54432b" onchange="requestDraw()">
         <div class="checkbox-row"><input type="checkbox" id="poDateLine" onchange="requestDraw()" checked><span>日期中间横线</span></div>
@@ -546,6 +578,33 @@ input[type=file]{font-size:11px}
 
         <div class="po-group">装饰花体字（若隐若现，位于拍立得后方）</div>
         <input type="text" id="poDecoText" value="memories" oninput="requestDraw()">
+        <label>花体字体</label>
+        <select id="poDecoFont" onchange="requestDraw()">
+          <optgroup label="英文 · 手写 / 花体">
+          <option value="'Great Vibes','Cormorant Garamond',cursive" selected>Great Vibes 花体（默认）</option>
+          <option value="'Dancing Script',cursive">Dancing Script 手写</option>
+          <option value="'Caveat',cursive">Caveat 随性</option>
+          <option value="'Sacramento',cursive">Sacramento 细花体</option>
+          <option value="'Parisienne',cursive">Parisienne 优雅花体</option>
+          </optgroup>
+          <optgroup label="英文 · 衬线">
+          <option value="'Playfair Display',serif">Playfair Display 衬线</option>
+          <option value="'Cormorant Garamond',serif">Cormorant Garamond 衬线</option>
+          <option value="'EB Garamond',serif">EB Garamond 衬线</option>
+          <option value="'Lora',serif">Lora 衬线</option>
+          </optgroup>
+          <optgroup label="中文 · 手写 / 毛笔">
+          <option value="'Ma Shan Zheng',cursive">马善政毛笔楷书</option>
+          <option value="'Long Cang',cursive">龙藏手写</option>
+          <option value="'Liu Jian Mao Cao',cursive">刘建毛草</option>
+          <option value="'Zhi Mang Xing',cursive">智芒星手写</option>
+          </optgroup>
+          <optgroup label="中文 · 宋体 / 黑体">
+          <option value="'Noto Serif SC',serif">思源宋体</option>
+          <option value="'Noto Sans SC',sans-serif">思源黑体</option>
+          <option value="'ZCOOL XiaoWei',serif">站酷小薇（宋体）</option>
+          </optgroup>
+        </select>
         <label>花体字颜色</label>
         <input type="color" id="poDecoColor" value="#7a5f3c" onchange="requestDraw()">
         <label>花体字大小: <span id="poDecoSizeVal">16</span>%</label>
@@ -576,6 +635,42 @@ input[type=file]{font-size:11px}
         <input type="text" id="poCaption" value="2026.10.7 值得纪念的一天" oninput="requestDraw()">
         <label>文字颜色</label>
         <input type="color" id="poCaptionColor" value="#4a3a22" onchange="requestDraw()">
+        <label>文字字体</label>
+        <select id="poCaptionFont" onchange="requestDraw()">
+          <optgroup label="中文 · 手写 / 毛笔">
+          <option value="'KaiTi','Kaiti SC','STKaiti','Ma Shan Zheng',serif" selected>楷体（默认）</option>
+          <option value="'Ma Shan Zheng',cursive">马善政毛笔楷书</option>
+          <option value="'Long Cang',cursive">龙藏手写</option>
+          <option value="'Liu Jian Mao Cao',cursive">刘建毛草</option>
+          <option value="'Zhi Mang Xing',cursive">智芒星手写</option>
+          </optgroup>
+          <optgroup label="中文 · 宋体 / 黑体 / 圆体">
+          <option value="'Noto Serif SC',serif">思源宋体</option>
+          <option value="'Noto Sans SC',sans-serif">思源黑体</option>
+          <option value="'ZCOOL XiaoWei',serif">站酷小薇（宋体）</option>
+          <option value="'ZCOOL QingKe HuangYou',sans-serif">站酷庆科黄油体（圆体）</option>
+          </optgroup>
+          <optgroup label="系统字体">
+          <option value="'FangSong','STFangsong',serif">仿宋</option>
+          <option value="'PingFang SC','Microsoft YaHei',sans-serif">苹方黑体</option>
+          </optgroup>
+          <optgroup label="英文 · 手写 / 花体">
+          <option value="'Great Vibes',cursive">Great Vibes 花体</option>
+          <option value="'Dancing Script',cursive">Dancing Script 手写</option>
+          <option value="'Caveat',cursive">Caveat 随性</option>
+          <option value="'Sacramento',cursive">Sacramento 细花体</option>
+          <option value="'Parisienne',cursive">Parisienne 优雅花体</option>
+          </optgroup>
+          <optgroup label="英文 · 衬线 / 无衬线">
+          <option value="'Playfair Display',serif">Playfair Display 衬线</option>
+          <option value="'Cormorant Garamond',serif">Cormorant Garamond 衬线</option>
+          <option value="'EB Garamond',serif">EB Garamond 衬线</option>
+          <option value="'Lora',serif">Lora 衬线</option>
+          <option value="'Montserrat',sans-serif">Montserrat 无衬线</option>
+          <option value="'Poppins',sans-serif">Poppins 无衬线</option>
+          <option value="'Inter',sans-serif">Inter 无衬线</option>
+          </optgroup>
+        </select>
         <label>文字字号: <span id="poCaptionSizeVal">6.2</span>%</label>
         <input type="range" id="poCaptionSize" min="2" max="16" step="0.2" value="6.2" oninput="document.getElementById('poCaptionSizeVal').textContent=this.value;requestDraw()">
         <label>水平位置: <span id="poCaptionXVal">0</span>%</label>
@@ -590,6 +685,42 @@ input[type=file]{font-size:11px}
 记录每个瞬间</textarea>
         <label>文字颜色</label>
         <input type="color" id="poFooterColor" value="#5a4a32" onchange="requestDraw()">
+        <label>文字字体</label>
+        <select id="poFooterFont" onchange="requestDraw()">
+          <optgroup label="中文 · 手写 / 毛笔">
+          <option value="'KaiTi','Kaiti SC','STKaiti','Ma Shan Zheng',serif" selected>楷体（默认）</option>
+          <option value="'Ma Shan Zheng',cursive">马善政毛笔楷书</option>
+          <option value="'Long Cang',cursive">龙藏手写</option>
+          <option value="'Liu Jian Mao Cao',cursive">刘建毛草</option>
+          <option value="'Zhi Mang Xing',cursive">智芒星手写</option>
+          </optgroup>
+          <optgroup label="中文 · 宋体 / 黑体 / 圆体">
+          <option value="'Noto Serif SC',serif">思源宋体</option>
+          <option value="'Noto Sans SC',sans-serif">思源黑体</option>
+          <option value="'ZCOOL XiaoWei',serif">站酷小薇（宋体）</option>
+          <option value="'ZCOOL QingKe HuangYou',sans-serif">站酷庆科黄油体（圆体）</option>
+          </optgroup>
+          <optgroup label="系统字体">
+          <option value="'FangSong','STFangsong',serif">仿宋</option>
+          <option value="'PingFang SC','Microsoft YaHei',sans-serif">苹方黑体</option>
+          </optgroup>
+          <optgroup label="英文 · 手写 / 花体">
+          <option value="'Great Vibes',cursive">Great Vibes 花体</option>
+          <option value="'Dancing Script',cursive">Dancing Script 手写</option>
+          <option value="'Caveat',cursive">Caveat 随性</option>
+          <option value="'Sacramento',cursive">Sacramento 细花体</option>
+          <option value="'Parisienne',cursive">Parisienne 优雅花体</option>
+          </optgroup>
+          <optgroup label="英文 · 衬线 / 无衬线">
+          <option value="'Playfair Display',serif">Playfair Display 衬线</option>
+          <option value="'Cormorant Garamond',serif">Cormorant Garamond 衬线</option>
+          <option value="'EB Garamond',serif">EB Garamond 衬线</option>
+          <option value="'Lora',serif">Lora 衬线</option>
+          <option value="'Montserrat',sans-serif">Montserrat 无衬线</option>
+          <option value="'Poppins',sans-serif">Poppins 无衬线</option>
+          <option value="'Inter',sans-serif">Inter 无衬线</option>
+          </optgroup>
+        </select>
         <label>文字字号: <span id="poFooterSizeVal">4.2</span>%</label>
         <input type="range" id="poFooterSize" min="1.5" max="12" step="0.1" value="4.2" oninput="document.getElementById('poFooterSizeVal').textContent=this.value;requestDraw()">
         <label>水平位置: <span id="poFooterXVal">0</span>%</label>
@@ -2349,6 +2480,10 @@ function drawPolaroid(){
   const footerRot=parseFloat(document.getElementById("poFooterRot").value);
   const poFilter=document.getElementById("poFilter").value;
   const filterStrength=parseInt(document.getElementById("poFilterStrength").value)/100;
+  const decoFont=document.getElementById("poDecoFont").value;
+  const dateFont=document.getElementById("poDateFont").value;
+  const captionFont=document.getElementById("poCaptionFont").value;
+  const footerFont=document.getElementById("poFooterFont").value;
   const frameTex=document.getElementById("poFrameTex").value;
   const frameTexAmt=parseInt(document.getElementById("poFrameTexAmt").value)/100;
   // ⑤/⑥ 作品图参数（在拍立得版式中同样生效）
@@ -2393,7 +2528,7 @@ function drawPolaroid(){
     ctx.fillStyle=decoColor;
     ctx.textAlign="center";
     ctx.textBaseline="middle";
-    ctx.font=`italic 400 ${Math.round(c.width*decoSize)}px 'Great Vibes','Cormorant Garamond',cursive`;
+    ctx.font=`italic 400 ${Math.round(c.width*decoSize)}px ${decoFont}`;
     ctx.translate(c.width*(0.5+decoX/100),cardY+cardH*0.42+c.height*(decoY/100));
     ctx.rotate(-0.045+decoRot*Math.PI/180);
     ctx.fillText(decoText,0,0);
@@ -2465,7 +2600,7 @@ function drawPolaroid(){
 
   // ④ 拍立得底部手写文字
   if(caption){
-    const capFont="'KaiTi','Kaiti SC','STKaiti','Ma Shan Zheng',serif";
+    const capFont=captionFont;
     const capSize=poFitFont(caption,imgW*0.96,capFont,Math.round(imgW*(captionSize/100)));
     ctx.fillStyle=captionColor;
     ctx.font=`400 ${capSize}px ${capFont}`;
@@ -2480,7 +2615,7 @@ function drawPolaroid(){
 
   // ⑤ 顶部日期 + 横线
   ctx.save();
-  ctx.font=`600 ${Math.round(c.width*(dateSize/100))}px 'PingFang SC','Noto Serif SC',serif`;
+  ctx.font=`600 ${Math.round(c.width*(dateSize/100))}px ${dateFont}`;
   ctx.fillStyle=dateColor;
   ctx.textAlign="left";ctx.textBaseline="middle";
   const dY=c.height*(0.072+dateY/100);
@@ -2510,7 +2645,7 @@ function drawPolaroid(){
   // ⑥ 画面底部手写文字（多行）
   const lines=footerText.split("\n").map(s=>s.trim()).filter(s=>s.length);
   if(lines.length){
-    const fFont="'KaiTi','Kaiti SC','STKaiti','Ma Shan Zheng',serif";
+    const fFont=footerFont;
     const fSize=Math.round(c.width*(footerSize/100));
     ctx.save();
     ctx.fillStyle=footerColor;
@@ -2973,6 +3108,7 @@ function getSettings(){
     poDateLeft:document.getElementById("poDateLeft").value,
     poDateRight:document.getElementById("poDateRight").value,
     poDateColor:document.getElementById("poDateColor").value,
+    poDateFont:document.getElementById("poDateFont").value,
     poDateLine:chk("poDateLine"),
     poDateSize:document.getElementById("poDateSize").value,
     poDateX:document.getElementById("poDateX").value,
@@ -2980,6 +3116,7 @@ function getSettings(){
     poDateRot:document.getElementById("poDateRot").value,
     poDecoText:document.getElementById("poDecoText").value,
     poDecoColor:document.getElementById("poDecoColor").value,
+    poDecoFont:document.getElementById("poDecoFont").value,
     poDecoSize:document.getElementById("poDecoSize").value,
     poDecoOpacity:document.getElementById("poDecoOpacity").value,
     poDecoX:document.getElementById("poDecoX").value,
@@ -2993,12 +3130,14 @@ function getSettings(){
     poCardY:document.getElementById("poCardY").value,
     poCaption:document.getElementById("poCaption").value,
     poCaptionColor:document.getElementById("poCaptionColor").value,
+    poCaptionFont:document.getElementById("poCaptionFont").value,
     poCaptionSize:document.getElementById("poCaptionSize").value,
     poCaptionX:document.getElementById("poCaptionX").value,
     poCaptionY:document.getElementById("poCaptionY").value,
     poCaptionRot:document.getElementById("poCaptionRot").value,
     poFooter:document.getElementById("poFooter").value,
     poFooterColor:document.getElementById("poFooterColor").value,
+    poFooterFont:document.getElementById("poFooterFont").value,
     poFooterSize:document.getElementById("poFooterSize").value,
     poFooterX:document.getElementById("poFooterX").value,
     poFooterY:document.getElementById("poFooterY").value,
@@ -3092,12 +3231,14 @@ function applySettings(s){
   set("poDateLeft",s.poDateLeft||"2026");
   set("poDateRight",s.poDateRight||"10月7日");
   set("poDateColor",s.poDateColor||"#54432b");
+  set("poDateFont",s.poDateFont||"'PingFang SC','Noto Serif SC',serif");
   chk("poDateLine",s.poDateLine!==false);
   set("poDateSize",s.poDateSize||"3");
   set("poDateX",s.poDateX||"0");
   set("poDateY",s.poDateY||"0");
   set("poDecoText",s.poDecoText||"memories");
   set("poDecoColor",s.poDecoColor||"#7a5f3c");
+  set("poDecoFont",s.poDecoFont||"'Great Vibes','Cormorant Garamond',cursive");
   set("poDecoSize",s.poDecoSize||"16");
   set("poDecoOpacity",s.poDecoOpacity||"13");
   set("poDecoX",s.poDecoX||"0");
@@ -3110,11 +3251,13 @@ function applySettings(s){
   set("poCardY",s.poCardY||"18.5");
   set("poCaption",s.poCaption||"2026.10.7 值得纪念的一天");
   set("poCaptionColor",s.poCaptionColor||"#4a3a22");
+  set("poCaptionFont",s.poCaptionFont||"'KaiTi','Kaiti SC','STKaiti','Ma Shan Zheng',serif");
   set("poCaptionSize",s.poCaptionSize||"6.2");
   set("poCaptionX",s.poCaptionX||"0");
   set("poCaptionY",s.poCaptionY||"0");
   set("poFooter",s.poFooter||"想和你一起\n记录每个瞬间");
   set("poFooterColor",s.poFooterColor||"#5a4a32");
+  set("poFooterFont",s.poFooterFont||"'KaiTi','Kaiti SC','STKaiti','Ma Shan Zheng',serif");
   set("poFooterSize",s.poFooterSize||"4.2");
   set("poFooterX",s.poFooterX||"0");
   set("poFooterY",s.poFooterY||"0");
