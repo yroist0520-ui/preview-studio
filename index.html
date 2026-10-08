@@ -131,7 +131,7 @@ input[type=file]{font-size:11px}
   .panel{max-height:45vh;padding:14px}
   .stage{height:45vh}
   button,select,input[type=text],input[type=number],textarea{font-size:13px;padding:10px}
-  .preset-grid{grid-template-columns:1fr 1fr}
+  .preset-grid{grid-template-columns:1fr 1fr;gap:6px}
   .footer-cols{gap:32px}
 }
 @media(max-width:480px){
@@ -146,7 +146,7 @@ input[type=file]{font-size:11px}
 .tpl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:24px}
 .tpl-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px;cursor:pointer;transition:border-color .2s,transform .2s,box-shadow .2s;display:flex;flex-direction:column;text-align:left}
 .tpl-card:hover{border-color:var(--accent);transform:translateY(-4px);box-shadow:0 22px 54px rgba(0,0,0,.5)}
-.tpl-thumb{height:230px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;background:radial-gradient(circle at 50% 35%,#1b1b23,#0b0b0f);border:1px solid var(--border);overflow:hidden}
+.tpl-thumb{--mk:1;height:clamp(120px,24vw,230px);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;background:radial-gradient(circle at 50% 35%,#1b1b23,#0b0b0f);border:1px solid var(--border);overflow:hidden}
 .tpl-card h3{font-size:18px;font-weight:700;margin-bottom:8px;color:var(--text)}
 .tpl-card p{color:var(--muted);font-size:13.5px;line-height:1.6;flex:1;margin-bottom:16px}
 .tpl-enter{padding:11px 0;border-radius:9px;background:var(--accent);color:#1a1a1a;font-weight:600;font-size:14px;border:none;cursor:pointer;transition:background .15s;text-align:center}
@@ -170,18 +170,41 @@ input[type=file]{font-size:11px}
 .mm-script{font-family:'Great Vibes',cursive;font-size:22px;color:#c08a4a;text-align:right;margin-top:20px;line-height:1}
 .mm-title{font-family:'KaiTi','Kaiti SC','STKaiti',serif;font-size:15px;color:#b8894a;line-height:1.55;margin-top:16px;font-weight:700}
 .mm-author{position:absolute;left:14px;bottom:12px;font-family:'KaiTi','Kaiti SC','STKaiti',serif;font-size:13px;color:#a8793f}
+.tpl-thumb .mock-normal,.tpl-thumb .mock-lock,.tpl-thumb .mock-ms{transform:scale(var(--mk,1));transform-origin:center;transition:transform .25s ease}
+/* 模板卡片响应式：必须置于基础样式之后，否则同优先级会被覆盖 */
+@media(max-width:768px){
+  .tpl-grid{gap:14px}
+  .tpl-card{padding:14px;border-radius:14px}
+  .tpl-thumb{height:clamp(110px,30vw,180px);margin-bottom:12px;--mk:.78}
+  .tpl-card h3{font-size:15px;margin-bottom:6px}
+  .tpl-card p{font-size:12.5px;margin-bottom:12px}
+  .tpl-enter{padding:9px 0;font-size:13px}
+}
+@media(max-width:640px){
+  .tpl-grid{grid-template-columns:repeat(3,1fr);gap:9px}
+  .tpl-card{padding:9px;border-radius:12px}
+  .tpl-thumb{height:clamp(84px,26vw,112px);margin-bottom:9px;border-radius:9px;--mk:.52}
+  .tpl-card h3{font-size:11.5px;margin-bottom:5px;line-height:1.3}
+  .tpl-card p{display:none}
+  .tpl-enter{padding:7px 0;font-size:11px;border-radius:7px}
+  .tpl-card:hover{transform:none;box-shadow:0 12px 30px rgba(0,0,0,.4)}
+}
+@media(max-width:480px){
+  .tpl-thumb{height:clamp(78px,24vw,100px);--mk:.46}
+  .tpl-card h3{font-size:11px}
+}
 /* 面板顶部返回条 */
 .panel-topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;padding-bottom:10px;border-bottom:1px solid var(--border)}
 .back-btn{width:auto;padding:6px 12px;margin:0;background:#21212a;border:1px solid #3a3a45;color:var(--text);font-size:12px;border-radius:7px}
 .back-btn:hover{background:#2c2c38;border-color:var(--accent)}
 .tpl-name{font-size:12px;color:var(--accent);font-weight:600;white-space:nowrap}
-/* 首页预设管理（最外层，跨模板通用） */
-.preset-home{margin-top:26px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:22px}
-.preset-home-head h3{font-size:15px;font-weight:700;color:var(--text);margin-bottom:6px}
-.preset-home-head p{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:16px}
-.preset-grid-home{grid-template-columns:repeat(auto-fit,minmax(92px,1fr))}
-.preset-home-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
-.preset-home-actions button{width:auto;flex:1;min-width:170px;margin:0}
+/* 工作区内预设存档（按模板隔离，存/载成对对齐） */
+.preset-tip{color:var(--muted);font-size:11px;line-height:1.65;margin:4px 0 9px}
+.preset-tip b{color:var(--accent);font-weight:600}
+.preset-grid button{margin:0;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.preset-grid button.slot-empty{opacity:.42;filter:grayscale(.5)}
+.preset-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.preset-actions button{flex:1;min-width:130px;margin:0}
 
 /* ===== 解锁码遮罩 ===== */
 .lock-overlay{position:fixed;inset:0;z-index:9999;background:rgba(10,10,14,.96);display:flex;align-items:center;justify-content:center;padding:24px}
@@ -246,7 +269,7 @@ input[type=file]{font-size:11px}
     <div class="hero-stats">
       <div class="stat"><div class="stat-num">12</div><div class="stat-label">画布尺寸预设</div></div>
       <div class="stat"><div class="stat-num">4</div><div class="stat-label">内置撕纸素材</div></div>
-      <div class="stat"><div class="stat-num">5</div><div class="stat-label">本地预设槽位</div></div>
+      <div class="stat"><div class="stat-num">5</div><div class="stat-label">每模板预设槽位</div></div>
       <div class="stat"><div class="stat-num">1</div><div class="stat-label">字稿风预设</div></div>
     </div>
   </div>
@@ -267,7 +290,7 @@ input[type=file]{font-size:11px}
       <div class="feature"><div class="feature-icon">🌫️</div><h3>上下羽化蒙版</h3><p>作品图上方 / 下方 / 上下双羽化，羽化宽度可调，柔和过渡到背景。</p></div>
       <div class="feature"><div class="feature-icon">📐</div><h3>iPhone / iPad 横竖屏 / 1:1</h3><p>12 种画布尺寸，覆盖手机壁纸、平板横屏壁纸、社交正方形封面。</p></div>
       <div class="feature"><div class="feature-icon">✍️</div><h3>手写英文 + 楷体中文</h3><p>顶部 Great Vibes 手写体英文，底部 KaiTi 楷体中文多行排版。</p></div>
-      <div class="feature"><div class="feature-icon">💾</div><h3>5 槽位本地预设</h3><p>所有参数一键保存到 localStorage，5 个独立槽位 + 字稿风一键应用。</p></div>
+      <div class="feature"><div class="feature-icon">💾</div><h3>模板独立预设槽</h3><p>每个模板各自 5 个槽位，存 / 载成对对齐，只保存于本模板工作区，互不干扰。</p></div>
     </div>
   </div>
 </section>
@@ -321,28 +344,6 @@ input[type=file]{font-size:11px}
         </div>
       </div>
 
-      <div class="preset-home">
-        <div class="preset-home-head">
-          <h3>✦ 我的预设（跨模板通用）</h3>
-          <p>预设会记录当前画布的全部参数，可存到 5 个槽位随时载入；这一区放在模板选择之外的最外层，不占用任何模板的工作区。</p>
-        </div>
-        <div class="preset-grid preset-grid-home">
-          <button class="primary small" onclick="savePreset(1)">存到 1</button>
-          <button class="primary small" onclick="loadPreset(1)">载入 1</button>
-          <button class="primary small" onclick="savePreset(2)">存到 2</button>
-          <button class="primary small" onclick="loadPreset(2)">载入 2</button>
-          <button class="primary small" onclick="savePreset(3)">存到 3</button>
-          <button class="primary small" onclick="loadPreset(3)">载入 3</button>
-          <button class="primary small" onclick="savePreset(4)">存到 4</button>
-          <button class="primary small" onclick="loadPreset(4)">载入 4</button>
-          <button class="primary small" onclick="savePreset(5)">存到 5</button>
-          <button class="primary small" onclick="loadPreset(5)">载入 5</button>
-        </div>
-        <div class="preset-home-actions">
-          <button class="primary" onclick="selectTemplate('manuscript')">✦ 一键应用字稿风预设</button>
-          <button class="warn" onclick="resetAll()">清空当前设置</button>
-        </div>
-      </div>
     </div>
 
     <div class="tool-shell" id="toolShell" style="display:none">
@@ -352,7 +353,29 @@ input[type=file]{font-size:11px}
           <span class="tpl-name" id="tplName"></span>
         </div>
         <div class="tpl-sec" data-tpl="normal lock manuscript">
-        <h3 class="tool-h">① 画布尺寸</h3>
+        <h3 class="tool-h">① 预设存档</h3>
+        <p class="preset-tip">仅保存于「<b id="presetTplName">普通作品预览</b>」工作区，与其他模板互不干扰；每个槽位左侧存档、右侧载入。</p>
+        <div class="preset-grid" id="presetGrid"></div>
+        <div class="preset-actions">
+          <button class="warn" onclick="resetAll()">清空当前设置</button>
+        </div>
+        <div class="hint">预设只记录参数，自定义纹理图与头像需重新上传。</div>
+
+        </div>
+        <div class="tpl-sec" data-tpl="normal lock manuscript">
+        <h3 class="tool-h" style="margin-top:14px">② 分享预设</h3>
+        <button class="primary" onclick="sharePreset()" style="margin-bottom:6px">🔗 生成短链接</button>
+        <label>导入预设（粘贴链接或短码）</label>
+        <input type="text" id="shareInput" placeholder="粘贴链接或短码" style="margin-bottom:4px">
+        <div class="row">
+          <button onclick="importPresetFromUrl()">📥 导入</button>
+          <button onclick="importFromClipboard()">📋 读剪贴板</button>
+        </div>
+        <div class="hint" id="shareHint">生成短链接复制给别人，打开即自动应用；也可手动粘贴导入。</div>
+
+        </div>
+        <div class="tpl-sec" data-tpl="normal lock manuscript">
+        <h3 class="tool-h">③ 画布尺寸</h3>
         <select id="size">
           <optgroup label="苹果锁屏 iPhone">
             <option value="1320,2868">iPhone 锁屏 1320×2868 (16/17/18 Pro Max)</option>
@@ -402,7 +425,7 @@ input[type=file]{font-size:11px}
 
         </div>
         <div class="tpl-sec" data-tpl="normal lock manuscript">
-        <h3 class="tool-h">② 背景</h3>
+        <h3 class="tool-h">④ 背景</h3>
         <label>背景类型</label>
         <select id="bgType" onchange="requestDraw()">
           <option value="solid">纯色</option>
@@ -425,7 +448,7 @@ input[type=file]{font-size:11px}
 
         </div>
         <div class="tpl-sec" data-tpl="normal lock manuscript">
-        <h3 class="tool-h">③ 作品图</h3>
+        <h3 class="tool-h">⑤ 作品图</h3>
         <input type="file" id="upload" accept="image/*">
         <button class="warn small" onclick="removeArt()">× 删除图片</button>
         <button class="ms-btn" onclick="extractColors()" style="margin-top:4px">✦ 从图片提取主色填入背景</button>
@@ -455,7 +478,7 @@ input[type=file]{font-size:11px}
 
         </div>
         <div class="tpl-sec" data-tpl="normal lock manuscript">
-        <h3 class="tool-h">④ 羽化蒙版（作品图边缘）</h3>
+        <h3 class="tool-h">⑥ 羽化蒙版（作品图边缘）</h3>
         <label>羽化模式</label>
         <select id="featherMode" onchange="requestDraw()">
           <option value="none" selected>无羽化</option>
@@ -470,7 +493,7 @@ input[type=file]{font-size:11px}
 
         </div>
         <div class="tpl-sec" data-tpl="normal">
-        <h3 class="tool-h">⑤ 纸张纹理 / 撕纸效果</h3>
+        <h3 class="tool-h">⑦ 纸张纹理 / 撕纸效果</h3>
         <label>纹理来源</label>
         <select id="texSource" onchange="onTexSourceChange()">
           <option value="preset" selected>内置预设素材</option>
@@ -497,7 +520,7 @@ input[type=file]{font-size:11px}
 
         </div>
         <div class="tpl-sec" data-tpl="normal">
-        <h3 class="tool-h">⑥ 文字</h3>
+        <h3 class="tool-h">⑧ 文字</h3>
         <label>英文标题</label>
         <input type="text" id="textEN" value="Preview" oninput="requestDraw()">
         <label>英文字体</label>
@@ -545,7 +568,7 @@ input[type=file]{font-size:11px}
 
         </div>
         <div class="tpl-sec" data-tpl="normal">
-        <h3 class="tool-h">⑦ 装饰</h3>
+        <h3 class="tool-h">⑨ 装饰</h3>
         <label>外框颜色</label>
         <input type="color" id="strokeColor" value="#ffffff" onchange="requestDraw()">
         <div class="checkbox-row"><input type="checkbox" id="decBorder" onchange="requestDraw()"><span>绘制外框</span></div>
@@ -554,7 +577,7 @@ input[type=file]{font-size:11px}
 
         </div>
         <div class="tpl-sec" data-tpl="manuscript">
-        <h3 class="tool-h">⑧ 字稿风模式（IMG_6729 暖金风）</h3>
+        <h3 class="tool-h">⑩ 字稿风模式（IMG_6729 暖金风）</h3>
         <div class="checkbox-row"><input type="checkbox" id="msMode" onchange="requestDraw()"><span>启用字稿风（图片模糊铺满 + 暖金叠加）</span></div>
         <div class="checkbox-row"><input type="checkbox" id="msStars" onchange="requestDraw()"><span>✦ 装饰符号</span></div>
         <div class="checkbox-row"><input type="checkbox" id="msInfoBar" onchange="requestDraw()"><span>顶部信息栏（头像 + 版权 + 营业时间）</span></div>
@@ -623,7 +646,7 @@ love
 
         </div>
         <div class="tpl-sec" data-tpl="manuscript">
-        <h3 class="tool-h" style="margin-top:14px">⑨ 元素大小与位置调节</h3>
+        <h3 class="tool-h" style="margin-top:14px">⑪ 元素大小与位置调节</h3>
         <label>主文字字号: <span id="msMainSizeVal">55</span>‰</label>
         <input type="range" id="msMainSize" min="20" max="100" value="55" oninput="document.getElementById('msMainSizeVal').textContent=this.value;requestDraw()">
         <label>主文字字体</label>
@@ -678,7 +701,7 @@ love
 
         </div>
         <div class="tpl-sec" data-tpl="lock">
-        <h3 class="tool-h" style="margin-top:14px">⑩ 苹果锁屏预览</h3>
+        <h3 class="tool-h" style="margin-top:14px">⑫ 苹果锁屏预览</h3>
         <div class="checkbox-row"><input type="checkbox" id="lockScreen" onchange="requestDraw()"><span>显示锁屏 UI（时间/日期/按钮）</span></div>
         <label>时间文字</label>
         <input type="text" id="lockTime" value="9:41" oninput="requestDraw()">
@@ -712,7 +735,7 @@ love
 
         </div>
         <div class="tpl-sec" data-tpl="normal lock manuscript">
-        <h3 class="tool-h" style="margin-top:14px">⑪ 全屏水印</h3>
+        <h3 class="tool-h" style="margin-top:14px">⑬ 全屏水印</h3>
         <div class="checkbox-row"><input type="checkbox" id="wmEnable" onchange="requestDraw()"><span>启用全屏水印</span></div>
         <input type="file" id="wmUpload" accept="image/*">
         <label>混合模式</label>
@@ -741,19 +764,7 @@ love
 
         </div>
         <div class="tpl-sec" data-tpl="normal lock manuscript">
-        <h3 class="tool-h" style="margin-top:14px">⑫ 分享预设</h3>
-        <button class="primary" onclick="sharePreset()" style="margin-bottom:6px">🔗 生成短链接</button>
-        <label>导入预设（粘贴链接或短码）</label>
-        <input type="text" id="shareInput" placeholder="粘贴链接或短码" style="margin-bottom:4px">
-        <div class="row">
-          <button onclick="importPresetFromUrl()">📥 导入</button>
-          <button onclick="importFromClipboard()">📋 读剪贴板</button>
-        </div>
-        <div class="hint" id="shareHint">生成短链接复制给别人，打开即自动应用；也可手动粘贴导入。</div>
-
-        </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript">
-        <h3 class="tool-h" style="margin-top:14px">⑬ 吸管取色</h3>
+        <h3 class="tool-h" style="margin-top:14px">⑭ 吸管取色</h3>
         <label>吸色目标</label>
         <select id="pickerTarget">
           <option value="msTitleColor">主文字颜色</option>
@@ -768,7 +779,7 @@ love
 
         </div>
         <div class="tpl-sec" data-tpl="normal lock manuscript">
-        <h3 class="tool-h">⑭ 导出</h3>
+        <h3 class="tool-h">⑮ 导出</h3>
         <button class="primary" onclick="exportPNG()">导出 PNG</button>
         <div class="hint" style="margin-top:10px">提示：预设只保存参数，自定义纹理图和头像需重新上传。</div>
         </div>
@@ -790,9 +801,9 @@ love
     </div>
     <div class="steps-grid">
       <div class="step"><div class="step-num">1</div><h4>选尺寸 / 一键字稿风</h4><p>选 12 种画布尺寸任一，或直接点「一键应用字稿风预设」自动配好全部参数。</p></div>
-      <div class="step"><div class="step-num">2</div><h4>上传作品 + 智能取色</h4><p>「③」上传主图后点「从图片提取主色」，背景渐变自动跟随图片色调。</p></div>
+      <div class="step"><div class="step-num">2</div><h4>上传作品 + 智能取色</h4><p>「⑤」上传主图后点「从图片提取主色」，背景渐变自动跟随图片色调。</p></div>
       <div class="step"><div class="step-num">3</div><h4>调字稿风细节</h4><p>开字稿风模式，上传头像、填署名、调四角星 / 竖排英文 / 底部信息栏。</p></div>
-      <div class="step"><div class="step-num">4</div><h4>存预设并导出</h4><p>满意后点「存到 1」留档，再点「导出 PNG」即下载，手机平板电脑全兼容。</p></div>
+      <div class="step"><div class="step-num">4</div><h4>存预设并导出</h4><p>满意后点「存到 1」留档（各模板独立），再点「导出 PNG」即下载，手机平板电脑全兼容。</p></div>
     </div>
     <div class="cta-banner">
       <h2>准备好了吗？</h2>
@@ -1113,7 +1124,7 @@ document.getElementById("wmUpload").onchange=e=>{
 
 // ============ 智能取色：从上传图片提取主色+副色 ============
 function extractColors(){
-  if(!layers.length||!layers[0].img){alert("请先在「③ 作品图」上传一张图片");return;}
+  if(!layers.length||!layers[0].img){alert("请先在「⑤ 作品图」上传一张图片");return;}
   const img=layers[0].img;
   // 离屏采样：缩到 100×100 加速
   const sw=100,sh=100;
@@ -1926,8 +1937,15 @@ function drawWatermark(){
   const gap=parseInt(document.getElementById("wmGap").value)/100;
   const wx=parseInt(document.getElementById("wmX").value)/100;
   const wy=parseInt(document.getElementById("wmY").value)/100;
-  const w=watermarkImg.width*scale;
-  const h=watermarkImg.height*scale;
+  // 以「画布长边」为基准等比计算水印尺寸，而不是用图片原始像素。
+  // 这样预览（缩小后的画布）与导出（全分辨率画布）渲染比例完全一致，
+  // 不会出现导出后水印缩成一小块的问题。
+  const iw=watermarkImg.naturalWidth||watermarkImg.width;
+  const ih=watermarkImg.naturalHeight||watermarkImg.height;
+  const canvasLong=Math.max(c.width,c.height);
+  const k=(canvasLong*scale*0.5)/Math.max(iw,ih);
+  const w=iw*k;
+  const h=ih*k;
   ctx.save();
   ctx.globalAlpha=opacity;
   ctx.globalCompositeOperation=blend;
@@ -2221,11 +2239,10 @@ function applyManuscriptPreset(silent){
   onTexSourceChange();
   resizeCanvas();
   if(silent===true)return;
-  alert("字稿风预设已应用（IMG_6729 暖金风）！\n\n下一步：\n1. 在「③ 作品图」上传你的摄影图\n2. 点「从图片提取主色填入背景」自动配色\n3. 在「⑧ 字稿风模式」上传头像\n4. 调整署名 / 营业时间 / 版权 / 散落小字\n5. 点「导出 PNG」");
+  alert("字稿风预设已应用（IMG_6729 暖金风）！\n\n下一步：\n1. 在「⑤ 作品图」上传你的摄影图\n2. 点「从图片提取主色填入背景」自动配色\n3. 在「⑩ 字稿风模式」上传头像\n4. 调整署名 / 营业时间 / 版权 / 散落小字\n5. 点「导出 PNG」");
 }
 
-// ============ 预设系统 ============
-const PRESET_KEY="artwork-preview-presets-v4";
+// ============ 预设系统（按模板隔离） ============
 function getSettings(){
   const chk=id=>document.getElementById(id).checked;
   return{
@@ -2455,17 +2472,47 @@ function applySettings(s){
   if((s.texSource||"preset")==="preset"){onTexPresetChange();}
   resizeCanvas();
 }
+function presetKey(){
+  const tpl=(typeof currentTemplate!=="undefined"&&currentTemplate)||"normal";
+  return "artwork-preview-presets-v5::"+tpl;
+}
+function readPresets(){
+  try{return JSON.parse(localStorage.getItem(presetKey())||"{}")||{};}catch(e){return {};}
+}
+function writePresets(p){localStorage.setItem(presetKey(),JSON.stringify(p));}
+function buildPresetGrid(){
+  const grid=document.getElementById("presetGrid");
+  if(!grid)return;
+  let html="";
+  for(let i=1;i<=5;i++){
+    html+='<button class="primary small" data-slot="'+i+'" data-act="save" onclick="savePreset('+i+')">存到 '+i+'</button>';
+    html+='<button class="primary small slot-empty" data-slot="'+i+'" data-act="load" onclick="loadPreset('+i+')">载入 '+i+'</button>';
+  }
+  grid.innerHTML=html;
+}
+function refreshPresetUI(){
+  const presets=readPresets();
+  document.querySelectorAll("#presetGrid button[data-act='load']").forEach(btn=>{
+    const filled=!!presets[btn.getAttribute("data-slot")];
+    btn.classList.toggle("slot-empty",!filled);
+  });
+  const nameEl=document.getElementById("presetTplName");
+  if(nameEl)nameEl.textContent=(typeof TPL_NAMES!=="undefined"&&TPL_NAMES[currentTemplate])||"当前模板";
+}
 function savePreset(n){
-  const presets=JSON.parse(localStorage.getItem(PRESET_KEY)||"{}");
+  const presets=readPresets();
   presets[n]=getSettings();
-  localStorage.setItem(PRESET_KEY,JSON.stringify(presets));
-  alert("预设 "+n+" 已保存");
+  writePresets(presets);
+  refreshPresetUI();
+  const tpl=(typeof TPL_NAMES!=="undefined"&&TPL_NAMES[currentTemplate])||"当前模板";
+  alert("已保存到「"+tpl+"」预设槽 "+n);
 }
 function loadPreset(n){
-  const presets=JSON.parse(localStorage.getItem(PRESET_KEY)||"{}");
-  if(!presets[n]){alert("预设 "+n+" 为空");return;}
+  const presets=readPresets();
+  if(!presets[n]){alert("该模板的预设槽 "+n+" 为空，请先存档");return;}
   applySettings(presets[n]);
-  alert("预设 "+n+" 已载入（如需自定义纹理图或头像请重新上传）");
+  const tpl=(typeof TPL_NAMES!=="undefined"&&TPL_NAMES[currentTemplate])||"当前模板";
+  alert("已载入「"+tpl+"」预设槽 "+n+"（如需自定义纹理图或头像请重新上传）");
 }
 function resetAll(){
   if(!confirm("清空当前所有设置？"))return;
@@ -2491,6 +2538,7 @@ function selectTemplate(type){
   const nameEl=document.getElementById("tplName");
   if(nameEl)nameEl.textContent=TPL_NAMES[type]||"";
   applyTemplatePreset(type);
+  refreshPresetUI();
   const tool=document.getElementById("tool");
   if(tool)tool.scrollIntoView({behavior:"smooth",block:"start"});
 }
@@ -2917,6 +2965,8 @@ idbGet("ps-texture").then(blob=>{
   img.src=URL.createObjectURL(blob);
 });
 onTexPresetChange();
+buildPresetGrid();
+refreshPresetUI();
 requestDraw();
 </script>
 </body>
