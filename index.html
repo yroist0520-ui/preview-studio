@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
 <title>Preview Studio · 作品预览图生成器</title>
-<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Snell+Roundhand&family=Apple+Chancery&family=Inter:wght@300;400;500;600;700;800&family=Cormorant+Garamond:wght@300;400;500;600&family=Playfair+Display:wght@400;600;700&family=Dancing+Script:wght@400;600&family=Caveat:wght@400;600&family=Montserrat:wght@300;400;600&family=ZCOOL+XiaoWei&family=ZCOOL+QingKe+HuangYou&family=Ma+Shan+Zheng&family=Long+Cang&family=Liu+Jian+Mao+Cao&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+<!-- 字体全部本地内置（真·离线），见 fonts.css + fonts/ 目录；均为 OFL 可商用授权 -->
+<link href="fonts.css" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -481,10 +482,12 @@ input[type=file]{font-size:11px}
         <label>图片位置（上下）: <span id="fillWidthYVal">50</span>%</label>
         <input type="range" id="fillWidthY" min="0" max="100" value="50" oninput="document.getElementById('fillWidthYVal').textContent=this.value;requestDraw()">
         <div class="hint">开启后图片填满画布宽度，Y滑块控制上下位置（配合羽化效果）</div>
+        <div class="tpl-sec" data-tpl="normal lock manuscript">
         <label>描边颜色</label>
         <input type="color" id="borderColor" value="#ffffff" onchange="requestDraw()">
         <label>描边宽度: <span id="borderVal">24</span>px</label>
         <input type="range" id="artBorder" min="0" max="80" value="24" oninput="document.getElementById('borderVal').textContent=this.value;requestDraw()">
+        </div>
         <label>向下投影距离: <span id="shadowDVal">20</span>px</label>
         <input type="range" id="shadowDist" min="0" max="80" value="20" oninput="document.getElementById('shadowDVal').textContent=this.value;requestDraw()">
         <label>投影模糊: <span id="shadowBVal">25</span>px</label>
@@ -512,6 +515,12 @@ input[type=file]{font-size:11px}
         </select>
         <label>羽化宽度: <span id="featherVal">120</span>px</label>
         <input type="range" id="featherW" min="20" max="400" value="120" oninput="document.getElementById('featherVal').textContent=this.value;requestDraw()">
+        <div class="tpl-sec" data-tpl="polaroid">
+        <label>羽化颜色（拍立得）</label>
+        <input type="color" id="featherColor" value="#ffffff" onchange="requestDraw()">
+        <label>羽化倾斜度: <span id="featherTiltVal">0</span>°</label>
+        <input type="range" id="featherTilt" min="-45" max="45" value="0" oninput="document.getElementById('featherTiltVal').textContent=this.value;requestDraw()">
+        </div>
         <div class="hint">作品图边缘会渐变透明，融合到背景中。</div>
 
         </div>
@@ -667,13 +676,25 @@ input[type=file]{font-size:11px}
         <input type="text" id="textEN" value="Preview" oninput="requestDraw()">
         <label>英文字体</label>
         <select id="fontEN" onchange="requestDraw()">
-          <option value="'Great Vibes',cursive" selected>Great Vibes 手写</option>
-          <option value="'Snell Roundhand','Apple Chancery',cursive">Snell 圆体</option>
+          <optgroup label="英文 · 手写 / 花体">
+          <option value="'Great Vibes',cursive" selected>Great Vibes 花体</option>
           <option value="'Dancing Script',cursive">Dancing Script 手写</option>
           <option value="'Caveat',cursive">Caveat 随性</option>
-          <option value="'Cormorant Garamond',serif">Cormorant 衬线</option>
-          <option value="'Playfair Display',serif">Playfair 衬线</option>
+          <option value="'Sacramento',cursive">Sacramento 细花体</option>
+          <option value="'Parisienne',cursive">Parisienne 优雅花体</option>
+          <option value="'Snell Roundhand','Apple Chancery',cursive">Snell 圆体（系统）</option>
+          </optgroup>
+          <optgroup label="英文 · 衬线">
+          <option value="'Playfair Display',serif">Playfair Display 衬线</option>
+          <option value="'Cormorant Garamond',serif">Cormorant Garamond 衬线</option>
+          <option value="'EB Garamond',serif">EB Garamond 衬线</option>
+          <option value="'Lora',serif">Lora 衬线</option>
+          </optgroup>
+          <optgroup label="英文 · 无衬线">
           <option value="'Montserrat',sans-serif">Montserrat 无衬线</option>
+          <option value="'Poppins',sans-serif">Poppins 无衬线</option>
+          <option value="'Inter',sans-serif">Inter 无衬线</option>
+          </optgroup>
         </select>
         <label>英文颜色</label>
         <input type="color" id="colorEN" value="#5a4a3a" onchange="requestDraw()">
@@ -688,15 +709,23 @@ input[type=file]{font-size:11px}
 版权所有 © 2026</textarea>
         <label>中文字体</label>
         <select id="fontCN" onchange="requestDraw()">
-          <option value="'KaiTi','Kaiti SC','STKaiti',serif" selected>楷体</option>
-          <option value="'Ma Shan Zheng',cursive">马善政毛笔</option>
+          <optgroup label="中文 · 手写 / 毛笔">
+          <option value="'Ma Shan Zheng',cursive">马善政毛笔楷书</option>
           <option value="'Long Cang',cursive">龙藏手写</option>
           <option value="'Liu Jian Mao Cao',cursive">刘建毛草</option>
-          <option value="'ZCOOL XiaoWei',serif">站酷小薇</option>
-          <option value="'ZCOOL QingKe HuangYou',sans-serif">站酷庆科黄油</option>
+          <option value="'Zhi Mang Xing',cursive">智芒星手写</option>
+          </optgroup>
+          <optgroup label="中文 · 黑体 / 宋体 / 圆体">
+          <option value="'Noto Sans SC',sans-serif">思源黑体</option>
           <option value="'Noto Serif SC',serif">思源宋体</option>
+          <option value="'ZCOOL XiaoWei',serif">站酷小薇（宋体）</option>
+          <option value="'ZCOOL QingKe HuangYou',sans-serif">站酷庆科黄油体（圆体）</option>
+          </optgroup>
+          <optgroup label="系统字体（随系统）">
+          <option value="'KaiTi','Kaiti SC','STKaiti',serif" selected>楷体</option>
           <option value="'FangSong','STFangsong',serif">仿宋</option>
           <option value="'PingFang SC','Microsoft YaHei',sans-serif">苹方黑体</option>
+          </optgroup>
         </select>
         <label>中文颜色</label>
         <input type="color" id="colorCN" value="#4a3a2a" onchange="requestDraw()">
@@ -731,14 +760,22 @@ input[type=file]{font-size:11px}
         <input type="text" id="msAuthor" value="裴砚" oninput="requestDraw()">
         <label>署名字体</label>
         <select id="msAuthorFont" onchange="requestDraw()">
-          <option value="'KaiTi','Kaiti SC','STKaiti',serif" selected>楷体</option>
-          <option value="'Ma Shan Zheng',cursive">马善政毛笔</option>
+          <optgroup label="中文 · 手写 / 毛笔">
+          <option value="'Ma Shan Zheng',cursive">马善政毛笔楷书</option>
           <option value="'Long Cang',cursive">龙藏手写</option>
           <option value="'Liu Jian Mao Cao',cursive">刘建毛草</option>
-          <option value="'ZCOOL XiaoWei',serif">站酷小薇</option>
-          <option value="'ZCOOL QingKe HuangYou',sans-serif">站酷庆科黄油</option>
+          <option value="'Zhi Mang Xing',cursive">智芒星手写</option>
+          </optgroup>
+          <optgroup label="中文 · 黑体 / 宋体 / 圆体">
+          <option value="'Noto Sans SC',sans-serif">思源黑体</option>
           <option value="'Noto Serif SC',serif">思源宋体</option>
+          <option value="'ZCOOL XiaoWei',serif">站酷小薇（宋体）</option>
+          <option value="'ZCOOL QingKe HuangYou',sans-serif">站酷庆科黄油体（圆体）</option>
+          </optgroup>
+          <optgroup label="系统字体（随系统）">
+          <option value="'KaiTi','Kaiti SC','STKaiti',serif" selected>楷体</option>
           <option value="'PingFang SC','Microsoft YaHei',sans-serif">苹方黑体</option>
+          </optgroup>
         </select>
         <label>署名颜色</label>
         <input type="color" id="msAuthorColor" value="#d4a574" onchange="requestDraw()">
@@ -774,14 +811,30 @@ love
         <input type="color" id="msScatterColor" value="#fff0d2" onchange="requestDraw()">
         <label>散落小字字体</label>
         <select id="msScatterFont" onchange="requestDraw()">
+          <optgroup label="混排推荐（中英通用）">
           <option value='"Cormorant Garamond","Great Vibes",serif"' selected>手写衬线（默认）</option>
-          <option value="'KaiTi','Kaiti SC','STKaiti',serif">楷体</option>
-          <option value="'Ma Shan Zheng',cursive">马善政毛笔</option>
+          <option value="'EB Garamond','Cormorant Garamond',serif">EB Garamond 衬线</option>
+          <option value="'Lora','Noto Serif SC',serif">Lora 衬线</option>
+          </optgroup>
+          <optgroup label="英文 · 无衬线">
+          <option value="'Inter','Helvetica',sans-serif">Inter 无衬线</option>
+          <option value="'Montserrat',sans-serif">Montserrat 无衬线</option>
+          <option value="'Poppins',sans-serif">Poppins 无衬线</option>
+          </optgroup>
+          <optgroup label="中文 · 手写 / 毛笔">
+          <option value="'Ma Shan Zheng',cursive">马善政毛笔楷书</option>
           <option value="'Long Cang',cursive">龙藏手写</option>
-          <option value="'ZCOOL XiaoWei',serif">站酷小薇</option>
+          <option value="'Zhi Mang Xing',cursive">智芒星手写</option>
+          </optgroup>
+          <optgroup label="中文 · 黑体 / 宋体">
           <option value="'Noto Serif SC',serif">思源宋体</option>
+          <option value="'Noto Sans SC',sans-serif">思源黑体</option>
+          <option value="'ZCOOL XiaoWei',serif">站酷小薇</option>
+          </optgroup>
+          <optgroup label="系统字体（随系统）">
+          <option value="'KaiTi','Kaiti SC','STKaiti',serif">楷体</option>
           <option value="'PingFang SC','Microsoft YaHei',sans-serif">苹方黑体</option>
-          <option value="'Inter','Helvetica',sans-serif">无衬线</option>
+          </optgroup>
         </select>
         <label>背景图模糊强度: <span id="msBlurVal">12</span>px</label>
         <input type="range" id="msBlur" min="0" max="40" value="12" oninput="document.getElementById('msBlurVal').textContent=this.value;requestDraw()">
@@ -793,14 +846,22 @@ love
         <input type="range" id="msMainSize" min="20" max="100" value="55" oninput="document.getElementById('msMainSizeVal').textContent=this.value;requestDraw()">
         <label>主文字字体</label>
         <select id="msMainFont" onchange="requestDraw()">
-          <option value="'KaiTi','Kaiti SC','STKaiti',serif" selected>楷体</option>
-          <option value="'Ma Shan Zheng',cursive">马善政毛笔</option>
+          <optgroup label="中文 · 手写 / 毛笔">
+          <option value="'Ma Shan Zheng',cursive">马善政毛笔楷书</option>
           <option value="'Long Cang',cursive">龙藏手写</option>
           <option value="'Liu Jian Mao Cao',cursive">刘建毛草</option>
-          <option value="'ZCOOL XiaoWei',serif">站酷小薇</option>
-          <option value="'ZCOOL QingKe HuangYou',sans-serif">站酷庆科黄油</option>
+          <option value="'Zhi Mang Xing',cursive">智芒星手写</option>
+          </optgroup>
+          <optgroup label="中文 · 黑体 / 宋体 / 圆体">
+          <option value="'Noto Sans SC',sans-serif">思源黑体</option>
           <option value="'Noto Serif SC',serif">思源宋体</option>
+          <option value="'ZCOOL XiaoWei',serif">站酷小薇（宋体）</option>
+          <option value="'ZCOOL QingKe HuangYou',sans-serif">站酷庆科黄油体（圆体）</option>
+          </optgroup>
+          <optgroup label="系统字体（随系统）">
+          <option value="'KaiTi','Kaiti SC','STKaiti',serif" selected>楷体</option>
           <option value="'PingFang SC','Microsoft YaHei',sans-serif">苹方黑体</option>
+          </optgroup>
         </select>
         <div class="row-2">
           <div><label>主文字 X: <span id="msMainXVal">50</span>%</label><input type="range" id="msMainX" min="0" max="100" value="50" oninput="document.getElementById('msMainXVal').textContent=this.value;requestDraw()"></div>
@@ -810,11 +871,20 @@ love
         <input type="range" id="msPreviewSize" min="20" max="80" value="45" oninput="document.getElementById('msPreviewSizeVal').textContent=this.value;requestDraw()">
         <label>Preview 字体</label>
         <select id="msPreviewFont" onchange="requestDraw()">
-          <option value="'Great Vibes',cursive" selected>Great Vibes 手写</option>
-          <option value="'Snell Roundhand','Apple Chancery',cursive">Snell 圆体</option>
-          <option value="'Dancing Script',cursive">Dancing Script</option>
-          <option value="'Caveat',cursive">Caveat</option>
-          <option value="'Playfair Display',serif">Playfair</option>
+          <optgroup label="英文 · 手写 / 花体">
+          <option value="'Great Vibes',cursive" selected>Great Vibes 花体</option>
+          <option value="'Dancing Script',cursive">Dancing Script 手写</option>
+          <option value="'Caveat',cursive">Caveat 随性</option>
+          <option value="'Sacramento',cursive">Sacramento 细花体</option>
+          <option value="'Parisienne',cursive">Parisienne 优雅花体</option>
+          <option value="'Snell Roundhand','Apple Chancery',cursive">Snell 圆体（系统）</option>
+          </optgroup>
+          <optgroup label="英文 · 衬线 / 无衬线">
+          <option value="'Playfair Display',serif">Playfair Display 衬线</option>
+          <option value="'Cormorant Garamond',serif">Cormorant Garamond 衬线</option>
+          <option value="'Lora',serif">Lora 衬线</option>
+          <option value="'Montserrat',sans-serif">Montserrat 无衬线</option>
+          </optgroup>
         </select>
         <div class="row-2">
           <div><label>Preview X: <span id="msPreviewXVal">82</span>%</label><input type="range" id="msPreviewX" min="0" max="100" value="82" oninput="document.getElementById('msPreviewXVal').textContent=this.value;requestDraw()"></div>
@@ -2030,7 +2100,7 @@ let dragTarget=null;
 let dragOffX=0,dragOffY=0;
 
 // ============ 离屏 canvas 缓存（避免每次 draw 重建导致内存压力） ============
-const offscreenCache={ feather:null, noise:null, noiseW:0, noiseH:0 };
+const offscreenCache={ feather:null, noise:null, noiseW:0, noiseH:0, poPhoto:null };
 
 // ============ 主渲染 ============
 function draw(){
@@ -2163,6 +2233,78 @@ function poFrameTexTile(type,w,h){
   offscreenCache.poTex=cv;offscreenCache.poTexKey=key;
   return cv;
 }
+// 构建拍立得照片图层：cover/填满宽度 + 缩放比例 + 上下位置 + 滤镜 + 羽化（颜色/倾斜）
+function poBuildPhoto(img,W,H,rad,cover,zoom,panY,filterStr,fMode,fW,fTilt,fColor){
+  let cv=offscreenCache.poPhoto;
+  if(!cv){cv=offscreenCache.poPhoto=document.createElement("canvas");}
+  W=Math.max(1,Math.ceil(W));H=Math.max(1,Math.ceil(H));
+  if(cv.width!==W||cv.height!==H){cv.width=W;cv.height=H;}
+  const g=cv.getContext("2d");
+  g.setTransform(1,0,0,1,0,0);
+  g.clearRect(0,0,W,H);
+  g.save();
+  // 圆角裁剪
+  const rr=Math.min(Math.max(0,rad),W/2,H/2);
+  g.beginPath();
+  g.moveTo(rr,0);g.arcTo(W,0,W,H,rr);g.arcTo(W,H,0,H,rr);g.arcTo(0,H,0,0,rr);g.arcTo(0,0,W,0,rr);g.closePath();
+  g.clip();
+  // cover（填满正方）或 填满宽度；缩放比例 zoom；上下位置 panY（0=顶部 1=底部）
+  const rw=W/img.naturalWidth, rh=H/img.naturalHeight;
+  let r=(cover?Math.max(rw,rh):rw)*zoom;
+  let dh=img.naturalHeight*r;
+  // 保证有可上下移动的空间（避免正方形照片在 cover 时完全无法平移）
+  if(cover&&dh<H*1.10){r=(H*1.10)/img.naturalHeight;dh=H*1.10;}
+  const dw=img.naturalWidth*r;
+  const dx=(W-dw)/2;
+  const dy=(H-dh)*panY;
+  g.filter=filterStr||"none";
+  g.drawImage(img,dx,dy,dw,dh);
+  g.filter="none";
+  // 羽化：边缘渐变透明（可倾斜）
+  if(fMode&&fMode!=="none"){
+    g.save();
+    if(fTilt){g.translate(W/2,H/2);g.rotate(fTilt*Math.PI/180);g.translate(-W/2,-H/2);}
+    let grad;
+    const fw=Math.min(fW,(fMode==="all"?Math.min(W,H):H)*0.8);
+    const ratio=fw/H;
+    if(fMode==="top"){
+      grad=g.createLinearGradient(0,0,0,H);
+      grad.addColorStop(0,"rgba(0,0,0,0)");
+      grad.addColorStop(Math.min(.99,ratio),"rgba(0,0,0,1)");
+      grad.addColorStop(1,"rgba(0,0,0,1)");
+    }else if(fMode==="bottom"){
+      grad=g.createLinearGradient(0,0,0,H);
+      grad.addColorStop(0,"rgba(0,0,0,1)");
+      grad.addColorStop(Math.max(.01,1-ratio),"rgba(0,0,0,1)");
+      grad.addColorStop(1,"rgba(0,0,0,0)");
+    }else if(fMode==="both"){
+      grad=g.createLinearGradient(0,0,0,H);
+      const half=Math.min(.49,ratio/2), halfEnd=Math.max(.51,1-half);
+      grad.addColorStop(0,"rgba(0,0,0,0)");
+      grad.addColorStop(half,"rgba(0,0,0,1)");
+      grad.addColorStop(halfEnd,"rgba(0,0,0,1)");
+      grad.addColorStop(1,"rgba(0,0,0,0)");
+    }else{
+      const minDim=Math.min(W,H);
+      grad=g.createRadialGradient(W/2,H/2,Math.max(0,minDim/2-fw),W/2,H/2,minDim/2);
+      grad.addColorStop(0,"rgba(0,0,0,1)");
+      grad.addColorStop(1,"rgba(0,0,0,0)");
+    }
+    g.globalCompositeOperation="destination-in";
+    g.fillStyle=grad;
+    g.fillRect(-W,-H,W*3,H*3);
+    g.restore();
+    // 羽化颜色：填充到羽化透明区域，让照片边缘过渡到自定义颜色
+    if(fColor){
+      g.globalCompositeOperation="destination-over";
+      g.fillStyle=fColor;
+      g.fillRect(0,0,W,H);
+      g.globalCompositeOperation="source-over";
+    }
+  }
+  g.restore();
+  return cv;
+}
 function drawPolaroid(){
   const enable=document.getElementById("poEnable");
   if(enable&&!enable.checked)return;
@@ -2195,7 +2337,7 @@ function drawPolaroid(){
   const decoX=parseFloat(document.getElementById("poDecoX").value);
   const decoY=parseFloat(document.getElementById("poDecoY").value);
   const cardYp=parseFloat(document.getElementById("poCardY").value);
-  const shadowOp=parseInt(document.getElementById("poShadowOp").value)/100;
+  const poShadowAlpha=parseInt(document.getElementById("poShadowOp").value)/100;
   const feOn=document.getElementById("poFeather").checked;
   const feColor=document.getElementById("poFeatherColor").value;
   const fePos=document.getElementById("poFeatherPos").value;
@@ -2209,6 +2351,18 @@ function drawPolaroid(){
   const filterStrength=parseInt(document.getElementById("poFilterStrength").value)/100;
   const frameTex=document.getElementById("poFrameTex").value;
   const frameTexAmt=parseInt(document.getElementById("poFrameTexAmt").value)/100;
+  // ⑤/⑥ 作品图参数（在拍立得版式中同样生效）
+  const artScale=parseInt(document.getElementById("artScale").value)/100;
+  const fillWidth=document.getElementById("fillWidth").checked;
+  const panY=parseInt(document.getElementById("fillWidthY").value)/100;
+  const sDist=parseInt(document.getElementById("shadowDist").value);
+  const sBlur=parseInt(document.getElementById("shadowBlur").value);
+  const sOp=parseInt(document.getElementById("shadowOp").value)/100;
+  const sAngDeg=parseInt(document.getElementById("shadowAngle").value);
+  const featherMode=document.getElementById("featherMode").value;
+  const featherW=parseInt(document.getElementById("featherW").value);
+  const featherColor=document.getElementById("featherColor").value;
+  const featherTilt=parseFloat(document.getElementById("featherTilt").value);
 
   const SIDE=poW*0.062, TOPP=poW*0.062, BOTP=poW*0.16;
   const imgW=poW-SIDE*2, imgH=imgW;
@@ -2252,10 +2406,16 @@ function drawPolaroid(){
   ctx.rotate(rotate);
   const cx=-poW/2, cy=-cardH/2;
   if(showShadow){
+    // 投影：距离/模糊/透明度来自⑤，方向在当前旋转坐标系内向下 → 自动跟随相纸倾斜（角度一致）
+    const alpha=Math.min(1,sOp*poShadowAlpha*2);
+    const a=sAngDeg*Math.PI/180;
+    const ox=sAngDeg===0?0:Math.cos(a)*sDist;
+    const oy=sAngDeg===0?0:Math.sin(a)*sDist;
     ctx.save();
-    ctx.shadowColor=`rgba(58,42,22,${shadowOp})`;
-    ctx.shadowBlur=c.width*0.035;
-    ctx.shadowOffsetY=c.width*0.014;
+    ctx.shadowColor=`rgba(58,42,22,${alpha})`;
+    ctx.shadowBlur=sBlur;
+    ctx.shadowOffsetX=ox;
+    ctx.shadowOffsetY=oy;
     ctx.fillStyle="#fff";
     rrPath(cx,cy,poW,cardH,radius);
     ctx.fill();
@@ -2276,19 +2436,16 @@ function drawPolaroid(){
     ctx.restore();
   }
 
-  // ③ 照片区域（正方形，cover 裁切 + 滤镜）
+  // ③ 照片区域（正方形：cover/填满宽度 + 缩放 + 上下位置 + 滤镜 + 羽化）
   const ix=cx+SIDE, iy=cy+TOPP;
-  ctx.save();
-  rrPath(ix,iy,imgW,imgH,Math.max(0,radius*0.5));
-  ctx.clip();
   const img=(layers.length&&layers[0]&&layers[0].img&&layers[0].img.complete&&layers[0].img.naturalWidth)?layers[0].img:null;
   if(img){
-    ctx.filter=poFilterStr(poFilter,filterStrength);
-    const r=Math.max(imgW/img.naturalWidth,imgH/img.naturalHeight);
-    const dw=img.naturalWidth*r, dh=img.naturalHeight*r;
-    ctx.drawImage(img,ix-(dw-imgW)/2,iy-(dh-imgH)/2,dw,dh);
-    ctx.filter="none";
+    const photo=poBuildPhoto(img,imgW,imgH,Math.max(0,radius*0.5),!fillWidth,artScale,panY,poFilterStr(poFilter,filterStrength),featherMode,featherW,featherTilt,featherColor);
+    ctx.drawImage(photo,ix,iy);
   }else{
+    ctx.save();
+    rrPath(ix,iy,imgW,imgH,Math.max(0,radius*0.5));
+    ctx.clip();
     const g=ctx.createLinearGradient(ix,iy,ix+imgW,iy+imgH);
     g.addColorStop(0,"#e6d3a3");g.addColorStop(1,"#bfa878");
     ctx.fillStyle=g;ctx.fillRect(ix,iy,imgW,imgH);
@@ -2296,12 +2453,15 @@ function drawPolaroid(){
     ctx.textAlign="center";ctx.textBaseline="middle";
     ctx.font=`400 ${Math.round(imgW*0.052)}px 'KaiTi','Kaiti SC',serif`;
     ctx.fillText("在「⑤ 作品图」上传照片",ix+imgW/2,iy+imgH/2);
+    ctx.restore();
   }
-  ctx.restore();
-  ctx.strokeStyle="rgba(0,0,0,.08)";
-  ctx.lineWidth=Math.max(1,c.width*0.0012);
-  rrPath(ix,iy,imgW,imgH,Math.max(0,radius*0.5));
-  ctx.stroke();
+  // 照片边缘细线（仅在无羽化时保留，羽化时省略以免破坏渐变过渡）
+  if(img&&featherMode==="none"){
+    ctx.strokeStyle="rgba(0,0,0,.08)";
+    ctx.lineWidth=Math.max(1,c.width*0.0012);
+    rrPath(ix,iy,imgW,imgH,Math.max(0,radius*0.5));
+    ctx.stroke();
+  }
 
   // ④ 拍立得底部手写文字
   if(caption){
@@ -2720,6 +2880,8 @@ function getSettings(){
     shadowAngle:document.getElementById("shadowAngle").value,
     featherMode:document.getElementById("featherMode").value,
     featherW:document.getElementById("featherW").value,
+    featherColor:document.getElementById("featherColor").value,
+    featherTilt:document.getElementById("featherTilt").value,
     texSource:document.getElementById("texSource").value,
     texPreset:document.getElementById("texPreset").value,
     texOpacity:document.getElementById("texOpacity").value,
@@ -2863,6 +3025,7 @@ function applySettings(s){
   set("shadowDist",s.shadowDist||20);set("shadowBlur",s.shadowBlur||25);
   set("shadowOp",s.shadowOp||45);set("shadowAngle",s.shadowAngle||90);
   set("featherMode",s.featherMode||"none");set("featherW",s.featherW||120);
+  set("featherColor",s.featherColor||"#ffffff");set("featherTilt",s.featherTilt||0);
   set("texSource",s.texSource||"preset");set("texPreset",s.texPreset||"kraft");
   set("texOpacity",s.texOpacity);chk("tornEdge",s.tornEdge);set("tornAmount",s.tornAmount);
   set("textEN",s.textEN);set("textCN",s.textCN);
@@ -2976,6 +3139,7 @@ function applySettings(s){
   document.getElementById("shadowBVal").textContent=s.shadowBlur||25;
   document.getElementById("shadowOVal").textContent=s.shadowOp||45;
   document.getElementById("featherVal").textContent=s.featherW||120;
+  document.getElementById("featherTiltVal").textContent=s.featherTilt||0;
   document.getElementById("texOpVal").textContent=s.texOpacity;
   document.getElementById("tornVal").textContent=s.tornAmount;
   document.getElementById("msBlurVal").textContent=s.msBlur||12;
@@ -3133,7 +3297,9 @@ function applyTemplatePreset(type){
   }else if(type==="polaroid"){
     chk("msMode",false);
     chk("lockScreen",false);
-    chk("featherMode","none");
+    set("featherMode","none");
+    set("featherColor","#ffffff");
+    set("featherTilt","0");
     set("size","1500,2000");
     // 默认背景：浅米色渐变
     set("bgType","gradient");
@@ -3551,6 +3717,33 @@ onTexPresetChange();
 buildPresetGrid();
 refreshPresetUI();
 requestDraw();
+
+// 字体全部本地内置：主动预加载所有 @font-face，加载完成后再重绘（Canvas 不会自动触发 WebFont 加载）
+(function preloadLocalFonts(){
+  var fams=[
+    "400 16px 'Noto Serif SC'","700 16px 'Noto Serif SC'",
+    "400 16px 'Noto Sans SC'","700 16px 'Noto Sans SC'",
+    "400 16px 'ZCOOL XiaoWei'","400 16px 'ZCOOL QingKe HuangYou'",
+    "400 16px 'Ma Shan Zheng'","400 16px 'Long Cang'",
+    "400 16px 'Liu Jian Mao Cao'","400 16px 'Zhi Mang Xing'",
+    "400 16px 'Great Vibes'","400 16px 'Dancing Script'","600 16px 'Dancing Script'",
+    "400 16px 'Caveat'","600 16px 'Caveat'","400 16px 'Sacramento'","400 16px 'Parisienne'",
+    "400 16px 'Playfair Display'","700 16px 'Playfair Display'",
+    "400 16px 'Cormorant Garamond'","600 16px 'Cormorant Garamond'",
+    "400 16px 'EB Garamond'","600 16px 'EB Garamond'",
+    "400 16px 'Lora'","600 16px 'Lora'",
+    "400 16px 'Montserrat'","600 16px 'Montserrat'","700 16px 'Montserrat'",
+    "400 16px 'Poppins'","600 16px 'Poppins'",
+    "400 16px 'Inter'","600 16px 'Inter'"
+  ];
+  if(document.fonts&&document.fonts.load){
+    Promise.all(fams.map(function(f){try{return document.fonts.load(f);}catch(e){return Promise.resolve();}}))
+      .then(function(){requestDraw();},function(){requestDraw();});
+    if(document.fonts.addEventListener){
+      document.fonts.addEventListener("loadingdone",function(){requestDraw();});
+    }
+  }
+})();
 </script>
 </body>
 </html>

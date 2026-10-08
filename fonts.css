@@ -1,0 +1,54 @@
+/* ============================================================
+   本地内置字体（真·离线）  ——  全部为 SIL Open Font License (OFL)
+   可商用 / 可嵌入 / 可再分发。来源：Fontsource (fontsource.org)
+   ------------------------------------------------------------
+   中文 · 黑体/宋体/圆体 : 思源宋体 Noto Serif SC、思源黑体 Noto Sans SC、
+                          站酷小薇 ZCOOL XiaoWei、站酷庆科黄油体 ZCOOL QingKe HuangYou
+   中文 · 手写/毛笔      : 马善政毛笔楷书 Ma Shan Zheng、龙藏 Long Cang、
+                          柳建毛草 Liu Jian Mao Cao、智芒星 Zhi Mang Xing
+   英文 · 手写/花体      : Great Vibes、Dancing Script、Caveat、Sacramento、Parisienne
+   英文 · 衬线           : Playfair Display、Cormorant Garamond、EB Garamond、Lora
+   英文 · 无衬线         : Montserrat、Poppins、Inter
+   ============================================================ */
+
+/* ---------- 中文 · 黑体 / 宋体 / 圆体 ---------- */
+@font-face{font-family:'Noto Serif SC';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/NotoSerifSC-400.woff2') format('woff2');}
+@font-face{font-family:'Noto Serif SC';font-style:normal;font-weight:700;font-display:swap;src:url('./fonts/NotoSerifSC-700.woff2') format('woff2');}
+@font-face{font-family:'Noto Sans SC';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/NotoSansSC-400.woff2') format('woff2');}
+@font-face{font-family:'Noto Sans SC';font-style:normal;font-weight:700;font-display:swap;src:url('./fonts/NotoSansSC-700.woff2') format('woff2');}
+@font-face{font-family:'ZCOOL XiaoWei';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/ZCOOLXiaoWei-400.woff2') format('woff2');}
+@font-face{font-family:'ZCOOL QingKe HuangYou';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/ZCOOLQingKeHuangYou-400.woff2') format('woff2');}
+
+/* ---------- 中文 · 手写 / 毛笔 ---------- */
+@font-face{font-family:'Ma Shan Zheng';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/MaShanZheng-400.woff2') format('woff2');}
+@font-face{font-family:'Long Cang';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/LongCang-400.woff2') format('woff2');}
+@font-face{font-family:'Liu Jian Mao Cao';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/LiuJianMaoCao-400.woff2') format('woff2');}
+@font-face{font-family:'Zhi Mang Xing';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/ZhiMangXing-400.woff2') format('woff2');}
+
+/* ---------- 英文 · 手写 / 花体 ---------- */
+@font-face{font-family:'Great Vibes';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/GreatVibes-400.woff2') format('woff2');}
+@font-face{font-family:'Dancing Script';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/DancingScript-400.woff2') format('woff2');}
+@font-face{font-family:'Dancing Script';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/DancingScript-600.woff2') format('woff2');}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/Caveat-400.woff2') format('woff2');}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/Caveat-600.woff2') format('woff2');}
+@font-face{font-family:'Sacramento';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/Sacramento-400.woff2') format('woff2');}
+@font-face{font-family:'Parisienne';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/Parisienne-400.woff2') format('woff2');}
+
+/* ---------- 英文 · 衬线 ---------- */
+@font-face{font-family:'Playfair Display';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/PlayfairDisplay-400.woff2') format('woff2');}
+@font-face{font-family:'Playfair Display';font-style:normal;font-weight:700;font-display:swap;src:url('./fonts/PlayfairDisplay-700.woff2') format('woff2');}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/CormorantGaramond-400.woff2') format('woff2');}
+@font-face{font-family:'Cormorant Garamond';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/CormorantGaramond-600.woff2') format('woff2');}
+@font-face{font-family:'EB Garamond';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/EBGaramond-400.woff2') format('woff2');}
+@font-face{font-family:'EB Garamond';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/EBGaramond-600.woff2') format('woff2');}
+@font-face{font-family:'Lora';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/Lora-400.woff2') format('woff2');}
+@font-face{font-family:'Lora';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/Lora-600.woff2') format('woff2');}
+
+/* ---------- 英文 · 无衬线 ---------- */
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/Montserrat-400.woff2') format('woff2');}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/Montserrat-600.woff2') format('woff2');}
+@font-face{font-family:'Montserrat';font-style:normal;font-weight:700;font-display:swap;src:url('./fonts/Montserrat-700.woff2') format('woff2');}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/Poppins-400.woff2') format('woff2');}
+@font-face{font-family:'Poppins';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/Poppins-600.woff2') format('woff2');}
+@font-face{font-family:'Inter';font-style:normal;font-weight:400;font-display:swap;src:url('./fonts/Inter-400.woff2') format('woff2');}
+@font-face{font-family:'Inter';font-style:normal;font-weight:600;font-display:swap;src:url('./fonts/Inter-600.woff2') format('woff2');}
