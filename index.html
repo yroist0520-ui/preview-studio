@@ -533,7 +533,7 @@ input[type=file]{font-size:11px}
         <label>右侧文字</label>
         <input type="text" id="poDateRight" value="10月7日" oninput="requestDraw()">
         <label>日期字体</label>
-        <select id="poDateFont" onchange="requestDraw()">
+        <select id="poDateFont" onchange="fontChanged(this)">
           <optgroup label="中文 · 宋体 / 黑体 / 圆体">
           <option value="'PingFang SC','Noto Serif SC',serif" selected>苹方 / 思源宋（系统，默认）</option>
           <option value="'Noto Serif SC',serif">思源宋体</option>
@@ -579,7 +579,7 @@ input[type=file]{font-size:11px}
         <div class="po-group">装饰花体字（若隐若现，位于拍立得后方）</div>
         <input type="text" id="poDecoText" value="memories" oninput="requestDraw()">
         <label>花体字体</label>
-        <select id="poDecoFont" onchange="requestDraw()">
+        <select id="poDecoFont" onchange="fontChanged(this)">
           <optgroup label="英文 · 手写 / 花体">
           <option value="'Great Vibes','Cormorant Garamond',cursive" selected>Great Vibes 花体（默认）</option>
           <option value="'Dancing Script',cursive">Dancing Script 手写</option>
@@ -636,7 +636,7 @@ input[type=file]{font-size:11px}
         <label>文字颜色</label>
         <input type="color" id="poCaptionColor" value="#4a3a22" onchange="requestDraw()">
         <label>文字字体</label>
-        <select id="poCaptionFont" onchange="requestDraw()">
+        <select id="poCaptionFont" onchange="fontChanged(this)">
           <optgroup label="中文 · 手写 / 毛笔">
           <option value="'KaiTi','Kaiti SC','STKaiti','Ma Shan Zheng',serif" selected>楷体（默认）</option>
           <option value="'Ma Shan Zheng',cursive">马善政毛笔楷书</option>
@@ -686,7 +686,7 @@ input[type=file]{font-size:11px}
         <label>文字颜色</label>
         <input type="color" id="poFooterColor" value="#5a4a32" onchange="requestDraw()">
         <label>文字字体</label>
-        <select id="poFooterFont" onchange="requestDraw()">
+        <select id="poFooterFont" onchange="fontChanged(this)">
           <optgroup label="中文 · 手写 / 毛笔">
           <option value="'KaiTi','Kaiti SC','STKaiti','Ma Shan Zheng',serif" selected>楷体（默认）</option>
           <option value="'Ma Shan Zheng',cursive">马善政毛笔楷书</option>
@@ -806,7 +806,7 @@ input[type=file]{font-size:11px}
         <label>英文标题</label>
         <input type="text" id="textEN" value="Preview" oninput="requestDraw()">
         <label>英文字体</label>
-        <select id="fontEN" onchange="requestDraw()">
+        <select id="fontEN" onchange="fontChanged(this)">
           <optgroup label="英文 · 手写 / 花体">
           <option value="'Great Vibes',cursive" selected>Great Vibes 花体</option>
           <option value="'Dancing Script',cursive">Dancing Script 手写</option>
@@ -839,7 +839,7 @@ input[type=file]{font-size:11px}
         <textarea id="textCN" rows="3" oninput="requestDraw()">营业时间 9:00-18:00
 版权所有 © 2026</textarea>
         <label>中文字体</label>
-        <select id="fontCN" onchange="requestDraw()">
+        <select id="fontCN" onchange="fontChanged(this)">
           <optgroup label="中文 · 手写 / 毛笔">
           <option value="'Ma Shan Zheng',cursive">马善政毛笔楷书</option>
           <option value="'Long Cang',cursive">龙藏手写</option>
@@ -890,7 +890,7 @@ input[type=file]{font-size:11px}
         <label>作者署名（手写体，画面左下）</label>
         <input type="text" id="msAuthor" value="裴砚" oninput="requestDraw()">
         <label>署名字体</label>
-        <select id="msAuthorFont" onchange="requestDraw()">
+        <select id="msAuthorFont" onchange="fontChanged(this)">
           <optgroup label="中文 · 手写 / 毛笔">
           <option value="'Ma Shan Zheng',cursive">马善政毛笔楷书</option>
           <option value="'Long Cang',cursive">龙藏手写</option>
@@ -941,7 +941,7 @@ love
         <label>散落小字颜色</label>
         <input type="color" id="msScatterColor" value="#fff0d2" onchange="requestDraw()">
         <label>散落小字字体</label>
-        <select id="msScatterFont" onchange="requestDraw()">
+        <select id="msScatterFont" onchange="fontChanged(this)">
           <optgroup label="混排推荐（中英通用）">
           <option value='"Cormorant Garamond","Great Vibes",serif"' selected>手写衬线（默认）</option>
           <option value="'EB Garamond','Cormorant Garamond',serif">EB Garamond 衬线</option>
@@ -976,7 +976,7 @@ love
         <label>主文字字号: <span id="msMainSizeVal">55</span>‰</label>
         <input type="range" id="msMainSize" min="20" max="100" value="55" oninput="document.getElementById('msMainSizeVal').textContent=this.value;requestDraw()">
         <label>主文字字体</label>
-        <select id="msMainFont" onchange="requestDraw()">
+        <select id="msMainFont" onchange="fontChanged(this)">
           <optgroup label="中文 · 手写 / 毛笔">
           <option value="'Ma Shan Zheng',cursive">马善政毛笔楷书</option>
           <option value="'Long Cang',cursive">龙藏手写</option>
@@ -1001,7 +1001,7 @@ love
         <label>Preview 花体字号: <span id="msPreviewSizeVal">45</span>‰</label>
         <input type="range" id="msPreviewSize" min="20" max="80" value="45" oninput="document.getElementById('msPreviewSizeVal').textContent=this.value;requestDraw()">
         <label>Preview 字体</label>
-        <select id="msPreviewFont" onchange="requestDraw()">
+        <select id="msPreviewFont" onchange="fontChanged(this)">
           <optgroup label="英文 · 手写 / 花体">
           <option value="'Great Vibes',cursive" selected>Great Vibes 花体</option>
           <option value="'Dancing Script',cursive">Dancing Script 手写</option>
@@ -1389,6 +1389,32 @@ function requestDraw(){
     rafPending=false;
     draw();
   });
+}
+
+// ============ 字体按需加载（Canvas 不会自动触发 WebFont，切换字体需主动 load 后重绘） ============
+var GENERIC_FONTS=/^(cursive|serif|sans-serif|monospace|fantasy|system-ui|ui-serif|ui-sans-serif|inherit)$/i;
+function parseFamilies(v){
+  if(!v)return [];
+  return String(v).split(",").map(function(x){
+    x=x.trim().replace(/^['"]|['"]$/g,"").trim();
+    return x;
+  }).filter(function(x){return x&&!GENERIC_FONTS.test(x);});
+}
+function loadFamilies(list,cb){
+  if(!(document.fonts&&document.fonts.load)){if(cb)cb();return;}
+  var jobs=[];
+  (list||[]).forEach(function(fam){
+    ["400 16px ","700 16px ","italic 400 16px "].forEach(function(pre){
+      try{jobs.push(document.fonts.load(pre+"'"+fam+"'"));}catch(e){}
+    });
+  });
+  if(!jobs.length){if(cb)cb();return;}
+  Promise.all(jobs).then(function(){if(cb)cb();},function(){if(cb)cb();});
+}
+function fontChanged(el){
+  requestDraw();
+  if(!el)return;
+  loadFamilies(parseFamilies(el.value),requestDraw);
 }
 
 // ============ 导出用全分辨率 Canvas ============
@@ -3861,30 +3887,19 @@ buildPresetGrid();
 refreshPresetUI();
 requestDraw();
 
-// 字体全部本地内置：主动预加载所有 @font-face，加载完成后再重绘（Canvas 不会自动触发 WebFont 加载）
-(function preloadLocalFonts(){
-  var fams=[
-    "400 16px 'Noto Serif SC'","700 16px 'Noto Serif SC'",
-    "400 16px 'Noto Sans SC'","700 16px 'Noto Sans SC'",
-    "400 16px 'ZCOOL XiaoWei'","400 16px 'ZCOOL QingKe HuangYou'",
-    "400 16px 'Ma Shan Zheng'","400 16px 'Long Cang'",
-    "400 16px 'Liu Jian Mao Cao'","400 16px 'Zhi Mang Xing'",
-    "400 16px 'Great Vibes'","400 16px 'Dancing Script'","600 16px 'Dancing Script'",
-    "400 16px 'Caveat'","600 16px 'Caveat'","400 16px 'Sacramento'","400 16px 'Parisienne'",
-    "400 16px 'Playfair Display'","700 16px 'Playfair Display'",
-    "400 16px 'Cormorant Garamond'","600 16px 'Cormorant Garamond'",
-    "400 16px 'EB Garamond'","600 16px 'EB Garamond'",
-    "400 16px 'Lora'","600 16px 'Lora'",
-    "400 16px 'Montserrat'","600 16px 'Montserrat'","700 16px 'Montserrat'",
-    "400 16px 'Poppins'","600 16px 'Poppins'",
-    "400 16px 'Inter'","600 16px 'Inter'"
-  ];
-  if(document.fonts&&document.fonts.load){
-    Promise.all(fams.map(function(f){try{return document.fonts.load(f);}catch(e){return Promise.resolve();}}))
-      .then(function(){requestDraw();},function(){requestDraw();});
-    if(document.fonts.addEventListener){
-      document.fonts.addEventListener("loadingdone",function(){requestDraw();});
-    }
+// 字体全部本地内置：只预加载当前各下拉框已选中的字体族，其余在切换时按需加载（移动端更稳）
+(function preloadSelectedFonts(){
+  if(!(document.fonts&&document.fonts.load))return;
+  var ids=["fontEN","fontCN","poDateFont","poDecoFont","poCaptionFont","poFooterFont","msAuthorFont","msScatterFont","msMainFont","msPreviewFont"];
+  var all=[];
+  ids.forEach(function(id){
+    var el=document.getElementById(id);
+    if(!el)return;
+    parseFamilies(el.value).forEach(function(f){if(all.indexOf(f)<0)all.push(f);});
+  });
+  loadFamilies(all,requestDraw);
+  if(document.fonts.addEventListener){
+    document.fonts.addEventListener("loadingdone",function(){requestDraw();});
   }
 })();
 </script>
