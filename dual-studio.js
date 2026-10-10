@@ -186,7 +186,7 @@ function fitViews(){
   let availW,availH;
   if(mobile){
     availW=window.innerWidth*0.86;
-    availH=window.innerHeight*0.58;
+    availH=window.innerHeight*0.30;
   }else{
     availW=wrap.clientWidth-100;
     availH=wrap.clientHeight-90;
