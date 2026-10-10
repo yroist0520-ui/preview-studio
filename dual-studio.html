@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>总览模板制作器 · Preview Studio</title>
+<link href="fonts.css" rel="stylesheet">
+<link rel="stylesheet" href="dual-studio.css">
+</head>
+<body>
+
+<header>
+  <div class="brand-logo">P</div>
+  <span class="brand">Preview Studio</span>
+  <span class="sep"></span>
+  <button class="back-btn" onclick="location.href='preview-studio.html'">← 返回模板选择</button>
+  <span class="tpl-name">总览模板</span>
+  <span class="grow"></span>
+  <button class="btn-ic" id="btnReset">恢复默认</button>
+  <span class="sep"></span>
+  <button class="primary small" id="btnExportOverview">导出总览PNG</button>
+</header>
+
+<main>
+  <!-- ============ 左侧：总览统一设置面板 ============ -->
+  <aside class="panel" id="leftPanel">
+    <details class="sec" open>
+      <summary>🖼 总览画布</summary>
+      <div class="body">
+        <div class="grid2">
+          <div><label>总览宽 px<b class="pv">2048</b></label><input type="range" id="ovW" min="120" max="6000" step="1" value="2048"></div>
+          <div><label>总览高 px<b class="pv">2048</b></label><input type="range" id="ovH" min="120" max="6000" step="1" value="2048"></div>
+        </div>
+        <p class="hint">最终导出的就是这一张总览大图模板。</p>
+      </div>
+    </details>
+
+    <details class="sec" open>
+      <summary>🎨 总览背景</summary>
+      <div class="body">
+        <div class="f"><label>背景类型</label>
+          <select id="ovBgType">
+            <option value="solid">纯色</option>
+            <option value="gradient">渐变</option>
+            <option value="dark">深色</option>
+          </select>
+        </div>
+        <div class="grid2">
+          <div><label>主色</label><input type="color" id="ovBgColor" value="#eceef0"></div>
+          <div><label>副色（渐变用）</label><input type="color" id="ovBgColor2" value="#ffffff"></div>
+        </div>
+        <div class="grid2">
+          <div><label>渐变方向</label>
+            <select id="ovBgDir">
+              <option value="v">上→下</option>
+              <option value="h">左→右</option>
+              <option value="d">左上→右下</option>
+              <option value="r">径向</option>
+            </select>
+          </div>
+          <div><label>模糊<b class="pv">0</b></label><input type="range" id="ovBgBlur" min="0" max="80" step="1" value="0"></div>
+        </div>
+        <label class="up" id="upOvBgBox">
+          <input type="file" id="upOvBg" accept="image/png,image/jpeg,image/webp" hidden>
+          <b>总览背景图片上传</b><span>导入后支持模糊 / 调透明度</span>
+        </label>
+        <div class="grid3">
+          <div><label>透明度<b class="pv">100%</b></label><input type="range" id="ovBgOp" min="0" max="1" step="0.01" value="1" data-fmt="pct"></div>
+          <div><label>缩放<b class="pv">1</b></label><input type="range" id="ovBgScale" min="0.2" max="4" step="0.05" value="1"></div>
+          <div><label>X偏移<b class="pv">0</b></label><input type="range" id="ovBgX" min="-2000" max="2000" step="1" value="0"></div>
+        </div>
+        <div class="grid2">
+          <div><label>Y偏移<b class="pv">0</b></label><input type="range" id="ovBgY" min="-2000" max="2000" step="1" value="0"></div>
+          <div style="display:flex;align-items:flex-end"><button id="ovBgClear" class="danger" style="margin:0 0 4px">移除背景图</button></div>
+        </div>
+        <div class="grid3">
+          <button id="bgPickWp">从壁纸取色</button>
+          <button id="bgPickSq">从方图取色</button>
+          <button id="bgPickOv">从背景图取色</button>
+        </div>
+        <p class="hint">「从壁纸/方图/背景图取色」会自动采样对应图片的主色与副色，填入渐变背景。</p>
+      </div>
+    </details>
+
+    <details class="sec" open>
+      <summary>📤 上传内容</summary>
+      <div class="body">
+        <label class="up" id="upWpBox">
+          <input type="file" id="upWpImg" accept="image/png,image/jpeg,image/webp" hidden>
+          <b>① 壁纸图片上传</b><span>铺满左侧壁纸预览框 · 锁屏排版叠加其上</span>
+        </label>
+        <div class="bgAdj">
+          <p class="hint" style="margin:0;font-weight:600;color:var(--text)">壁纸背景图调节</p>
+          <div class="grid2">
+            <div><label>高斯模糊<b class="pv">0</b></label><input type="range" id="wpBgBlur" min="0" max="80" step="1" value="0"></div>
+            <div><label>透明度<b class="pv">100%</b></label><input type="range" id="wpBgOp" min="0" max="1" step="0.01" value="1" data-fmt="pct"></div>
+          </div>
+          <div class="grid2">
+            <div><label>缩放<b class="pv">1</b></label><input type="range" id="wpBgScale" min="0.2" max="4" step="0.05" value="1"></div>
+            <div><label>X偏移<b class="pv">0</b></label><input type="range" id="wpBgX" min="-2000" max="2000" step="1" value="0"></div>
+          </div>
+          <div class="grid2">
+            <div><label>Y偏移<b class="pv">0</b></label><input type="range" id="wpBgY" min="-2000" max="2000" step="1" value="0"></div>
+            <div style="display:flex;align-items:flex-end"><button id="wpBgClear" class="danger" style="margin:0 0 4px">移除壁纸背景图</button></div>
+          </div>
+        </div>
+        <label class="up" id="upSqBox">
+          <input type="file" id="upSqImg" accept="image/png,image/jpeg,image/webp" hidden>
+          <b>② 方图封面图片上传</b><span>铺满右侧方图框 · 作为朋友圈封面背景</span>
+        </label>
+        <div class="bgAdj">
+          <p class="hint" style="margin:0;font-weight:600;color:var(--text)">方图背景图调节</p>
+          <div class="grid2">
+            <div><label>高斯模糊<b class="pv">0</b></label><input type="range" id="sqBgBlur" min="0" max="80" step="1" value="0"></div>
+            <div><label>透明度<b class="pv">100%</b></label><input type="range" id="sqBgOp" min="0" max="1" step="0.01" value="1" data-fmt="pct"></div>
+          </div>
+          <div class="grid2">
+            <div><label>缩放<b class="pv">1</b></label><input type="range" id="sqBgScale" min="0.2" max="4" step="0.05" value="1"></div>
+            <div><label>X偏移<b class="pv">0</b></label><input type="range" id="sqBgX" min="-2000" max="2000" step="1" value="0"></div>
+          </div>
+          <div class="grid2">
+            <div><label>Y偏移<b class="pv">0</b></label><input type="range" id="sqBgY" min="-2000" max="2000" step="1" value="0"></div>
+            <div style="display:flex;align-items:flex-end"><button id="sqBgClear" class="danger" style="margin:0 0 4px">移除方图背景图</button></div>
+          </div>
+        </div>
+        <label class="up" id="upAvBox">
+          <input type="file" id="upAvatar" accept="image/png,image/jpeg,image/webp" hidden>
+          <b>③ 朋友圈头像上传</b><span>显示在封面右下角 · 位置大小见「方图信息栏 &amp; 头像」</span>
+        </label>
+      </div>
+    </details>
+
+    <details class="sec" open>
+      <summary>🛍 方图信息栏 & 头像</summary>
+      <div class="body">
+        <p class="hint">右侧方图已参考微信朋友圈主页布局：背景封面 + 右下角头像 + 昵称 + 个性签名。下方「白色信息栏」默认隐藏，如需商品价格栏可打开。</p>
+        <label class="chk" style="margin:4px 0"><input type="checkbox" id="ibVis">显示白色信息栏</label>
+        <div class="grid2">
+          <div><label>信息栏高度<b class="pv">180</b></label><input type="range" id="ibH" min="60" max="420" step="1" value="180"></div>
+          <div><label>底色</label><input type="color" id="ibBg" value="#ffffff"></div>
+        </div>
+        <div class="grid2">
+          <div><label>信息栏宽度<b class="pv">1080</b></label><input type="range" id="ibW" min="60" max="2000" step="1" value="1080"></div>
+          <div><label>信息栏X<b class="pv">0</b></label><input type="range" id="ibX" min="-1000" max="2000" step="1" value="0"></div>
+        </div>
+        <div class="grid2">
+          <div><label>内边距<b class="pv">46</b></label><input type="range" id="ibPad" min="10" max="120" step="1" value="46"></div>
+          <div style="display:flex;align-items:flex-end"><button id="ibAddLine" style="margin:0 0 4px">＋ 添加一行</button></div>
+        </div>
+        <div style="margin-top:6px">
+          <p class="hint" style="margin-bottom:6px;font-weight:600;color:var(--text)">👤 头像（朋友圈布局：右下角）</p>
+          <div class="grid2">
+            <div><label>头像X<b class="pv">780</b></label><input type="range" id="avX" min="0" max="1080" step="1" value="780"></div>
+            <div><label>头像Y<b class="pv">780</b></label><input type="range" id="avY" min="0" max="1080" step="1" value="780"></div>
+          </div>
+          <div class="grid2">
+            <div><label>头像大小<b class="pv">220</b></label><input type="range" id="avW" min="40" max="400" step="1" value="220"></div>
+            <div><label>圆角<b class="pv">20</b></label><input type="range" id="avR" min="0" max="400" step="1" value="20"></div>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:8px;margin-top:6px">
+          <p class="hint" style="margin-bottom:6px;font-weight:600;color:var(--text)">📝 信息栏文字</p>
+          <div id="ibLines"></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="sec" open>
+      <summary>💬 方图文字（朋友圈昵称 / 签名）</summary>
+      <div class="body">
+        <p class="hint">这些文字直接画在方图封面上，就是朋友圈的昵称与个性签名。可在预览里直接拖动/缩放，也可用下面滑块精调；「＋ 添加文字」可再加多组装饰文案。</p>
+        <div class="grid2">
+          <button id="sqTextAdd">＋ 添加文字</button>
+          <button id="sqTextDel" class="danger">删除选中文字</button>
+        </div>
+        <div id="sqTextList"></div>
+      </div>
+    </details>
+
+    <details class="sec" open>
+      <summary>📱 壁纸锁屏元素（大时间 / 日期等）</summary>
+      <div class="body">
+        <p class="hint">锁屏大时间、日期、状态栏、底部按钮/线条都可单独调节大小、位置、颜色与字体，也可在预览里直接拖动缩放。</p>
+        <div class="grid2">
+          <button id="wpElAdd">＋ 添加文字</button>
+          <button id="wpElDel" class="danger">删除选中</button>
+        </div>
+        <div id="wpElList"></div>
+      </div>
+    </details>
+
+    <details class="sec" open>
+      <summary>💧 全屏水印（壁纸 / 方图）</summary>
+      <div class="body">
+        <div class="f"><label>作用图层</label>
+          <select id="wmTarget">
+            <option value="wp">壁纸图层</option>
+            <option value="sq">方图图层</option>
+          </select>
+        </div>
+        <label class="chk" style="margin:2px 0"><input type="checkbox" id="wmEnable">启用全屏水印</label>
+        <label class="up" id="upWmBox">
+          <input type="file" id="upWm" accept="image/png,image/jpeg,image/webp" hidden>
+          <b>上传水印图片</b><span>建议 PNG 透明底 logo / 文字</span>
+        </label>
+        <div class="f"><label>混合模式</label>
+          <select id="wmBlend">
+            <option value="overlay">叠加 overlay</option>
+            <option value="soft-light">柔光 soft-light</option>
+            <option value="hard-light">强光 hard-light</option>
+            <option value="multiply">正片叠底 multiply</option>
+            <option value="screen">滤色 screen</option>
+            <option value="lighten">变亮 lighten</option>
+            <option value="darken">变暗 darken</option>
+            <option value="normal">正常 normal</option>
+          </select>
+        </div>
+        <div class="grid2">
+          <div><label>缩放<b class="pv">40%</b></label><input type="range" id="wmScale" min="0.05" max="3" step="0.05" value="0.4" data-fmt="pct"></div>
+          <div><label>透明度<b class="pv">35%</b></label><input type="range" id="wmOpacity" min="0" max="1" step="0.01" value="0.35" data-fmt="pct"></div>
+        </div>
+        <div class="grid2">
+          <div><label>X位置<b class="pv">50%</b></label><input type="range" id="wmX" min="0" max="1" step="0.01" value="0.5" data-fmt="pct"></div>
+          <div><label>Y位置<b class="pv">50%</b></label><input type="range" id="wmY" min="0" max="1" step="0.01" value="0.5" data-fmt="pct"></div>
+        </div>
+        <div class="grid2">
+          <div><label>倾斜<b class="pv">0°</b></label><input type="range" id="wmRot" min="-45" max="45" step="1" value="0" data-fmt="deg"></div>
+          <div><label>平铺间距<b class="pv">60%</b></label><input type="range" id="wmGap" min="0" max="2" step="0.05" value="0.6" data-fmt="pct"></div>
+        </div>
+        <label class="chk" style="margin:2px 0"><input type="checkbox" id="wmTile" checked>全屏平铺</label>
+        <p class="hint">水印按「画布长边」等比计算尺寸，预览与导出比例一致；壁纸与方图各自独立配置。</p>
+      </div>
+    </details>
+
+    <details class="sec" open>
+      <summary>📱 壁纸预览框</summary>
+      <div class="body">
+        <div class="row">
+          <label class="chk" style="margin:0"><input type="checkbox" id="ovWpSlotVis" checked>显示壁纸框</label>
+        </div>
+        <div class="grid3" style="margin-top:4px">
+          <div><label>X 位置<b class="pv">120</b></label><input type="range" id="ovWpSlotX" min="-500" max="4000" step="1" value="120"></div>
+          <div><label>Y 位置<b class="pv">90</b></label><input type="range" id="ovWpSlotY" min="-500" max="4000" step="1" value="90"></div>
+          <div><label>宽度<b class="pv">820</b></label><input type="range" id="ovWpSlotW" min="100" max="3000" step="1" value="820"></div>
+        </div>
+        <div class="grid3">
+          <div><label>圆角<b class="pv">44</b></label><input type="range" id="ovWpSlotR" min="0" max="400" step="1" value="44"></div>
+          <div><label>阴影<b class="pv">40</b></label><input type="range" id="ovWpSlotSd" min="0" max="200" step="1" value="40"></div>
+          <div><label>内边距<b class="pv">16</b></label><input type="range" id="ovWpSlotPad" min="0" max="200" step="1" value="16"></div>
+        </div>
+        <div class="grid3">
+          <div><label>框型</label>
+            <select id="ovWpSlotFrame">
+              <option value="round">圆角</option>
+              <option value="arch">拱顶</option>
+              <option value="corner">角标</option>
+            </select>
+          </div>
+          <div><label>描边颜色</label><input type="color" id="ovWpSlotBC" value="#c9a37c"></div>
+          <div style="display:flex;align-items:flex-end"><label class="chk" style="margin:0 0 6px"><input type="checkbox" id="ovWpSlotBorder" checked>双线描边</label></div>
+        </div>
+        <div class="grid3">
+          <div><label>底部标题</label><input type="text" id="ovWpSlotTitle" placeholder="可留空"></div>
+          <div><label>标题字号<b class="pv">30</b></label><input type="range" id="ovWpSlotTS" min="8" max="200" step="1" value="30"></div>
+          <div><label>标题颜色</label><input type="color" id="ovWpSlotTC" value="#8a8f96"></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="sec" open>
+      <summary>🛍 方图预览框</summary>
+      <div class="body">
+        <div class="row">
+          <label class="chk" style="margin:0"><input type="checkbox" id="ovSqSlotVis" checked>显示方图框</label>
+        </div>
+        <div class="grid3" style="margin-top:4px">
+          <div><label>X 位置<b class="pv">1040</b></label><input type="range" id="ovSqSlotX" min="-500" max="4000" step="1" value="1040"></div>
+          <div><label>Y 位置<b class="pv">594</b></label><input type="range" id="ovSqSlotY" min="-500" max="4000" step="1" value="594"></div>
+          <div><label>宽度<b class="pv">900</b></label><input type="range" id="ovSqSlotW" min="100" max="3000" step="1" value="900"></div>
+        </div>
+        <div class="grid3">
+          <div><label>圆角<b class="pv">40</b></label><input type="range" id="ovSqSlotR" min="0" max="400" step="1" value="40"></div>
+          <div><label>阴影<b class="pv">40</b></label><input type="range" id="ovSqSlotSd" min="0" max="200" step="1" value="40"></div>
+          <div><label>内边距<b class="pv">14</b></label><input type="range" id="ovSqSlotPad" min="0" max="200" step="1" value="14"></div>
+        </div>
+        <div class="grid3">
+          <div><label>框型</label>
+            <select id="ovSqSlotFrame">
+              <option value="round">圆角</option>
+              <option value="arch">拱顶</option>
+              <option value="corner">角标</option>
+            </select>
+          </div>
+          <div><label>描边颜色</label><input type="color" id="ovSqSlotBC" value="#c9a37c"></div>
+          <div style="display:flex;align-items:flex-end"><label class="chk" style="margin:0 0 6px"><input type="checkbox" id="ovSqSlotBorder" checked>双线描边</label></div>
+        </div>
+        <div class="grid3">
+          <div><label>底部标题</label><input type="text" id="ovSqSlotTitle" placeholder="可留空"></div>
+          <div><label>标题字号<b class="pv">30</b></label><input type="range" id="ovSqSlotTS" min="8" max="200" step="1" value="30"></div>
+          <div><label>标题颜色</label><input type="color" id="ovSqSlotTC" value="#8a8f96"></div>
+        </div>
+      </div>
+    </details>
+
+    <details class="sec" open>
+      <summary>✒ 署名 & 标注文字</summary>
+      <div class="body">
+        <div id="ovSigBody"></div>
+      </div>
+    </details>
+
+    <details class="sec">
+      <summary>✨ 风格预设</summary>
+      <div class="body">
+        <div class="presetBtns">
+          <button class="pbtn" data-p="gray"><span class="dot" style="background:#eceef0"></span>浅灰简约</button>
+          <button class="pbtn" data-p="white"><span class="dot" style="background:#fff"></span>纯白极简</button>
+          <button class="pbtn" data-p="pink"><span class="dot" style="background:#f9ebef"></span>浅粉甜系</button>
+          <button class="pbtn" data-p="dark"><span class="dot" style="background:#141414"></span>深色高对比</button>
+        </div>
+        <p class="hint">预设一键换色，所有文字仍可单独编辑。页面每 15 秒自动保存，刷新自动恢复。</p>
+      </div>
+    </details>
+
+    <details class="sec">
+      <summary>💾 预设存档 / 分享链接</summary>
+      <div class="body">
+        <p class="hint">预设保存在本机浏览器，可快速切换不同排版风格；也可以生成分享链接发给别人，对方打开链接即可自动套用。</p>
+        <div class="presetGrid" id="presetGrid"></div>
+        <div class="row" style="margin-top:6px">
+          <button id="btnMakeLink" class="primary">🔗 生成分享链接</button>
+          <button id="btnCopyLink">复制链接</button>
+        </div>
+        <div class="f"><label>分享链接 / 短码</label><input type="text" id="presetLink" placeholder="点「生成分享链接」，或把别人的链接粘贴到这里"></div>
+        <div class="grid2">
+          <button id="btnImportLink">导入链接</button>
+          <button id="btnPasteImport">从剪贴板导入</button>
+        </div>
+        <p class="hint">链接只记录排版与参数（不含图片）；接收方打开后图片需重新上传。</p>
+      </div>
+    </details>
+  </aside>
+
+  <!-- ============ 中部：总览画布 ============ -->
+  <section id="stageWrap">
+    <div class="stageCol">
+      <div class="stageBar">
+        <span class="t">🖼 总览合成（最终导出）</span>
+        <button class="btn-ic" id="ovZout">－</button>
+        <span class="zoomv" id="ovZoomv"></span>
+        <button class="btn-ic" id="ovZin">＋</button>
+        <button id="ovFit">适应</button>
+        <span class="grow"></span>
+      </div>
+      <div class="stageOuter">
+        <div class="stageInner" id="ovInner">
+          <canvas id="ovCanvas" class="base"></canvas>
+          <canvas id="ovOvl" class="ovl"></canvas>
+          <textarea id="ovInline" class="inlineEditor" spellcheck="false"></textarea>
+        </div>
+      </div>
+      <p class="hint" id="ovTip">提示：方图封面内的头像 / 昵称 / 文字可直接在预览里拖动，四角拖动缩放，顶部圆点拖动旋转，双击文字即可修改内容。</p>
+    </div>
+  </section>
+</main>
+
+<input type="file" id="fileReplace" accept="image/png,image/jpeg,image/webp" hidden>
+<div id="toast"></div>
+
+<script src="dual-studio-default.js"></script>
+<script src="dual-studio.js"></script>
+</body>
+</html>

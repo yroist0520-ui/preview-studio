@@ -1,0 +1,294 @@
+/* ============================================================
+   Dual Studio · 与 Preview Studio 共用的深色主题
+   ============================================================ */
+@import url('fonts.css');
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+:root{
+  /* 与 preview-studio.html 保持一致 */
+  --bg:#0d0d10;--bg-soft:#15151a;--card:#1a1a22;--border:#26262f;
+  --text:#e8e8ee;--muted:#8b8b95;--accent:#c9a37c;--accent-soft:#3a5a8a;
+  --danger:#e5484d;--ok:#5ab47d;
+  --radius:14px;
+  --header-h:52px;
+}
+body{
+  font:12.5px/1.5 'Inter',"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:var(--text);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+a{color:inherit;text-decoration:none}
+
+/* ---------- 通用控件 ---------- */
+button,select,input[type=text],input[type=number],input[type=file],textarea{
+  width:100%;margin:4px 0;padding:7px 9px;
+  background:#21212a;color:#fff;
+  border:1px solid #3a3a45;border-radius:7px;
+  font-size:12px;font-family:inherit;transition:background .15s,border-color .15s;
+}
+button{cursor:pointer;transition:.15s}
+button:hover{background:#2c2c38;border-color:#4a4a58}
+button.primary{background:var(--accent);border-color:var(--accent);color:#1a1a1a;font-weight:600}
+button.primary:hover{background:#d4b08c}
+button.ghost{background:transparent}
+button.small{width:auto;padding:5px 10px;margin:2px;display:inline-block;font-size:11.5px}
+button:disabled{opacity:.45;cursor:not-allowed}
+input:focus,select:focus,textarea:focus{outline:2px solid rgba(201,163,124,.35);border-color:var(--accent)}
+input[type=color]{height:30px;padding:2px;background:#21212a;border:1px solid #3a3a45;border-radius:6px;cursor:pointer}
+input[type=range]{width:100%;padding:0;border:none;background:transparent;accent-color:var(--accent)}
+label{display:block;font-size:11px;color:#9a9aa3;margin:6px 0 3px;letter-spacing:.3px}
+label .pv{float:right;color:var(--accent);font-weight:600;font-variant-numeric:tabular-nums}
+.hint{font-size:10.5px;color:#6a6a74;line-height:1.5;margin:4px 0}
+.chk{display:flex;align-items:center;gap:6px;font-size:11.5px;color:#b8b8c0;cursor:pointer;margin:4px 0}
+.chk input{width:auto;margin:0}
+
+/* ---------- 顶栏（与原站 .panel-topbar 风格一致） ---------- */
+header{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 18px;
+  background:rgba(13,13,16,.88);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  z-index:20;flex-wrap:wrap;
+}
+header .brand{
+  display:flex;align-items:center;gap:8px;
+  font-weight:700;font-size:15px;color:var(--text);
+}
+header .brand-logo{
+  width:28px;height:28px;border-radius:7px;
+  background:linear-gradient(135deg,var(--accent),#a87f5a);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Great Vibes',cursive;color:#fff;font-size:18px;
+  box-shadow:0 4px 12px rgba(201,163,124,.35);
+}
+.back-btn{
+  padding:6px 12px;border-radius:7px;
+  background:#1a1a22;border:1px solid var(--border);
+  color:var(--muted);font-size:12px;font-weight:500;
+  transition:.15s;cursor:pointer;white-space:nowrap;
+  width:auto;margin:0;
+}
+.back-btn:hover{color:var(--accent);border-color:var(--accent);background:#22222c}
+.tpl-name{font-size:12.5px;color:var(--muted);padding-left:4px}
+header .sep{width:1px;height:18px;background:var(--border);margin:0 2px}
+header .grow{flex:1}
+header .btn-ic{width:auto;padding:6px 9px;margin:0;font-size:12px}
+
+/* ---------- 主体三栏 ---------- */
+main{flex:1;display:flex;min-height:0}
+.panel{
+  background:#16161c;overflow-y:auto;overflow-x:hidden;
+  border-right:1px solid var(--border);
+}
+.panel::-webkit-scrollbar{width:6px}
+.panel::-webkit-scrollbar-thumb{background:#333;border-radius:3px}
+#leftPanel{width:290px;padding:14px;flex-shrink:0}
+#rightPanel{width:276px;padding:14px;flex-shrink:0;border-right:none;border-left:1px solid var(--border)}
+
+/* ---------- 折叠分组 ---------- */
+.sec{margin-bottom:12px}
+.sec>summary{
+  list-style:none;cursor:pointer;
+  padding:9px 2px 6px;
+  font-weight:600;font-size:12px;color:#9a9aa3;
+  letter-spacing:.5px;
+  border-top:1px solid #2a2a35;
+  padding-top:10px;margin-top:8px;
+  display:flex;align-items:center;gap:6px;user-select:none;
+}
+.sec:first-child>summary{border-top:none;margin-top:0}
+.sec>summary::after{content:"▾";margin-left:auto;color:var(--muted);transition:.15s;font-size:10px}
+.sec:not([open])>summary::after{transform:rotate(-90deg)}
+.sec .body{padding:4px 2px 6px;display:flex;flex-direction:column;gap:8px}
+
+.row{display:flex;gap:6px;align-items:center}
+.row>*{min-width:0}
+.row .f{flex:1}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+
+/* ---------- 画布切换 tab ---------- */
+.cTabs{display:flex;gap:6px;margin-bottom:10px}
+.cTabs button{flex:1;padding:7px 0;font-size:12px;margin:0}
+.cTabs button.on{background:var(--accent);border-color:var(--accent);color:#1a1a1a;font-weight:600}
+
+.canvasTabs{display:flex;gap:6px;margin-bottom:8px}
+.canvasTabs button{flex:1;padding:6px 0;font-size:11.5px}
+.canvasTabs button.on{background:var(--accent);border-color:var(--accent);color:#1a1a1a}
+
+/* ---------- 上传框 ---------- */
+.up{
+  border:1.5px dashed #3a3a45;border-radius:10px;
+  padding:12px 10px;text-align:center;cursor:pointer;
+  transition:.15s;position:relative;background:#15151a;
+}
+.up:hover{border-color:var(--accent);background:#1d1d26}
+.up b{display:block;font-size:12px;margin-bottom:2px;color:var(--text);font-weight:600}
+.up span{font-size:10.5px;color:var(--muted)}
+.up.has{border-style:solid;border-color:#5ab47d;background:rgba(90,180,125,.08)}
+.up .thumb{max-width:100%;max-height:60px;border-radius:5px;margin-bottom:4px;display:block;margin-inline:auto}
+
+/* ---------- 预设按钮 ---------- */
+.presetBtns{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.pbtn{display:flex;align-items:center;gap:7px;padding:6px 8px;font-size:11.5px;text-align:left;margin:0}
+.pbtn .dot{width:14px;height:14px;border-radius:4px;border:1px solid #3a3a45;flex-shrink:0}
+
+/* ---------- 预设存档槽 / 导入导出 ---------- */
+.presetGrid{display:flex;flex-direction:column;gap:5px}
+.presetGrid .presetRow{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.presetGrid button{margin:0;font-size:11.5px;padding:6px 0}
+.presetGrid button.empty{opacity:.5}
+
+/* ---------- 画布区 ---------- */
+#stageWrap{
+  flex:1;display:flex;gap:18px;padding:20px;
+  overflow:auto;align-items:flex-start;justify-content:center;flex-wrap:wrap;
+  background:radial-gradient(ellipse at center,#141418 0%,#070709 100%);
+}
+.stageCol{display:flex;flex-direction:column;gap:10px;max-width:100%;align-items:center}
+.stageBar{
+  display:flex;align-items:center;gap:6px;
+  background:#16161c;border:1px solid var(--border);
+  border-radius:10px;padding:7px 12px;flex-wrap:wrap;
+  min-width:min(100%,200px);
+}
+.stageBar .t{font-weight:600;font-size:12px;color:var(--text)}
+.stageBar .grow{flex:1}
+.stageBar .zoomv{font-size:11px;color:var(--muted);min-width:36px;text-align:center;font-variant-numeric:tabular-nums}
+.btn-ic{padding:5px 9px;font-size:12px}
+.stageOuter{
+  background:
+    repeating-conic-gradient(#18181e 0% 25%, #1e1e26 0% 50%) 50%/20px 20px;
+  border:1px solid var(--border);
+  border-radius:12px;padding:14px;
+  display:inline-block;max-width:100%;
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.stageInner{
+  position:relative;margin:0 auto;
+  box-shadow:0 0 0 1px rgba(201,163,124,.15), 0 6px 28px rgba(0,0,0,.5);
+  border-radius:6px;overflow:visible;background:#fff;
+}
+.stageInner canvas{position:absolute;left:0;top:0;border-radius:0}
+.stageInner canvas.base{position:relative}
+.stageInner canvas.ovl{touch-action:none;cursor:default}
+.inlineEditor{
+  position:absolute;display:none;resize:none;overflow:hidden;
+  background:rgba(255,255,255,.97);
+  border:2px solid var(--accent);border-radius:3px;
+  padding:0;margin:0;line-height:1.3;z-index:15;white-space:pre;
+  color:#1a1a1a;
+}
+
+/* ---------- 图层列表 ---------- */
+#layerList{display:flex;flex-direction:column;gap:3px;max-height:280px;overflow-y:auto}
+.layerItem{
+  display:flex;align-items:center;gap:6px;
+  padding:6px 8px;border:1px solid var(--border);
+  border-radius:7px;cursor:pointer;font-size:12px;
+  background:#1a1a22;color:var(--text);
+  transition:.12s;
+}
+.layerItem:hover{border-color:var(--accent);background:#1f1f2a}
+.layerItem.sel{border-color:var(--accent);background:rgba(201,163,124,.12)}
+.layerItem .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.layerItem .ic{font-size:12px;width:16px;text-align:center;flex-shrink:0;color:var(--muted);font-weight:600}
+.layerItem .mini{
+  border:none;background:none;padding:2px 3px;margin:0;
+  font-size:11px;color:var(--muted);width:auto;
+}
+.layerItem .mini:hover{color:var(--accent)}
+
+/* ---------- 属性面板 ---------- */
+#propBody .row{margin-bottom:2px}
+#emptyProp{color:var(--muted);font-size:12px;text-align:center;padding:18px 0;line-height:1.6}
+#emptyProp strong{color:var(--accent);display:block;font-size:12.5px;margin-bottom:4px}
+.statusline{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;font-family:'Menlo','Consolas',monospace}
+
+/* ---------- 信息栏行 ---------- */
+.ibLine{border:1px solid var(--border);border-radius:8px;padding:8px;background:#1a1a22;display:flex;flex-direction:column;gap:5px}
+.ibLine .row{gap:6px}
+.ibLine .del{padding:4px 8px;font-size:11px;margin:0}
+
+/* ---------- 图案组：快捷图标选择 ---------- */
+.subLine{border:1px dashed var(--border);border-radius:7px;padding:7px;margin-top:4px;display:flex;flex-direction:column;gap:5px;background:#16161c}
+.iconPick{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.iconPick button{
+  width:auto;padding:3px 7px;margin:0;font-size:15px;line-height:1.2;
+  background:#21212a;border:1px solid #3a3a45;border-radius:6px;color:var(--text);cursor:pointer;
+}
+.iconPick button:hover{border-color:var(--accent);background:#26262f}
+
+/* ---------- toast ---------- */
+#toast{
+  position:fixed;left:50%;bottom:26px;
+  transform:translateX(-50%) translateY(20px);
+  background:#1a1a22;color:#fff;
+  padding:9px 18px;border-radius:10px;font-size:12.5px;
+  border:1px solid var(--border);
+  opacity:0;pointer-events:none;transition:.25s;z-index:99;max-width:80vw;
+  box-shadow:0 8px 24px rgba(0,0,0,.5);
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.err{background:#3a1a1a;border-color:#5a3a3a}
+
+/* ---------- 键盘快捷键提示 ---------- */
+.shortcuts{
+  font-size:10.5px;color:#6a6a74;line-height:1.7;
+  padding:8px 10px;background:#15151a;border:1px solid var(--border);border-radius:7px;
+}
+.shortcuts kbd{
+  display:inline-block;padding:1px 5px;margin:0 1px;
+  background:#21212a;border:1px solid #3a3a45;border-radius:3px;
+  font-size:10px;font-family:'Menlo','Consolas',monospace;color:var(--text);
+}
+
+/* ---------- 移动端：预览画布常驻顶部，参数区下方独立滚动 ---------- */
+@media (max-width:1080px){
+  html{height:auto;overflow-x:hidden;overflow-y:auto;-webkit-text-size-adjust:100%}
+  /* body 不能有非 visible 的 overflow，否则会成为滚动容器导致 sticky 失效 */
+  body{height:auto;min-height:0;overflow:visible;display:block}
+  main{flex-direction:column;overflow:visible;display:flex;flex:none;min-height:0}
+  /* 顶栏：sticky 置顶，含 iOS 刘海安全区 */
+  header{
+    position:sticky;top:0;z-index:40;
+    padding-top:calc(10px + env(safe-area-inset-top,0px));
+  }
+  /* 预览画布：常驻在顶栏下方，滚动参数时始终可见 */
+  #stageWrap{
+    position:sticky;top:var(--header-h,52px);z-index:30;
+    order:1;flex:none;
+    flex-wrap:nowrap;overflow:hidden;
+    justify-content:center;align-items:center;
+    gap:0;padding:8px 10px;
+    background:rgba(13,13,16,.97);
+    border-bottom:1px solid var(--border);
+    box-shadow:0 10px 24px rgba(0,0,0,.5);
+    scroll-snap-type:none;
+  }
+  .stageCol{scroll-snap-align:none;flex:0 0 auto;max-width:100%}
+  .stageBar{padding:5px 10px;border-radius:8px}
+  .stageOuter{padding:8px;max-width:100%}
+  /* 参数区：正常文档流，位于预览下方，随页面滚动 */
+  #leftPanel,#rightPanel{
+    width:100%;border:none;border-top:1px solid var(--border);
+    max-height:none;overflow:visible;flex:none;
+  }
+  #leftPanel{order:2}
+  #rightPanel{order:3}
+  .panel{max-height:none;overflow:visible}
+  /* 底部安全区留白，避免最后一个控件被 Home 条遮挡 */
+  #leftPanel{padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+}
+@media (max-width:560px){
+  #stageWrap{gap:0;padding:6px 8px}
+  .stageOuter{padding:6px}
+  .stageBar .t{font-size:11px}
+  header{padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top,0px));gap:8px}
+  header .brand{font-size:13px}
+  header .tpl-name{display:none}
+}

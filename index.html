@@ -179,7 +179,20 @@ input[type=file]{font-size:11px}
 .mp-frame-img{width:100%;aspect-ratio:1/1;border-radius:2px;background:linear-gradient(135deg,#e2cd92,#b8a06c)}
 .mp-frame-text{text-align:center;font-family:'KaiTi','Kaiti SC',serif;font-size:10px;color:#4a3a22;margin-top:7px}
 .mp-deco{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Great Vibes',cursive;font-size:58px;color:rgba(120,95,60,.12);pointer-events:none}
-.tpl-thumb .mock-normal,.tpl-thumb .mock-lock,.tpl-thumb .mock-ms,.tpl-thumb .mock-polaroid{transform:scale(var(--mk,1));transform-origin:center;transition:transform .25s ease}
+.mock-dual{width:100%;height:100%;display:flex;gap:6px;padding:8px;align-items:stretch;background:linear-gradient(160deg,#eceef0,#dfe2e6);border-radius:10px;box-sizing:border-box}
+.mock-dual .md-wp{flex:1;background:rgba(255,255,255,.45);border-radius:6px;position:relative;overflow:hidden}
+.mock-dual .md-time{position:absolute;top:14px;left:50%;transform:translateX(-50%);font-size:22px;font-weight:700;color:#2b2b2b;letter-spacing:2px}
+.mock-dual .md-date{position:absolute;top:46px;left:50%;transform:translateX(-50%);font-size:8px;color:#5a5a5a}
+.mock-dual .md-wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;color:rgba(138,143,150,.25);font-weight:600}
+.mock-dual .md-foot{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:8px;color:#2b2b2b;font-weight:600}
+.mock-dual .md-sq{width:44%;display:flex;flex-direction:column;border-radius:6px;overflow:hidden;background:rgba(255,255,255,.55);position:relative}
+.mock-dual .md-sq-body{flex:1;background:linear-gradient(135deg,#e4e6ea,#ced2d8)}
+.mock-dual .md-sq-bar{height:34%;background:#fff;padding:5px 6px;display:flex;flex-direction:column;gap:3px;box-sizing:border-box}
+.mock-dual .md-sq-bar span{height:4px;background:#333;border-radius:2px}
+.mock-dual .md-sq-bar span:nth-child(1){width:70%;background:#9aa0a6}
+.mock-dual .md-sq-bar span:nth-child(2){width:86%;background:#444}
+.mock-dual .md-sq-bar span:nth-child(3){width:74%;background:#444}
+.tpl-thumb .mock-normal,.tpl-thumb .mock-lock,.tpl-thumb .mock-ms,.tpl-thumb .mock-polaroid,.tpl-thumb .mock-dual{transform:scale(var(--mk,1));transform-origin:center;transition:transform .25s ease}
 /* 模板卡片响应式：必须置于基础样式之后，否则同优先级会被覆盖 */
 @media(max-width:768px){
   .tpl-grid{gap:14px}
@@ -334,8 +347,8 @@ input[type=file]{font-size:11px}
               <div class="ml-btns"><span></span><span></span></div>
             </div>
           </div>
-          <h3>苹果锁屏预览</h3>
-          <p>iPhone / iPad 锁屏比例，自动叠加时间、日期、手电筒 / 相机按钮与 Home 指示条。</p>
+          <h3>锁屏排版预览</h3>
+          <p>竖屏锁屏比例，可自由叠加时间、日期、底部快捷按钮与底部指示条（通用锁屏排版风格）。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('lock')">进入制作 →</button>
         </div>
         <div class="tpl-card" data-tpl="manuscript" onclick="selectTemplate('manuscript')">
@@ -365,6 +378,27 @@ input[type=file]{font-size:11px}
           <h3>拍立得预览</h3>
           <p>浅米色渐变背景 + 若隐若现英文花体 + 顶部日期横线 + 经典拍立得白框 + 手写体文字，治愈系排版。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('polaroid')">进入制作 →</button>
+        </div>
+        <div class="tpl-card" data-tpl="dual" onclick="location.href='dual-studio.html'">
+          <div class="tpl-thumb">
+            <div class="mock-dual">
+              <div class="md-wp">
+                <div class="md-time">5:20</div>
+                <div class="md-date">5月21日 星期二</div>
+                <div class="md-wm">╭=ω=╭</div>
+                <div class="md-foot">價格：xx 番号：xx</div>
+              </div>
+              <div class="md-sq">
+                <div class="md-sq-body"></div>
+                <div class="md-sq-bar">
+                  <span></span><span></span><span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <h3>壁纸＋方图双模板</h3>
+          <p>左侧手机壁纸、右侧方形商品图双画布实时预览，元素自由拖拽缩放、头像上传、白色信息栏独立编辑，支持高清 PNG 导出。</p>
+          <button class="tpl-enter" onclick="event.stopPropagation();location.href='dual-studio.html'">进入制作 →</button>
         </div>
       </div>
 
@@ -401,19 +435,19 @@ input[type=file]{font-size:11px}
         <div class="tpl-sec" data-tpl="normal lock manuscript polaroid">
         <h3 class="tool-h">③ 画布尺寸</h3>
         <select id="size">
-          <optgroup label="苹果锁屏 iPhone">
-            <option value="1320,2868">iPhone 锁屏 1320×2868 (16/17/18 Pro Max)</option>
-            <option value="1206,2622">iPhone 锁屏 1206×2622 (16/17/18 Pro)</option>
-            <option value="1260,2736">iPhone 锁屏 1260×2736 (Air)</option>
-            <option value="1290,2796">iPhone 锁屏 1290×2796 (16 Plus)</option>
-            <option value="1179,2556">iPhone 锁屏 1179×2556 (14 Pro/15/16)</option>
-            <option value="1170,2532">iPhone 锁屏 1170×2532 (12/13/14/17e)</option>
+          <optgroup label="手机锁屏尺寸">
+            <option value="1320,2868">锁屏 1320×2868 (全面屏大尺寸)</option>
+            <option value="1206,2622">锁屏 1206×2622 (全面屏)</option>
+            <option value="1260,2736">锁屏 1260×2736 (轻薄款)</option>
+            <option value="1290,2796">锁屏 1290×2796 (大屏款)</option>
+            <option value="1179,2556">锁屏 1179×2556 (标准全面屏)</option>
+            <option value="1170,2532">锁屏 1170×2532 (经典全面屏)</option>
           </optgroup>
-          <optgroup label="苹果锁屏 iPad">
-            <option value="1668,2388">iPad 锁屏竖 1668×2388 (11")</option>
-            <option value="2048,2732">iPad 锁屏竖 2048×2732 (12.9")</option>
-            <option value="2388,1668">iPad 锁屏横 2388×1668 (11")</option>
-            <option value="2732,2048">iPad 锁屏横 2732×2048 (12.9")</option>
+          <optgroup label="平板锁屏尺寸">
+            <option value="1668,2388">平板锁屏竖 1668×2388 (11")</option>
+            <option value="2048,2732">平板锁屏竖 2048×2732 (12.9")</option>
+            <option value="2388,1668">平板锁屏横 2388×1668 (11")</option>
+            <option value="2732,2048">平板锁屏横 2732×2048 (12.9")</option>
           </optgroup>
           <optgroup label="iPhone 壁纸">
             <option value="1320,2868">iPhone 1320×2868 (16/17/18 Pro Max)</option>
@@ -607,8 +641,8 @@ input[type=file]{font-size:11px}
         </select>
         <label>花体字颜色</label>
         <input type="color" id="poDecoColor" value="#7a5f3c" onchange="requestDraw()">
-        <label>花体字大小: <span id="poDecoSizeVal">16</span>%</label>
-        <input type="range" id="poDecoSize" min="6" max="40" value="16" oninput="document.getElementById('poDecoSizeVal').textContent=this.value;requestDraw()">
+        <label>花体字大小: <span id="poDecoSizeVal">36</span>%</label>
+        <input type="range" id="poDecoSize" min="6" max="40" value="36" oninput="document.getElementById('poDecoSizeVal').textContent=this.value;requestDraw()">
         <label>花体字透明度: <span id="poDecoOpacityVal">13</span>%</label>
         <input type="range" id="poDecoOpacity" min="2" max="40" value="13" oninput="document.getElementById('poDecoOpacityVal').textContent=this.value;requestDraw()">
         <label>花体字水平位置: <span id="poDecoXVal">0</span>%</label>
@@ -1044,7 +1078,7 @@ love
 
         </div>
         <div class="tpl-sec" data-tpl="lock">
-        <h3 class="tool-h" style="margin-top:14px">⑫ 苹果锁屏预览</h3>
+        <h3 class="tool-h" style="margin-top:14px">⑫ 锁屏排版预览</h3>
         <div class="checkbox-row"><input type="checkbox" id="lockScreen" onchange="requestDraw()"><span>显示锁屏 UI（时间/日期/按钮）</span></div>
         <label>时间文字</label>
         <input type="text" id="lockTime" value="9:41" oninput="requestDraw()">
@@ -1062,19 +1096,19 @@ love
         <input type="range" id="lockShadowOp" min="0" max="100" value="40" oninput="document.getElementById('lockShadowOpVal').textContent=this.value;requestDraw()">
         <label>阴影模糊: <span id="lockShadowBlurVal">14</span></label>
         <input type="range" id="lockShadowBlur" min="0" max="50" value="14" oninput="document.getElementById('lockShadowBlurVal').textContent=this.value;requestDraw()">
-        <div class="checkbox-row"><input type="checkbox" id="lockButtons" onchange="requestDraw()" checked><span>底部手电筒 / 相机按钮</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="lockButtons" onchange="requestDraw()" checked><span>底部快捷按钮</span></div>
         <label>按钮大小: <span id="lockBtnSizeVal">4.5</span>%</label>
         <input type="range" id="lockBtnSize" min="2" max="10" value="4.5" step="0.1" oninput="document.getElementById('lockBtnSizeVal').textContent=this.value;requestDraw()">
         <label>按钮高度(距底部): <span id="lockBtnYVal">94</span>%</label>
         <input type="range" id="lockBtnY" min="80" max="98" value="94" oninput="document.getElementById('lockBtnYVal').textContent=this.value;requestDraw()">
         <label>按钮间距(距边缘): <span id="lockBtnGapVal">14</span>%</label>
         <input type="range" id="lockBtnGap" min="5" max="30" value="14" oninput="document.getElementById('lockBtnGapVal').textContent=this.value;requestDraw()">
-        <label>左侧图标（默认手电筒，可输入颜文字/emoji）</label>
-        <input type="text" id="lockLeftIcon" value="" placeholder="留空=矢量手电筒" oninput="requestDraw()">
-        <label>右侧图标（默认相机，可输入颜文字/emoji）</label>
-        <input type="text" id="lockRightIcon" value="" placeholder="留空=矢量相机" oninput="requestDraw()">
+        <label>左侧图标（可输入颜文字/emoji）</label>
+        <input type="text" id="lockLeftIcon" value="" placeholder="留空=默认圆形图标" oninput="requestDraw()">
+        <label>右侧图标（可输入颜文字/emoji）</label>
+        <input type="text" id="lockRightIcon" value="" placeholder="留空=默认圆形图标" oninput="requestDraw()">
         <div class="hint">彩色表情会自动栅格化为白色剪影</div>
-        <div class="checkbox-row"><input type="checkbox" id="lockHomeBar" onchange="requestDraw()" checked><span>底部 Home 指示条</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="lockHomeBar" onchange="requestDraw()" checked><span>底部指示条</span></div>
 
         </div>
         <div class="tpl-sec" data-tpl="normal lock manuscript polaroid">
@@ -1377,6 +1411,7 @@ function restoreAutosave(){
   if(!raw)return;
   try{
     const s=JSON.parse(raw);
+    if(s&&String(s.poDecoSize)==="16")s.poDecoSize="36";
     applySettings(s);
   }catch(e){}
 }
@@ -3265,7 +3300,7 @@ function applySettings(s){
   set("poDecoText",s.poDecoText||"memories");
   set("poDecoColor",s.poDecoColor||"#7a5f3c");
   set("poDecoFont",s.poDecoFont||"'Great Vibes','Cormorant Garamond',cursive");
-  set("poDecoSize",s.poDecoSize||"16");
+  set("poDecoSize",s.poDecoSize||"36");
   set("poDecoOpacity",s.poDecoOpacity||"13");
   set("poDecoX",s.poDecoX||"0");
   set("poDecoY",s.poDecoY||"0");
@@ -3351,7 +3386,7 @@ function applySettings(s){
   document.getElementById("poDateSizeVal").textContent=s.poDateSize||3;
   document.getElementById("poDateXVal").textContent=s.poDateX||0;
   document.getElementById("poDateYVal").textContent=s.poDateY||0;
-  document.getElementById("poDecoSizeVal").textContent=s.poDecoSize||16;
+  document.getElementById("poDecoSizeVal").textContent=s.poDecoSize||36;
   document.getElementById("poDecoOpacityVal").textContent=s.poDecoOpacity||13;
   document.getElementById("poDecoXVal").textContent=s.poDecoX||0;
   document.getElementById("poDecoYVal").textContent=s.poDecoY||0;
@@ -3432,7 +3467,7 @@ function resetAll(){
 
 // ============ 模板选择首页 / 工作区 ============
 let currentTemplate="normal";
-const TPL_NAMES={normal:"普通作品预览",lock:"苹果锁屏预览",manuscript:"字稿风预览",polaroid:"拍立得预览"};
+const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscript:"字稿风预览",polaroid:"拍立得预览"};
 function selectTemplate(type){
   currentTemplate=type;
   document.getElementById("tplPicker").style.display="none";
