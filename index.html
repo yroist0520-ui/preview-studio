@@ -179,19 +179,10 @@ input[type=file]{font-size:11px}
 .mp-frame-img{width:100%;aspect-ratio:1/1;border-radius:2px;background:linear-gradient(135deg,#e2cd92,#b8a06c)}
 .mp-frame-text{text-align:center;font-family:'KaiTi','Kaiti SC',serif;font-size:10px;color:#4a3a22;margin-top:7px}
 .mp-deco{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Great Vibes',cursive;font-size:58px;color:rgba(120,95,60,.12);pointer-events:none}
-.mock-dual{width:100%;height:100%;display:flex;gap:6px;padding:8px;align-items:stretch;background:linear-gradient(160deg,#eceef0,#dfe2e6);border-radius:10px;box-sizing:border-box}
-.mock-dual .md-wp{flex:1;background:rgba(255,255,255,.45);border-radius:6px;position:relative;overflow:hidden}
-.mock-dual .md-time{position:absolute;top:14px;left:50%;transform:translateX(-50%);font-size:22px;font-weight:700;color:#2b2b2b;letter-spacing:2px}
-.mock-dual .md-date{position:absolute;top:46px;left:50%;transform:translateX(-50%);font-size:8px;color:#5a5a5a}
-.mock-dual .md-wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;color:rgba(138,143,150,.25);font-weight:600}
-.mock-dual .md-foot{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:8px;color:#2b2b2b;font-weight:600}
-.mock-dual .md-sq{width:44%;display:flex;flex-direction:column;border-radius:6px;overflow:hidden;background:rgba(255,255,255,.55);position:relative}
-.mock-dual .md-sq-body{flex:1;background:linear-gradient(135deg,#e4e6ea,#ced2d8)}
-.mock-dual .md-sq-bar{height:34%;background:#fff;padding:5px 6px;display:flex;flex-direction:column;gap:3px;box-sizing:border-box}
-.mock-dual .md-sq-bar span{height:4px;background:#333;border-radius:2px}
-.mock-dual .md-sq-bar span:nth-child(1){width:70%;background:#9aa0a6}
-.mock-dual .md-sq-bar span:nth-child(2){width:86%;background:#444}
-.mock-dual .md-sq-bar span:nth-child(3){width:74%;background:#444}
+/* 双模板缩略图：极简——一个灰色壁纸竖形 + 一个灰色小方图，无文字 */
+.mock-dual{width:100%;height:100%;display:flex;gap:7px;padding:10px;align-items:center;justify-content:center;background:linear-gradient(160deg,#eceef0,#dfe2e6);border-radius:10px;box-sizing:border-box}
+.mock-dual .md-wp{flex:0 0 30%;height:100%;background:#b7bcc4;border-radius:6px}
+.mock-dual .md-sq{width:38%;aspect-ratio:1/1;background:#ccd1d7;border-radius:6px}
 .tpl-thumb .mock-normal,.tpl-thumb .mock-lock,.tpl-thumb .mock-ms,.tpl-thumb .mock-polaroid,.tpl-thumb .mock-dual{transform:scale(var(--mk,1));transform-origin:center;transition:transform .25s ease}
 /* 模板卡片响应式：必须置于基础样式之后，否则同优先级会被覆盖 */
 @media(max-width:768px){
@@ -382,18 +373,8 @@ input[type=file]{font-size:11px}
         <div class="tpl-card" data-tpl="dual" onclick="location.href='dual-studio.html'">
           <div class="tpl-thumb">
             <div class="mock-dual">
-              <div class="md-wp">
-                <div class="md-time">5:20</div>
-                <div class="md-date">5月21日 星期二</div>
-                <div class="md-wm">╭=ω=╭</div>
-                <div class="md-foot">價格：xx 番号：xx</div>
-              </div>
-              <div class="md-sq">
-                <div class="md-sq-body"></div>
-                <div class="md-sq-bar">
-                  <span></span><span></span><span></span>
-                </div>
-              </div>
+              <div class="md-wp"></div>
+              <div class="md-sq"></div>
             </div>
           </div>
           <h3>壁纸＋方图双模板</h3>
