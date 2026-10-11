@@ -143,6 +143,9 @@ let wpSelId=null;           // 壁纸锁屏元素面板当前选中的元素 id
 let copyBuf=[];             // 复制缓冲
 let history={stack:[],idx:-1};
 const AS_KEY='dual-studio-autosave-v5';
+/* 默认预设版本：生成文件更新后，旧自动保存自动失效，确保新默认样式能加载出来 */
+const DEF_VER_KEY='dual-studio-defver';
+function defVer(){return (typeof window!=='undefined'&&window.DS_DEFAULT_VERSION)||'0';}
 
 /* ---------- 历史 ---------- */
 function snapshot(){
@@ -1549,11 +1552,17 @@ function stateForStore(){
   return copy;
 }
 function saveAutosave(){
-  if(tryStore(AS_KEY,stateForStore()))return true;
+  if(storeAutosave(stateForStore()))return true;
   if(asCompressing)return false;
   asCompressing=true;
   saveAutosaveCompress().finally(()=>{asCompressing=false;});
   return false;
+}
+/* 写入自动缓存，并同步记录当前默认预设版本 */
+function storeAutosave(obj){
+  if(!tryStore(AS_KEY,obj))return false;
+  try{localStorage.setItem(DEF_VER_KEY,defVer());}catch(e){}
+  return true;
 }
 function tryStore(key,obj){
   try{localStorage.setItem(key,JSON.stringify(obj));return true;}catch(e){return false;}
@@ -1586,16 +1595,16 @@ async function saveAutosaveCompress(){
   for(const id of ids){
     try{
       light.images[id]=await recompressDataUrl(light.images[id],1400,0.85);
-      if(tryStore(AS_KEY,light))return;
+      if(storeAutosave(light))return;
       light.images[id]=await recompressDataUrl(light.images[id],1000,0.78);
-      if(tryStore(AS_KEY,light))return;
+      if(storeAutosave(light))return;
     }catch(e){}
   }
   if(ids.length){
     ids.forEach(id=>delete light.images[id]);
     ['wp','sq','ov'].forEach(n=>{if(light[n]&&light[n].bg&&ids.indexOf(light[n].bg.imgId)>=0)light[n].bg.imgId=null;});
     [light.wp.els,light.sq.els].forEach(arr=>(arr||[]).forEach(el=>{if(ids.indexOf(el.imgId)>=0)el.imgId=null;}));
-    if(tryStore(AS_KEY,light)){
+    if(storeAutosave(light)){
       toast('本地缓存空间不足，已仅保存排版配置（图片请重新上传）','err');
       return;
     }
@@ -1605,6 +1614,7 @@ async function saveAutosaveCompress(){
 function restoreAutosave(){
   try{
     const raw=localStorage.getItem(AS_KEY);
+    // 始终优先恢复用户自己的本地修改（默认预设更新不再清空用户样式）
     if(!raw)return false;
     const s=JSON.parse(raw);
     if(!s||!s.wp||!s.sq)return false;
@@ -1619,6 +1629,7 @@ function restoreAutosave(){
     }else{
       s.ov.bg=mkBg(s.ov.bg);
       const dOv=deep(defaultTemplate().ov);
+      // 用户保存过 ov 时保留用户值，仅补齐默认缺省字段
       s.ov.wpSlot=Object.assign({},dOv.wpSlot,s.ov.wpSlot||{});
       s.ov.sqSlot=Object.assign({},dOv.sqSlot,s.ov.sqSlot||{});
       s.ov.signature=s.ov.signature||[];
@@ -1628,6 +1639,8 @@ function restoreAutosave(){
     mergeDefaultImages(state);
     clampAvatarAboveInfobar(state.sq);
     loadStateImages(state);
+    // 恢复成功即同步记录当前默认版本号，避免下次再被判定为"版本过期"
+    try{localStorage.setItem(DEF_VER_KEY,defVer());}catch(e){}
     return true;
   }catch(e){console.warn('restoreAutosave failed, falling back to defaults',e);return false;}
 }

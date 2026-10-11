@@ -274,7 +274,8 @@ main{flex:1;display:flex;min-height:0}
   /* 移动端只保留画布常驻：隐藏缩放/导出工具条与提示文字，给滑块腾出空间 */
   .stageBar{display:none}
   #ovTip{display:none}
-  header #btnExportOverview,header #btnReset{display:none}
+  /* 导出/恢复默认保留在顶栏（紧凑），不能隐藏，否则手机上无法导出、无法回到默认样式 */
+  header #btnExportOverview,header #btnReset{font-size:12px;padding:6px 9px}
   .stageOuter{padding:6px;max-width:100%;max-height:32vh;display:flex;align-items:center;justify-content:center}
   /* 参数区：正常文档流，位于预览下方，随页面滚动 */
   #leftPanel,#rightPanel{
@@ -291,7 +292,16 @@ main{flex:1;display:flex;min-height:0}
   #stageWrap{gap:0;padding:6px 8px}
   .stageOuter{padding:6px}
   .stageBar .t{font-size:11px}
-  header{padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top,0px));gap:8px}
-  header .brand{font-size:13px}
+  /* 顶栏手机端：不换行，保证「导出总览PNG」「恢复默认」始终可见可点 */
+  header{padding:8px 10px;padding-top:calc(8px + env(safe-area-inset-top,0px));gap:6px;flex-wrap:nowrap}
+  header .brand{font-size:13px;flex:0 1 auto;min-width:0;overflow:hidden;white-space:nowrap}
+  header .brand-logo{width:24px;height:24px;font-size:15px}
   header .tpl-name{display:none}
+  /* 取消 grow 的撑开效果，避免把右侧按钮顶到看不见的位置 */
+  header .grow{flex:0 1 auto}
+  header .sep{display:none}
+  /* 返回按钮收到最小，把空间让给导出/恢复默认 */
+  header .back-btn{font-size:11px;padding:5px 7px;max-width:64px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;flex:0 0 auto}
+  /* 导出/恢复默认：紧凑但始终可见，不收缩 */
+  header #btnExportOverview,header #btnReset{font-size:11.5px;padding:6px 9px;flex:0 0 auto;white-space:nowrap;margin:0}
 }
