@@ -25,6 +25,24 @@
   <!-- ============ 左侧：总览统一设置面板 ============ -->
   <aside class="panel" id="leftPanel">
     <details class="sec" open>
+      <summary>💾 预设存档 / 分享链接</summary>
+      <div class="body">
+        <p class="hint">预设保存在本机浏览器，可快速切换不同排版风格；也可以生成分享链接发给别人，对方打开链接即可自动套用。</p>
+        <div class="presetGrid" id="presetGrid"></div>
+        <div class="row" style="margin-top:6px">
+          <button id="btnMakeLink" class="primary">🔗 生成分享链接</button>
+          <button id="btnCopyLink">复制链接</button>
+        </div>
+        <div class="f"><label>分享链接 / 短码</label><input type="text" id="presetLink" placeholder="点「生成分享链接」，或把别人的链接粘贴到这里"></div>
+        <div class="grid2">
+          <button id="btnImportLink">导入链接</button>
+          <button id="btnPasteImport">从剪贴板导入</button>
+        </div>
+        <p class="hint">链接只记录排版与参数（不含图片）；接收方打开后图片需重新上传。</p>
+      </div>
+    </details>
+
+    <details class="sec" open>
       <summary>🖼 总览画布</summary>
       <div class="body">
         <div class="grid2">
@@ -322,23 +340,6 @@
       </div>
     </details>
 
-    <details class="sec">
-      <summary>💾 预设存档 / 分享链接</summary>
-      <div class="body">
-        <p class="hint">预设保存在本机浏览器，可快速切换不同排版风格；也可以生成分享链接发给别人，对方打开链接即可自动套用。</p>
-        <div class="presetGrid" id="presetGrid"></div>
-        <div class="row" style="margin-top:6px">
-          <button id="btnMakeLink" class="primary">🔗 生成分享链接</button>
-          <button id="btnCopyLink">复制链接</button>
-        </div>
-        <div class="f"><label>分享链接 / 短码</label><input type="text" id="presetLink" placeholder="点「生成分享链接」，或把别人的链接粘贴到这里"></div>
-        <div class="grid2">
-          <button id="btnImportLink">导入链接</button>
-          <button id="btnPasteImport">从剪贴板导入</button>
-        </div>
-        <p class="hint">链接只记录排版与参数（不含图片）；接收方打开后图片需重新上传。</p>
-      </div>
-    </details>
   </aside>
 
   <!-- ============ 中部：总览画布 ============ -->

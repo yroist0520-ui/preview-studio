@@ -573,18 +573,7 @@ function drawWatermark(ctx,c){
   }
   ctx.restore();
 }
-/* 信息栏可见时把旧存档头像限制在其上方；信息栏隐藏时不动（朋友圈布局头像在右下角） */
-function clampAvatarAboveInfobar(cc){
-  if(!cc||!Array.isArray(cc.els))return;
-  const ib=cc.infobar||{};
-  if(ib.visible===false)return;
-  const ibTop=(typeof ib.y==='number')?ib.y:900;
-  cc.els.forEach(el=>{
-    if(el.type!=='avatar')return;
-    const h=el.h||180;
-    if((el.y||0)+h>ibTop-16)el.y=Math.max(24,ibTop-h-40);
-  });
-}
+/* 头像允许与信息栏重合：drawContent 中头像最后绘制、永远在信息栏图层之上，位置完全由用户自由摆放 */
 /* 旧默认署名文字 → 新默认文字（兼容用户本地旧存档，避免刷新后仍是旧文案） */
 const OLD_SIG_MAP={
   '⚡★ 署名の美化小铺贩卖ing':'署名：在此输入你的署名',
@@ -1637,7 +1626,6 @@ function restoreAutosave(){
     }
     state=s;
     mergeDefaultImages(state);
-    clampAvatarAboveInfobar(state.sq);
     loadStateImages(state);
     // 恢复成功即同步记录当前默认版本号，避免下次再被判定为"版本过期"
     try{localStorage.setItem(DEF_VER_KEY,defVer());}catch(e){}
@@ -1669,7 +1657,6 @@ function applyStateObject(s,msg){
   state.ov.sqSlot=Object.assign({},dOv.sqSlot,state.ov.sqSlot||{});
   state.ov.signature=state.ov.signature||[];
   migrateSignatureText(state);
-  clampAvatarAboveInfobar(state.sq);
   Object.entries(state.images).forEach(([id,src])=>{
     const im=new Image();im.onload=()=>drawAll();im.src=src;imgCache[id]=im;
   });
