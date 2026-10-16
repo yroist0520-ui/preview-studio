@@ -179,11 +179,30 @@ input[type=file]{font-size:11px}
 .mp-frame-img{width:100%;aspect-ratio:1/1;border-radius:2px;background:linear-gradient(135deg,#e2cd92,#b8a06c)}
 .mp-frame-text{text-align:center;font-family:'KaiTi','Kaiti SC',serif;font-size:10px;color:#4a3a22;margin-top:7px}
 .mp-deco{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Great Vibes',cursive;font-size:58px;color:rgba(120,95,60,.12);pointer-events:none}
-/* 双模板缩略图：极简——一个灰色壁纸竖形 + 一个灰色小方图，无文字 */
-.mock-dual{width:100%;height:100%;display:flex;gap:7px;padding:10px;align-items:center;justify-content:center;background:linear-gradient(160deg,#eceef0,#dfe2e6);border-radius:10px;box-sizing:border-box}
-.mock-dual .md-wp{flex:0 0 30%;height:100%;background:#b7bcc4;border-radius:6px}
-.mock-dual .md-sq{width:38%;aspect-ratio:1/1;background:#ccd1d7;border-radius:6px}
-.tpl-thumb .mock-normal,.tpl-thumb .mock-lock,.tpl-thumb .mock-ms,.tpl-thumb .mock-polaroid,.tpl-thumb .mock-dual{transform:scale(var(--mk,1));transform-origin:center;transition:transform .25s ease}
+.mock-dual{width:100%;height:100%;display:flex;gap:6px;padding:8px;align-items:stretch;background:linear-gradient(160deg,#eceef0,#dfe2e6);border-radius:10px;box-sizing:border-box}
+.mock-dual .md-wp{flex:1;background:rgba(255,255,255,.45);border-radius:6px;position:relative;overflow:hidden}
+.mock-dual .md-time{position:absolute;top:14px;left:50%;transform:translateX(-50%);font-size:22px;font-weight:700;color:#2b2b2b;letter-spacing:2px}
+.mock-dual .md-date{position:absolute;top:46px;left:50%;transform:translateX(-50%);font-size:8px;color:#5a5a5a}
+.mock-dual .md-wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;color:rgba(138,143,150,.25);font-weight:600}
+.mock-dual .md-foot{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:8px;color:#2b2b2b;font-weight:600}
+.mock-dual .md-sq{width:44%;display:flex;flex-direction:column;border-radius:6px;overflow:hidden;background:rgba(255,255,255,.55);position:relative}
+.mock-dual .md-sq-body{flex:1;background:linear-gradient(135deg,#e4e6ea,#ced2d8)}
+.mock-dual .md-sq-bar{height:34%;background:#fff;padding:5px 6px;display:flex;flex-direction:column;gap:3px;box-sizing:border-box}
+.mock-dual .md-sq-bar span{height:4px;background:#333;border-radius:2px}
+.mock-dual .md-sq-bar span:nth-child(1){width:70%;background:#9aa0a6}
+.mock-dual .md-sq-bar span:nth-child(2){width:86%;background:#444}
+.mock-dual .md-sq-bar span:nth-child(3){width:74%;background:#444}
+.mock-profile{width:112px;height:190px;border-radius:14px;background:linear-gradient(180deg,#bfe0ea 0%,#dceef0 42%,#e8d3a8 78%,#dcc293 100%);position:relative;box-shadow:0 10px 26px rgba(0,0,0,.3);overflow:hidden}
+.mock-profile .mpf-status{position:absolute;top:10px;left:0;right:0;display:flex;justify-content:space-between;padding:0 12px;font-size:9px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.25);z-index:2}
+.mock-profile .mpf-bg{position:absolute;inset:0}
+.mock-profile .mpf-card{position:absolute;left:0;right:0;bottom:0;height:44%;background:#fff;border-radius:16px 16px 0 0;padding:26px 12px 10px}
+.mock-profile .mpf-ava{position:absolute;top:-26px;left:14px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#cfd5dc,#9aa3ad);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.18);box-sizing:border-box}
+.mock-profile .mpf-lines{display:flex;flex-direction:column;gap:5px;margin-left:64px}
+.mock-profile .mpf-lines i{display:block;height:7px;width:90%;border-radius:4px;background:#2b2b2b}
+.mock-profile .mpf-lines i.short{width:46%;background:#9aa3ad}
+.mock-profile .mpf-stats{display:flex;gap:14px;margin-top:14px;padding-left:4px}
+.mock-profile .mpf-stats b{font-size:13px;color:#1a1a1a;font-weight:700}
+.tpl-thumb .mock-normal,.tpl-thumb .mock-lock,.tpl-thumb .mock-ms,.tpl-thumb .mock-polaroid,.tpl-thumb .mock-dual,.tpl-thumb .mock-profile{transform:scale(var(--mk,1));transform-origin:center;transition:transform .25s ease}
 /* 模板卡片响应式：必须置于基础样式之后，否则同优先级会被覆盖 */
 @media(max-width:768px){
   .tpl-grid{gap:14px}
@@ -370,16 +389,64 @@ input[type=file]{font-size:11px}
           <p>浅米色渐变背景 + 若隐若现英文花体 + 顶部日期横线 + 经典拍立得白框 + 手写体文字，治愈系排版。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('polaroid')">进入制作 →</button>
         </div>
+        <div class="tpl-card" data-tpl="profile" onclick="selectTemplate('profile')">
+          <div class="tpl-thumb">
+            <div class="mock-profile">
+              <div class="mpf-status"><span>18:57</span><span>5G</span></div>
+              <div class="mpf-bg"></div>
+              <div class="mpf-card">
+                <div class="mpf-ava"></div>
+                <div class="mpf-lines"><i></i><i class="short"></i></div>
+                <div class="mpf-stats"><b>18</b><b>128</b><b>375</b></div>
+              </div>
+            </div>
+          </div>
+          <h3>个人主页模板</h3>
+          <p>仿社交平台个人主页：状态栏 + 大图背景 + 白色信息卡（圆形头像、昵称、在线状态、粉丝/关注/转评赞统计）+ 个性签名，所有元素可拖拽可显隐。</p>
+          <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('profile')">进入制作 →</button>
+        </div>
         <div class="tpl-card" data-tpl="dual" onclick="location.href='dual-studio.html'">
           <div class="tpl-thumb">
             <div class="mock-dual">
-              <div class="md-wp"></div>
-              <div class="md-sq"></div>
+              <div class="md-wp">
+                <div class="md-time">5:20</div>
+                <div class="md-date">5月21日 星期二</div>
+                <div class="md-wm">╭=ω=╭</div>
+                <div class="md-foot">價格：xx 番号：xx</div>
+              </div>
+              <div class="md-sq">
+                <div class="md-sq-body"></div>
+                <div class="md-sq-bar">
+                  <span></span><span></span><span></span>
+                </div>
+              </div>
             </div>
           </div>
           <h3>壁纸＋方图双模板</h3>
           <p>左侧手机壁纸、右侧方形商品图双画布实时预览，元素自由拖拽缩放、头像上传、白色信息栏独立编辑，支持高清 PNG 导出。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();location.href='dual-studio.html'">进入制作 →</button>
+        </div>
+        <div class="tpl-card" data-tpl="qzone" onclick="location.href='qzone-studio.html'">
+          <div class="tpl-thumb">
+            <div class="mock-qz">
+              <div class="qz-bg">
+                <div class="qz-island"></div>
+                <div class="qz-time">11:51</div>
+                <div class="qz-calig">唯有真心</div>
+                <div class="qz-profile">
+                  <div class="qz-ava"></div>
+                  <div class="qz-info"><b>Yroist.</b><span>QQ：2130243360</span><i>底素江狸 入青云系列款</i></div>
+                </div>
+                <div class="qz-card">
+                  <div class="qz-stats"><span><b>226</b>说说</span><span><b>0</b>日志</span><span><b>5093</b>相册</span><span><b>4</b>留言</span><span><b>56347</b>访客</span></div>
+                  <div class="qz-int">❤ 亲密空间 ›</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <h3>QQ空间动态模板</h3>
+          <p>仿 QQ空间个人主页动态卡片：水彩背景 + 书法字 + 头像昵称签名 + 成长值面板 + 底部统计卡，所有元素可调大小位置颜色字体，支持背景模糊与预设分享链接。</p>
+          <button class="tpl-enter" onclick="event.stopPropagation();location.href='qzone-studio.html'">进入制作 →</button>
         </div>
       </div>
 
@@ -391,7 +458,7 @@ input[type=file]{font-size:11px}
           <button class="back-btn" onclick="backToTemplates()">← 返回模板选择</button>
           <span class="tpl-name" id="tplName"></span>
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile">
         <h3 class="tool-h">① 预设存档</h3>
         <p class="preset-tip">仅保存于「<b id="presetTplName">普通作品预览</b>」工作区，与其他模板互不干扰；每个槽位左侧存档、右侧载入。</p>
         <div class="preset-grid" id="presetGrid"></div>
@@ -401,7 +468,7 @@ input[type=file]{font-size:11px}
         <div class="hint">预设只记录参数，自定义纹理图与头像需重新上传。</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile">
         <h3 class="tool-h" style="margin-top:14px">② 分享预设</h3>
         <button class="primary" onclick="sharePreset()" style="margin-bottom:6px">🔗 生成短链接</button>
         <label>导入预设（粘贴链接或短码）</label>
@@ -413,7 +480,7 @@ input[type=file]{font-size:11px}
         <div class="hint" id="shareHint">生成短链接复制给别人，打开即自动应用；也可手动粘贴导入。</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile">
         <h3 class="tool-h">③ 画布尺寸</h3>
         <select id="size">
           <optgroup label="手机锁屏尺寸">
@@ -439,6 +506,12 @@ input[type=file]{font-size:11px}
             <option value="1170,2532">iPhone 1170×2532 (12/13/14/17e)</option>
             <option value="1080,1920">iPhone 1080×1920</option>
           </optgroup>
+          <optgroup label="个人主页尺寸">
+            <option value="1080,2340">个人主页 1080×2340 (9:19.5)</option>
+            <option value="1170,2532">个人主页 1170×2532</option>
+            <option value="1242,2688">个人主页 1242×2688</option>
+            <option value="1440,3120">个人主页 1440×3120 (高清)</option>
+          </optgroup>
           <optgroup label="iPad 竖屏壁纸">
             <option value="1668,2388">iPad 竖 1668×2388</option>
             <option value="2048,2732">iPad 竖 2048×2732</option>
@@ -463,7 +536,7 @@ input[type=file]{font-size:11px}
         <button onclick="resizeCanvas()">切换尺寸</button>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile">
         <h3 class="tool-h">④ 背景</h3>
         <label>背景类型</label>
         <select id="bgType" onchange="requestDraw()">
@@ -486,7 +559,7 @@ input[type=file]{font-size:11px}
         <input type="range" id="bgBlur" min="0" max="80" value="0" oninput="document.getElementById('blurVal').textContent=this.value;requestDraw()">
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile">
         <h3 class="tool-h">⑤ 作品图</h3>
         <input type="file" id="upload" accept="image/*">
         <button class="warn small" onclick="removeArt()">× 删除图片</button>
@@ -497,7 +570,7 @@ input[type=file]{font-size:11px}
         <label>图片位置（上下）: <span id="fillWidthYVal">50</span>%</label>
         <input type="range" id="fillWidthY" min="0" max="100" value="50" oninput="document.getElementById('fillWidthYVal').textContent=this.value;requestDraw()">
         <div class="hint">开启后图片填满画布宽度，Y滑块控制上下位置（配合羽化效果）</div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript">
+        <div class="tpl-sec" data-tpl="normal lock manuscript profile">
         <label>描边颜色</label>
         <input type="color" id="borderColor" value="#ffffff" onchange="requestDraw()">
         <label>描边宽度: <span id="borderVal">24</span>px</label>
@@ -518,7 +591,7 @@ input[type=file]{font-size:11px}
         </select>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile">
         <h3 class="tool-h">⑥ 羽化蒙版（作品图边缘）</h3>
         <label>羽化模式</label>
         <select id="featherMode" onchange="requestDraw()">
@@ -1092,7 +1165,179 @@ love
         <div class="checkbox-row"><input type="checkbox" id="lockHomeBar" onchange="requestDraw()" checked><span>底部指示条</span></div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid">
+        <!-- ========== 个人主页模板专属面板 ========== -->
+        <div class="tpl-sec" data-tpl="profile">
+        <h3 class="tool-h" style="margin-top:14px">⑦ 个人主页 · 信息卡 / 头像 / 状态栏</h3>
+        <div class="checkbox-row"><input type="checkbox" id="pfStatusBar" onchange="requestDraw()" checked><span>顶部状态栏（时间 · 信号 · 5G · 电量）</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="pfTopIcons" onchange="requestDraw()" checked><span>顶部左右图标（返回 · 两个圆形按钮）</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="pfCard" onchange="requestDraw()" checked><span>底部白色信息卡</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="pfAvatar" onchange="requestDraw()" checked><span>圆形头像</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="pfPlus" onchange="requestDraw()" checked><span>头像右下角「+」白圈</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="pfOnline" onchange="requestDraw()" checked><span>在线状态胶囊</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="pfVip" onchange="requestDraw()"><span>昵称右侧会员徽章</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="pfStats" onchange="requestDraw()" checked><span>粉丝 / 关注 / 转评赞统计</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="pfPlay" onchange="requestDraw()" checked><span>播放量胶囊</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="pfSign" onchange="requestDraw()" checked><span>个性签名</span></div>
+
+        <label>头像上传（圆形裁切）</label>
+        <input type="file" id="pfAvatarUpload" accept="image/*">
+
+        <div class="po-group">状态栏</div>
+        <div class="row-2">
+          <div><label>左侧时间</label><input type="text" id="pfTime" value="18:57" oninput="requestDraw()"></div>
+          <div><label>网络</label><input type="text" id="pfNet" value="5G" oninput="requestDraw()"></div>
+        </div>
+        <div class="row-2">
+          <div><label>电量数字</label><input type="text" id="pfBattery" value="28" oninput="requestDraw()"></div>
+          <div><label>颜色</label><input type="color" id="pfStatusColor" value="#ffffff" onchange="requestDraw()"></div>
+        </div>
+        <label>状态栏字号: <span id="pfStatusSizeVal">4.2</span>%（画布宽）</label>
+        <input type="range" id="pfStatusSize" min="2.5" max="7" step="0.1" value="4.2" oninput="document.getElementById('pfStatusSizeVal').textContent=this.value;requestDraw()">
+        <label>顶部图标大小: <span id="pfIconSizeVal">3.1</span>%（画布宽）</label>
+        <input type="range" id="pfIconSize" min="1.2" max="8" step="0.1" value="3.1" oninput="document.getElementById('pfIconSizeVal').textContent=this.value;requestDraw()">
+
+        <div class="po-group">白色信息卡</div>
+        <div class="row-2">
+          <div><label>卡片颜色</label><input type="color" id="pfCardColor" value="#ffffff" onchange="requestDraw()"></div>
+          <div><label>顶部圆角: <span id="pfCardRadiusVal">32</span></label><input type="range" id="pfCardRadius" min="0" max="90" value="32" oninput="document.getElementById('pfCardRadiusVal').textContent=this.value;requestDraw()"></div>
+        </div>
+        <div class="row-2">
+          <div><label>卡片顶边 Y: <span id="pfCardYVal">72</span>%</label><input type="range" id="pfCardY" min="45" max="90" value="72" oninput="document.getElementById('pfCardYVal').textContent=this.value;requestDraw()"></div>
+          <div><label>卡片高度: <span id="pfCardHVal">28</span>%</label><input type="range" id="pfCardH" min="12" max="55" value="28" oninput="document.getElementById('pfCardHVal').textContent=this.value;requestDraw()"></div>
+        </div>
+
+        <div class="po-group">头像（可直接在画布拖拽）</div>
+        <label>头像直径: <span id="pfAvatarSizeVal">19</span>%（画布宽）</label>
+        <input type="range" id="pfAvatarSize" min="8" max="32" step="0.5" value="19" oninput="document.getElementById('pfAvatarSizeVal').textContent=this.value;requestDraw()">
+        <div class="row-2">
+          <div><label>头像 X: <span id="pfAvatarXVal">17</span>%</label><input type="range" id="pfAvatarX" min="0" max="100" value="17" oninput="document.getElementById('pfAvatarXVal').textContent=this.value;requestDraw()"></div>
+          <div><label>头像 Y: <span id="pfAvatarYVal">72</span>%</label><input type="range" id="pfAvatarY" min="0" max="100" value="72" oninput="document.getElementById('pfAvatarYVal').textContent=this.value;requestDraw()"></div>
+        </div>
+        <div class="row-2">
+          <div><label>描边颜色</label><input type="color" id="pfRingColor" value="#ffffff" onchange="requestDraw()"></div>
+          <div><label>描边粗细: <span id="pfRingWVal">5</span></label><input type="range" id="pfRingW" min="0" max="16" step="0.5" value="5" oninput="document.getElementById('pfRingWVal').textContent=this.value;requestDraw()"></div>
+        </div>
+
+        <div class="po-group">昵称（可直接在画布拖拽）</div>
+        <label>昵称文字</label>
+        <input type="text" id="pfName" value="林夏爱吃葵花菜" oninput="requestDraw()">
+        <label>昵称字体</label>
+        <select id="pfNameFont" onchange="fontChanged(this)">
+          <option value="'PingFang SC','Microsoft YaHei',sans-serif" selected>苹方 / 雅黑（默认）</option>
+          <option value="'Noto Sans SC',sans-serif">思源黑体</option>
+          <option value="'Noto Serif SC',serif">思源宋体</option>
+          <option value="'ZCOOL QingKe HuangYou',sans-serif">站酷庆科黄油体（圆体）</option>
+          <option value="'ZCOOL XiaoWei',serif">站酷小薇（宋体）</option>
+          <option value="'KaiTi','Kaiti SC','STKaiti',serif">楷体</option>
+        </select>
+        <div class="row-2">
+          <div><label>颜色</label><input type="color" id="pfNameColor" value="#1a1a1a" onchange="requestDraw()"></div>
+          <div><label>字号: <span id="pfNameSizeVal">5.0</span>%（宽）</label><input type="range" id="pfNameSize" min="2.5" max="9" step="0.1" value="5.0" oninput="document.getElementById('pfNameSizeVal').textContent=this.value;requestDraw()"></div>
+        </div>
+        <div class="row-2">
+          <div><label>昵称 X: <span id="pfNameXVal">40</span>%</label><input type="range" id="pfNameX" min="0" max="100" value="40" oninput="document.getElementById('pfNameXVal').textContent=this.value;requestDraw()"></div>
+          <div><label>昵称 Y: <span id="pfNameYVal">73.5</span>%</label><input type="range" id="pfNameY" min="0" max="100" value="73.5" oninput="document.getElementById('pfNameYVal').textContent=this.value;requestDraw()"></div>
+        </div>
+        <label>在线胶囊文字</label>
+        <input type="text" id="pfOnlineText" value="在线" oninput="requestDraw()">
+
+        <div class="po-group">统计行（可直接在画布拖拽）</div>
+        <div class="row-2">
+          <div><label>数字1 / 标签</label><input type="text" id="pfFans" value="18" oninput="requestDraw()"></div>
+          <div><label>&nbsp;</label><input type="text" id="pfFansLabel" value="粉丝" oninput="requestDraw()"></div>
+        </div>
+        <div class="row-2">
+          <div><label>数字2 / 标签</label><input type="text" id="pfFollow" value="128" oninput="requestDraw()"></div>
+          <div><label>&nbsp;</label><input type="text" id="pfFollowLabel" value="关注" oninput="requestDraw()"></div>
+        </div>
+        <div class="row-2">
+          <div><label>数字3 / 标签</label><input type="text" id="pfLike" value="375" oninput="requestDraw()"></div>
+          <div><label>&nbsp;</label><input type="text" id="pfLikeLabel" value="转评赞" oninput="requestDraw()"></div>
+        </div>
+        <div class="row-2">
+          <div><label>数字颜色</label><input type="color" id="pfStatColor" value="#1a1a1a" onchange="requestDraw()"></div>
+          <div><label>标签颜色</label><input type="color" id="pfStatLabelColor" value="#9a9a9a" onchange="requestDraw()"></div>
+        </div>
+        <label>统计字号: <span id="pfStatsSizeVal">4.4</span>%（宽）</label>
+        <input type="range" id="pfStatsSize" min="2.5" max="7.5" step="0.1" value="4.4" oninput="document.getElementById('pfStatsSizeVal').textContent=this.value;requestDraw()">
+        <div class="row-2">
+          <div><label>统计 X: <span id="pfStatsXVal">6</span>%</label><input type="range" id="pfStatsX" min="0" max="100" value="6" oninput="document.getElementById('pfStatsXVal').textContent=this.value;requestDraw()"></div>
+          <div><label>统计 Y: <span id="pfStatsYVal">84.5</span>%</label><input type="range" id="pfStatsY" min="0" max="100" value="84.5" oninput="document.getElementById('pfStatsYVal').textContent=this.value;requestDraw()"></div>
+        </div>
+
+        <div class="po-group">播放量胶囊与签名</div>
+        <div class="row-2">
+          <div style="flex:2"><label>播放量文字</label><input type="text" id="pfPlayText" value="视频累计播放量193" oninput="requestDraw()"></div>
+          <div><label>颜色</label><input type="color" id="pfPlayColor" value="#e8913a" onchange="requestDraw()"></div>
+        </div>
+        <div class="row-2">
+          <div style="flex:2"><label>个性签名</label><input type="text" id="pfSignText" value="My best love with KUN" oninput="requestDraw()"></div>
+          <div><label>颜色</label><input type="color" id="pfSignColor" value="#9a9a9a" onchange="requestDraw()"></div>
+        </div>
+        <label>签名字号: <span id="pfSignSizeVal">3.4</span>%（画布宽）</label>
+        <input type="range" id="pfSignSize" min="1.5" max="7" step="0.1" value="3.4" oninput="document.getElementById('pfSignSizeVal').textContent=this.value;requestDraw()">
+        <div class="row-2">
+          <div><label>签名 X: <span id="pfSignXVal">6</span>%</label><input type="range" id="pfSignX" min="0" max="100" step="0.5" value="6" oninput="document.getElementById('pfSignXVal').textContent=this.value;requestDraw()"></div>
+          <div><label>签名 Y: <span id="pfSignYVal">96.5</span>%</label><input type="range" id="pfSignY" min="0" max="100" step="0.5" value="96.5" oninput="document.getElementById('pfSignYVal').textContent=this.value;requestDraw()"></div>
+        </div>
+        <div class="checkbox-row"><input type="checkbox" id="pfSignIcon" onchange="requestDraw()" checked><span>签名左侧小文档图标</span></div>
+        </div>
+
+        <div class="tpl-sec" data-tpl="profile">
+        <h3 class="tool-h">⑧ 文字（日期 / 话题正文 / 音乐栏）</h3>
+        <div class="checkbox-row"><input type="checkbox" id="pfDate" onchange="requestDraw()"><span>昵称下方日期第二行（图2 样式）</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="pfBody" onchange="requestDraw()" checked><span>话题标签正文（图2）</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="pfMusic" onchange="requestDraw()" checked><span>底部音乐栏（图2）</span></div>
+
+        <label>日期文字</label>
+        <input type="text" id="pfDateText" value="2025.5.20" oninput="requestDraw()">
+        <div class="row-2">
+          <div><label>日期颜色</label><input type="color" id="pfDateColor" value="#9a9a9a" onchange="requestDraw()"></div>
+          <div><label>日期字号: <span id="pfDateSizeVal">3.4</span>%（宽）</label><input type="range" id="pfDateSize" min="2" max="6" step="0.1" value="3.4" oninput="document.getElementById('pfDateSizeVal').textContent=this.value;requestDraw()"></div>
+        </div>
+
+        <label>话题标签正文（多行）</label>
+        <textarea id="pfBodyText" rows="3" oninput="requestDraw()">kissovo</textarea>
+        <label>正文字体</label>
+        <select id="pfBodyFont" onchange="fontChanged(this)">
+          <option value="'Inter','PingFang SC',sans-serif" selected>Inter 无衬线（默认）</option>
+          <option value="'Montserrat',sans-serif">Montserrat</option>
+          <option value="'Poppins',sans-serif">Poppins</option>
+          <option value="'Noto Sans SC',sans-serif">思源黑体</option>
+          <option value="'Caveat',cursive">Caveat 手写</option>
+          <option value="'Dancing Script',cursive">Dancing Script 手写</option>
+        </select>
+        <div class="row-2">
+          <div><label>正文颜色</label><input type="color" id="pfBodyColor" value="#ffffff" onchange="requestDraw()"></div>
+          <div><label>正文字号: <span id="pfBodySizeVal">4.6</span>%（宽）</label><input type="range" id="pfBodySize" min="2.5" max="8" step="0.1" value="4.6" oninput="document.getElementById('pfBodySizeVal').textContent=this.value;requestDraw()"></div>
+        </div>
+        <label>正文行宽: <span id="pfBodyWidthVal">88</span>%</label>
+        <input type="range" id="pfBodyWidth" min="40" max="100" value="88" oninput="document.getElementById('pfBodyWidthVal').textContent=this.value;requestDraw()">
+        <div class="row-2">
+          <div><label>正文 X: <span id="pfBodyXVal">7</span>%</label><input type="range" id="pfBodyX" min="0" max="100" value="7" oninput="document.getElementById('pfBodyXVal').textContent=this.value;requestDraw()"></div>
+          <div><label>正文首行 Y: <span id="pfBodyYVal">56</span>%</label><input type="range" id="pfBodyY" min="0" max="100" value="56" oninput="document.getElementById('pfBodyYVal').textContent=this.value;requestDraw()"></div>
+        </div>
+
+        <label>音乐栏文字</label>
+        <input type="text" id="pfMusicText" value="hug me" oninput="requestDraw()">
+        <div class="row-2">
+          <div><label>音乐栏颜色</label><input type="color" id="pfMusicColor" value="#ffffff" onchange="requestDraw()"></div>
+          <div><label>音乐栏字号: <span id="pfMusicSizeVal">4.6</span>%（宽）</label><input type="range" id="pfMusicSize" min="2.5" max="8" step="0.1" value="4.6" oninput="document.getElementById('pfMusicSizeVal').textContent=this.value;requestDraw()"></div>
+        </div>
+        <div class="row-2">
+          <div><label>音乐栏 X: <span id="pfMusicXVal">25</span>%</label><input type="range" id="pfMusicX" min="0" max="100" value="25" oninput="document.getElementById('pfMusicXVal').textContent=this.value;requestDraw()"></div>
+          <div><label>音乐栏 Y: <span id="pfMusicYVal">66</span>%</label><input type="range" id="pfMusicY" min="0" max="100" value="66" oninput="document.getElementById('pfMusicYVal').textContent=this.value;requestDraw()"></div>
+        </div>
+
+        <div class="po-group">照片上文字可读性</div>
+        <label>文字阴影强度: <span id="pfShadowVal">45</span>%</label>
+        <input type="range" id="pfTextShadow" min="0" max="100" value="45" oninput="document.getElementById('pfShadowVal').textContent=this.value;requestDraw()">
+        <label>照片底部压暗: <span id="pfVignetteVal">25</span>%</label>
+        <input type="range" id="pfVignette" min="0" max="80" value="25" oninput="document.getElementById('pfVignetteVal').textContent=this.value;requestDraw()">
+        <div class="hint">💡 头像 / 昵称 / 统计 / 正文 / 音乐栏都可以直接在画布上拖拽移动</div>
+        </div>
+
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile">
         <h3 class="tool-h" style="margin-top:14px">⑬ 全屏水印</h3>
         <div class="checkbox-row"><input type="checkbox" id="wmEnable" onchange="requestDraw()"><span>启用全屏水印</span></div>
         <input type="file" id="wmUpload" accept="image/*">
@@ -1123,7 +1368,7 @@ love
         <div class="hint">水印图会以所选混合模式叠加在作品图上</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile">
         <h3 class="tool-h" style="margin-top:14px">⑭ 吸管取色</h3>
         <label>吸色目标</label>
         <select id="pickerTarget">
@@ -1133,12 +1378,17 @@ love
           <option value="bgColor2">背景副色</option>
           <option value="colorEN">英文文字色</option>
           <option value="colorCN">中文文字色</option>
+          <option value="pfNameColor">个人主页 · 昵称色</option>
+          <option value="pfStatColor">个人主页 · 统计数字色</option>
+          <option value="pfBodyColor">个人主页 · 话题正文色</option>
+          <option value="pfMusicColor">个人主页 · 音乐栏色</option>
+          <option value="pfCardColor">个人主页 · 信息卡颜色</option>
         </select>
         <button class="ms-btn" onclick="enablePicker()" style="margin:4px 0">👁 进入吸管模式（点击画布吸色）</button>
         <div class="hint" id="pickerHint" style="display:none;color:#f4c842">吸管模式已开启：点击右侧画布任意位置吸取颜色</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile">
         <h3 class="tool-h">⑮ 导出</h3>
         <button class="primary" onclick="exportPNG()">导出 PNG</button>
         <div class="hint" style="margin-top:10px">提示：预设只保存参数，自定义纹理图和头像需重新上传。</div>
@@ -1509,6 +1759,14 @@ document.getElementById("wmUpload").onchange=e=>{
   idbPut("ps-watermark",f);
   const img=new Image();
   img.onload=()=>{watermarkImg=img;requestDraw();};
+  img.src=URL.createObjectURL(f);
+};
+// 个人主页模板的头像上传（与字稿风共用同一份头像素材 ps-avatar）
+document.getElementById("pfAvatarUpload").onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  idbPut("ps-avatar",f);
+  const img=new Image();
+  img.onload=()=>{avatarImg=img;requestDraw();};
   img.src=URL.createObjectURL(f);
 };
 
@@ -2264,7 +2522,13 @@ const dragMap={
   msPreview:{xId:"msPreviewX",yId:"msPreviewY",xVal:"msPreviewXVal",yVal:"msPreviewYVal"},
   msAuthor:{xId:"msAuthorX",yId:"msAuthorY",xVal:"msAuthorXVal",yVal:"msAuthorYVal"},
   msScatter:{xId:"msScatterX",yId:"msScatterY",xVal:"msScatterXVal",yVal:"msScatterYVal"},
-  lockTime:{xId:"lockTimeX",yId:"lockTimeY",xVal:"lockTimeXVal",yVal:"lockTimeYVal"}
+  lockTime:{xId:"lockTimeX",yId:"lockTimeY",xVal:"lockTimeXVal",yVal:"lockTimeYVal"},
+  pfAvatar:{xId:"pfAvatarX",yId:"pfAvatarY",xVal:"pfAvatarXVal",yVal:"pfAvatarYVal"},
+  pfName:{xId:"pfNameX",yId:"pfNameY",xVal:"pfNameXVal",yVal:"pfNameYVal"},
+  pfStats:{xId:"pfStatsX",yId:"pfStatsY",xVal:"pfStatsXVal",yVal:"pfStatsYVal"},
+  pfBody:{xId:"pfBodyX",yId:"pfBodyY",xVal:"pfBodyXVal",yVal:"pfBodyYVal"},
+  pfMusic:{xId:"pfMusicX",yId:"pfMusicY",xVal:"pfMusicXVal",yVal:"pfMusicYVal"},
+  pfSign:{xId:"pfSignX",yId:"pfSignY",xVal:"pfSignXVal",yVal:"pfSignYVal"}
 };
 function pushTextHit(id,x,y,w,h){
   textHitRects.push({id,x,y,w,h});
@@ -2275,11 +2539,357 @@ let dragOffX=0,dragOffY=0;
 // ============ 离屏 canvas 缓存（避免每次 draw 重建导致内存压力） ============
 const offscreenCache={ feather:null, noise:null, noiseW:0, noiseH:0, poPhoto:null };
 
+// ============ 个人主页模板 ============
+function pfVal(id){return parseFloat(document.getElementById(id).value);}
+function pfChk(id){return document.getElementById(id).checked;}
+function pfStr(id){return document.getElementById(id).value;}
+// 仅顶部两角圆角的路径（信息卡）
+function pfTopRR(x,y,w,h,r){
+  r=Math.max(0,Math.min(r,w/2,h));
+  ctx.beginPath();
+  ctx.moveTo(x,y+r);
+  ctx.arcTo(x,y,x+r,y,r);
+  ctx.lineTo(x+w-r,y);
+  ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h);
+  ctx.lineTo(x,y+h);
+  ctx.closePath();
+}
+// 通用小胶囊
+function pfPill(x,y,w,h,r){
+  ctx.beginPath();
+  if(ctx.roundRect){ctx.roundRect(x,y,w,h,Math.min(r,h/2));}
+  else{
+    r=Math.min(r,w/2,h/2);
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+}
+function drawProfile(){
+  const W=c.width,H=c.height;
+  // 1) 兜底背景（未上传作品图时显示）
+  drawBackground();
+  // 2) 作品图铺满（cover，可缩放、可羽化）
+  const img=layers[0]&&layers[0].img;
+  if(img&&img.complete&&img.naturalWidth){
+    const scale=pfVal("artScale")/100;
+    const r=Math.max(W/img.width,H/img.height)*scale;
+    const iw=img.width*r,ih=img.height*r,ix=(W-iw)/2,iy=(H-ih)/2;
+    const fm=pfStr("featherMode"),fw=pfVal("featherW");
+    if(fm==="none"||fw<=0){
+      ctx.drawImage(img,ix,iy,iw,ih);
+    }else{
+      const cw=Math.max(1,Math.ceil(iw)),ch=Math.max(1,Math.ceil(ih));
+      if(!offscreenCache.feather||offscreenCache.feather.width!==cw||offscreenCache.feather.height!==ch){
+        offscreenCache.feather=document.createElement("canvas");
+        offscreenCache.feather.width=cw;offscreenCache.feather.height=ch;
+      }
+      const cv=offscreenCache.feather,g2=cv.getContext("2d");
+      g2.clearRect(0,0,cw,ch);
+      g2.drawImage(img,0,0,cw,ch);
+      g2.globalCompositeOperation="destination-in";
+      const grd=(x0,y0,x1,y1)=>{const gg=g2.createLinearGradient(x0,y0,x1,y1);gg.addColorStop(0,"rgba(0,0,0,0)");gg.addColorStop(1,"rgba(0,0,0,1)");return gg;};
+      if(fm==="top"||fm==="both"){g2.fillStyle=grd(0,0,0,Math.min(fw,ch));g2.fillRect(0,0,cw,Math.min(fw,ch));}
+      if(fm==="bottom"||fm==="both"){const t=Math.min(fw,ch);g2.fillStyle=grd(0,ch,0,ch-t);g2.fillRect(0,ch-t,cw,t);}
+      if(fm==="all"){g2.fillStyle=grd(0,0,0,Math.min(fw,cw));g2.fillRect(0,0,Math.min(fw,cw),ch);const t=Math.min(fw,cw);g2.fillStyle=grd(cw,0,cw-t,0);g2.fillRect(cw-t,0,t,ch);}
+      g2.globalCompositeOperation="source-over";
+      ctx.drawImage(cv,ix,iy,iw,ih);
+    }
+  }
+  // 3) 底部压暗，保证白色文字可读
+  const vig=pfVal("pfVignette")/100;
+  if(vig>0){
+    const g=ctx.createLinearGradient(0,H*0.45,0,H);
+    g.addColorStop(0,"rgba(0,0,0,0)");
+    g.addColorStop(1,"rgba(0,0,0,"+(vig*0.55).toFixed(3)+")");
+    ctx.fillStyle=g;ctx.fillRect(0,H*0.45,W,H*0.55);
+  }
+  const shOp=pfVal("pfTextShadow")/100;
+  function shadowed(fs){ctx.shadowColor="rgba(0,0,0,"+(shOp*0.7).toFixed(3)+")";ctx.shadowBlur=Math.max(2,fs*0.14);ctx.shadowOffsetY=Math.max(1,fs*0.05);}
+  function noShadow(){ctx.shadowColor="transparent";ctx.shadowBlur=0;ctx.shadowOffsetX=0;ctx.shadowOffsetY=0;}
+  const SYS="'Inter','PingFang SC','Microsoft YaHei',sans-serif";
+
+  // 4) 白色信息卡
+  const cardY=H*pfVal("pfCardY")/100;
+  if(pfChk("pfCard")){
+    const cardH=H*pfVal("pfCardH")/100,rad=W*pfVal("pfCardRadius")/1000;
+    ctx.save();
+    ctx.shadowColor="rgba(0,0,0,0.18)";ctx.shadowBlur=W*0.025;ctx.shadowOffsetY=-W*0.004;
+    ctx.fillStyle=pfStr("pfCardColor");
+    pfTopRR(0,cardY,W,cardH+W*0.05,rad);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // 5) 顶部状态栏（时间 / 信号格 / 5G / 电量）
+  if(pfChk("pfStatusBar")){
+    const fs=W*pfVal("pfStatusSize")/100,m=W*0.06,top=H*0.02+fs*0.42,col=pfStr("pfStatusColor");
+    // 时间
+    ctx.save();ctx.fillStyle=col;ctx.textBaseline="middle";ctx.textAlign="left";
+    ctx.font="600 "+fs+"px "+SYS;
+    shadowed(fs);ctx.fillText(pfStr("pfTime"),m,top);
+    ctx.restore();
+    // 电量胶囊（最右）
+    const batW=fs*2.5,batH=fs*1.18,bx=W-m-batW,by=top-batH/2;
+    ctx.save();ctx.fillStyle=col;shadowed(fs);
+    pfPill(bx,by,batW,batH,batH/2);ctx.fill();
+    ctx.restore();
+    ctx.save();ctx.fillStyle="#1a1a1a";ctx.font="600 "+(fs*0.62)+"px "+SYS;
+    ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(pfStr("pfBattery"),bx+batW*0.45,top+1);
+    ctx.restore();
+    // 电池头
+    ctx.save();ctx.fillStyle=col;
+    pfPill(bx+batW+fs*0.06,by+batH*0.3,fs*0.12,batH*0.4,fs*0.05);ctx.fill();
+    ctx.restore();
+    // 网络
+    const rx=bx-fs*0.55;
+    ctx.save();ctx.fillStyle=col;ctx.font="600 "+(fs*0.78)+"px "+SYS;ctx.textAlign="right";ctx.textBaseline="middle";
+    shadowed(fs);ctx.fillText(pfStr("pfNet"),rx,top);
+    const netLeft=rx-ctx.measureText(pfStr("pfNet")).width;
+    // 信号 4 格（底边与网络/电量同基线，右端与网络间隔 fs*0.55）
+    const bh=fs*0.62,bw=fs*0.17,gap=fs*0.12,tot=4*bw+3*gap;
+    const sigLeft=(netLeft-fs*0.55)-tot,baseline=top+bh/2;
+    for(let i=0;i<4;i++){
+      const hh=bh*(0.4+0.2*i),x2=sigLeft+i*(bw+gap);
+      pfPill(x2,baseline-hh,bw,hh,bw*0.4);ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // 6) 顶部左右图标（返回 / 环形 / 齿轮）
+  if(pfChk("pfTopIcons")){
+    const r0=W*pfVal("pfIconSize")/100,y=H*0.115,m=W*0.055;
+    ctx.save();ctx.strokeStyle="#ffffff";ctx.fillStyle="#ffffff";
+    shadowed(r0*2);ctx.lineCap="round";ctx.lineJoin="round";
+    // 线宽随图标尺寸等比缩放，避免缩小后线条糊成一团
+    const lwOutline=r0*0.19,lwThin=r0*0.155;
+    ctx.lineWidth=lwOutline;
+    ctx.beginPath();ctx.moveTo(m+r0*0.4,y-r0*0.78);ctx.lineTo(m,y);ctx.lineTo(m+r0*0.4,y+r0*0.78);ctx.stroke();
+    const cxR=W-m-r0;
+    ctx.lineWidth=lwOutline;
+    ctx.beginPath();ctx.arc(cxR,y,r0*0.82,0,Math.PI*2);ctx.stroke();
+    ctx.lineWidth=lwThin;
+    ctx.beginPath();ctx.arc(cxR,y,r0*0.54,Math.PI*0.25,Math.PI*1.7);ctx.stroke();
+    const cx2=cxR-r0*2.7;
+    ctx.lineWidth=lwThin;
+    for(let i=0;i<8;i++){
+      const a=i*Math.PI/4;
+      ctx.beginPath();
+      ctx.moveTo(cx2+Math.cos(a)*r0*0.7,y+Math.sin(a)*r0*0.7);
+      ctx.lineTo(cx2+Math.cos(a)*r0*0.98,y+Math.sin(a)*r0*0.98);
+      ctx.stroke();
+    }
+    ctx.lineWidth=lwOutline;
+    ctx.beginPath();ctx.arc(cx2,y,r0*0.62,0,Math.PI*2);ctx.stroke();
+    ctx.lineWidth=lwThin;
+    ctx.beginPath();ctx.arc(cx2,y,r0*0.22,0,Math.PI*2);ctx.stroke();
+    ctx.restore();
+  }
+
+  // 7) 话题标签正文（图2）
+  if(pfChk("pfBody")){
+    const x=W*pfVal("pfBodyX")/100,y=H*pfVal("pfBodyY")/100;
+    const fs=W*pfVal("pfBodySize")/100,maxW=W*pfVal("pfBodyWidth")/100,font=pfStr("pfBodyFont");
+    ctx.save();ctx.font="400 "+fs+"px "+font;ctx.textAlign="left";ctx.textBaseline="top";
+    ctx.fillStyle=pfStr("pfBodyColor");shadowed(fs);
+    const lh=fs*1.34;
+    const raw=(pfStr("pfBodyText")||"").split("\n"),lines=[];
+    raw.forEach(line=>{
+      if(line.trim()===""){lines.push("");return;}
+      const words=line.split(/\s+/);let cur="";
+      words.forEach(w=>{
+        const t=cur?cur+" "+w:w;
+        if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w;}else{cur=t;}
+      });
+      if(cur)lines.push(cur);
+    });
+    lines.forEach((ln,i)=>ctx.fillText(ln,x,y+i*lh));
+    ctx.restore();
+    pushTextHit("pfBody",x+maxW/2,y+(Math.max(1,lines.length)-1)*lh/2,maxW,Math.max(1,lines.length)*lh);
+  }
+
+  // 8) 音乐栏（图2）
+  if(pfChk("pfMusic")){
+    const x=W*pfVal("pfMusicX")/100,y=H*pfVal("pfMusicY")/100;
+    const fs=W*pfVal("pfMusicSize")/100,t=pfStr("pfMusicText");
+    ctx.save();ctx.fillStyle=pfStr("pfMusicColor");ctx.textBaseline="middle";ctx.textAlign="left";
+    shadowed(fs);
+    ctx.font="400 "+(fs*1.15)+"px "+SYS;
+    ctx.fillText("\u266A",x,y);
+    const nw=ctx.measureText("\u266A").width;
+    ctx.font="500 "+fs+"px "+SYS;
+    ctx.fillText(t,x+nw+fs*0.55,y);
+    const tw=ctx.measureText(t).width;
+    ctx.restore();
+    pushTextHit("pfMusic",x+(nw+fs*0.55+tw)/2,y,nw+fs*0.55+tw,fs*1.7);
+  }
+
+  // 9) 圆形头像 + 右下「+」
+  let avCX=0,avCY=0,avR=0;
+  if(pfChk("pfAvatar")){
+    avR=W*pfVal("pfAvatarSize")/100/2;
+    avCX=W*pfVal("pfAvatarX")/100;
+    avCY=H*pfVal("pfAvatarY")/100;
+    // 头像本体（圆形裁切）
+    ctx.save();
+    ctx.beginPath();ctx.arc(avCX,avCY,avR,0,Math.PI*2);ctx.clip();
+    if(avatarImg&&avatarImg.complete&&avatarImg.naturalWidth){
+      const rr2=Math.max(avR*2/avatarImg.width,avR*2/avatarImg.height);
+      const dw=avatarImg.width*rr2,dh=avatarImg.height*rr2;
+      ctx.drawImage(avatarImg,avCX-dw/2,avCY-dh/2,dw,dh);
+    }else{
+      const g=ctx.createLinearGradient(avCX-avR,avCY-avR,avCX+avR,avCY+avR);
+      g.addColorStop(0,"#d8dde3");g.addColorStop(1,"#9aa3ad");
+      ctx.fillStyle=g;ctx.fillRect(avCX-avR,avCY-avR,avR*2,avR*2);
+      ctx.fillStyle="rgba(255,255,255,0.9)";ctx.font="500 "+(avR*0.55)+"px "+SYS;
+      ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText("头像",avCX,avCY);
+    }
+    ctx.restore();
+    // 头像描边
+    const rw=W*pfVal("pfRingW")/1000;
+    if(rw>0){
+      ctx.save();ctx.lineWidth=rw;ctx.strokeStyle=pfStr("pfRingColor");
+      ctx.beginPath();ctx.arc(avCX,avCY,avR,0,Math.PI*2);ctx.stroke();
+      ctx.restore();
+    }
+    // 右下角「+」白圈
+    if(pfChk("pfPlus")){
+      const bx=avCX+avR*0.72,by=avCY+avR*0.72,br=avR*0.36;
+      ctx.save();
+      ctx.shadowColor="rgba(0,0,0,0.25)";ctx.shadowBlur=br*0.3;ctx.shadowOffsetY=br*0.1;
+      ctx.fillStyle="#ffffff";ctx.beginPath();ctx.arc(bx,by,br,0,Math.PI*2);ctx.fill();
+      ctx.restore();
+      ctx.save();ctx.strokeStyle="#1a1a1a";ctx.lineWidth=Math.max(2,br*0.16);ctx.lineCap="round";
+      ctx.beginPath();
+      ctx.moveTo(bx-br*0.45,by);ctx.lineTo(bx+br*0.45,by);
+      ctx.moveTo(bx,by-br*0.45);ctx.lineTo(bx,by+br*0.45);
+      ctx.stroke();
+      ctx.restore();
+    }
+    pushTextHit("pfAvatar",avCX,avCY,avR*2.7,avR*2.7);
+  }
+
+  // 10) 昵称块（昵称 / VIP / 日期第二行 / 在线胶囊）
+  const nameX=W*pfVal("pfNameX")/100,nameY=H*pfVal("pfNameY")/100;
+  const nfs0=W*pfVal("pfNameSize")/100,nFont=pfStr("pfNameFont");
+  let nfs=nfs0,name=pfStr("pfName"),maxNameW=W*0.6;
+  ctx.save();
+  ctx.font="700 "+nfs+"px "+nFont;
+  while(ctx.measureText(name).width>maxNameW&&nfs>10){nfs-=2;ctx.font="700 "+nfs+"px "+nFont;}
+  ctx.textAlign="left";ctx.textBaseline="middle";
+  ctx.fillStyle=pfStr("pfNameColor");ctx.font="700 "+nfs+"px "+nFont;
+  ctx.fillText(name,nameX,nameY);
+  const nameW=ctx.measureText(name).width;
+  ctx.restore();
+  let blockH=nfs;
+  if(pfChk("pfVip")){
+    const bw=nfs*1.9,bh=nfs*0.82,bx=nameX+nameW+nfs*0.3;
+    ctx.save();
+    const gg=ctx.createLinearGradient(bx,nameY-bh/2,bx,nameY+bh/2);
+    gg.addColorStop(0,"#ffe9a8");gg.addColorStop(1,"#f3b94d");
+    ctx.fillStyle=gg;pfPill(bx,nameY-bh/2,bw,bh,bh/2);ctx.fill();
+    ctx.fillStyle="#c8651a";ctx.font="600 "+(nfs*0.48)+"px "+SYS;
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText("\uD83D\uDC51开通",bx+bw/2,nameY+1);
+    ctx.restore();
+  }
+  let cy=nameY;
+  if(pfChk("pfDate")){
+    cy+=nfs*1.12;blockH+=nfs*1.12;
+    const dfs=W*pfVal("pfDateSize")/100;
+    ctx.save();ctx.fillStyle=pfStr("pfDateColor");ctx.font="500 "+dfs+"px "+SYS;
+    ctx.textAlign="left";ctx.textBaseline="middle";
+    ctx.fillText(pfStr("pfDateText"),nameX,cy);
+    ctx.restore();
+  }
+  if(pfChk("pfOnline")&&pfStr("pfOnlineText")){
+    cy+=nfs*1.18;blockH+=nfs*1.18;
+    const pfs=nfs*0.62,t=pfStr("pfOnlineText")+" \u203A";
+    ctx.save();
+    ctx.font="500 "+pfs+"px "+SYS;ctx.textAlign="left";ctx.textBaseline="middle";
+    const pw=ctx.measureText(t).width+pfs*0.9,ph=pfs*1.4;
+    ctx.strokeStyle="rgba(130,178,110,0.65)";ctx.lineWidth=Math.max(1.5,pfs*0.07);
+    pfPill(nameX,cy-ph/2,pw,ph,ph/2);ctx.stroke();
+    ctx.fillStyle="#83a870";ctx.textAlign="center";ctx.fillText(t,nameX+pw/2,cy+1);
+    ctx.restore();
+  }
+  pushTextHit("pfName",nameX+maxNameW/2,nameY+blockH/2-nfs/2,maxNameW,blockH*1.2);
+
+  // 11) 统计行 + 播放量胶囊
+  if(pfChk("pfStats")){
+    const sx=W*pfVal("pfStatsX")/100,sy=H*pfVal("pfStatsY")/100;
+    const fs=W*pfVal("pfStatsSize")/100;
+    const groups=[[pfStr("pfFans"),pfStr("pfFansLabel")],[pfStr("pfFollow"),pfStr("pfFollowLabel")],[pfStr("pfLike"),pfStr("pfLikeLabel")]];
+    let x=sx;
+    groups.forEach(grp=>{
+      ctx.save();ctx.textBaseline="middle";ctx.textAlign="left";
+      ctx.fillStyle=pfStr("pfStatColor");ctx.font="700 "+fs+"px "+SYS;
+      ctx.fillText(grp[0],x,sy);
+      const nw=ctx.measureText(grp[0]).width;
+      const lfs=fs*0.62;
+      ctx.fillStyle=pfStr("pfStatLabelColor");ctx.font="400 "+lfs+"px "+SYS;
+      ctx.fillText(grp[1],x+nw+fs*0.3,sy+fs*0.06);
+      x+=nw+fs*0.3+ctx.measureText(grp[1]).width+fs*1.15;
+      ctx.restore();
+    });
+    pushTextHit("pfStats",(sx+x)/2,sy,x-sx,fs*1.5);
+    if(pfChk("pfPlay")&&pfStr("pfPlayText")){
+      const py=sy+fs*2,pfs=fs*0.66,t=pfStr("pfPlayText");
+      ctx.save();ctx.font="500 "+pfs+"px "+SYS;
+      const pw=ctx.measureText(t).width+pfs*1.9,ph=pfs*1.5;
+      ctx.fillStyle="rgba(232,145,58,0.13)";pfPill(sx,py-ph/2,pw,ph,ph/2);ctx.fill();
+      ctx.fillStyle=pfStr("pfPlayColor");ctx.textAlign="left";ctx.textBaseline="middle";
+      ctx.fillText(t,sx+pfs*0.7,py+1);
+      ctx.strokeStyle=pfStr("pfPlayColor");ctx.lineWidth=Math.max(2,pfs*0.08);ctx.lineCap="round";
+      const ax=sx+pw-pfs*0.85;
+      ctx.beginPath();ctx.moveTo(ax-pfs*0.22,py-pfs*0.12);ctx.lineTo(ax,py+pfs*0.18);ctx.lineTo(ax+pfs*0.22,py-pfs*0.12);ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  // 12) 个性签名（默认贴信息卡底部，可自由拖动）
+  if(pfChk("pfSign")&&pfStr("pfSignText")){
+    const fs=W*pfVal("pfSignSize")/100;
+    const x=W*pfVal("pfSignX")/100,y=H*pfVal("pfSignY")/100;
+    const withIcon=pfChk("pfSignIcon");
+    ctx.save();
+    shadowed(fs);
+    ctx.strokeStyle=pfStr("pfSignColor");ctx.fillStyle=pfStr("pfSignColor");
+    ctx.font="400 "+fs+"px "+SYS;ctx.textAlign="left";ctx.textBaseline="middle";
+    const iw=fs*0.74,ih=fs*0.92;
+    let textX=x;
+    if(withIcon){
+      ctx.lineWidth=Math.max(2,fs*0.08);
+      pfPill(x,y-ih/2,iw,ih,fs*0.1);ctx.stroke();
+      [0.28,0.5,0.72].forEach(fr=>{ctx.fillRect(x+iw*0.22,y-ih/2+ih*fr,iw*0.56,Math.max(2,fs*0.07));});
+      textX=x+iw+fs*0.55;
+    }
+    ctx.fillText(pfStr("pfSignText"),textX,y+1);
+    const tw=ctx.measureText(pfStr("pfSignText")).width,totalW=(textX-x)+tw,h=Math.max(ih,fs*1.3);
+    ctx.restore();
+    pushTextHit("pfSign",x+totalW/2,y,totalW,h);
+  }
+
+  // 13) 全屏水印作用于整张照片
+  wmClip={ox:0,oy:0,rot:0,x:0,y:0,w:W,h:H,r:0};
+}
+
 // ============ 主渲染 ============
 function draw(){
   ctx.clearRect(0,0,c.width,c.height);
   textHitRects.length=0;
   wmClip=null;
+  // 个人主页模板：独立渲染管线
+  if(typeof currentTemplate!=="undefined"&&currentTemplate==="profile"){
+    drawProfile();
+    drawWatermark();
+    scheduleAutosave();
+    return;
+  }
   const blurAmt=parseInt(document.getElementById("bgBlur").value);
   const lockScreen=document.getElementById("lockScreen").checked;
   const msMode=document.getElementById("msMode").checked;
@@ -3192,7 +3802,79 @@ function getSettings(){
     poFrameTex:document.getElementById("poFrameTex").value,
     poFrameTexAmt:document.getElementById("poFrameTexAmt").value,
     poFilter:document.getElementById("poFilter").value,
-    poFilterStrength:document.getElementById("poFilterStrength").value
+    poFilterStrength:document.getElementById("poFilterStrength").value,
+    // ===== 个人主页模板 =====
+    pfStatusBar:chk("pfStatusBar"),
+    pfTopIcons:chk("pfTopIcons"),
+    pfCard:chk("pfCard"),
+    pfAvatar:chk("pfAvatar"),
+    pfPlus:chk("pfPlus"),
+    pfOnline:chk("pfOnline"),
+    pfVip:chk("pfVip"),
+    pfStats:chk("pfStats"),
+    pfPlay:chk("pfPlay"),
+    pfSign:chk("pfSign"),
+    pfDate:chk("pfDate"),
+    pfBody:chk("pfBody"),
+    pfMusic:chk("pfMusic"),
+    pfTime:document.getElementById("pfTime").value,
+    pfNet:document.getElementById("pfNet").value,
+    pfBattery:document.getElementById("pfBattery").value,
+    pfStatusColor:document.getElementById("pfStatusColor").value,
+    pfStatusSize:document.getElementById("pfStatusSize").value,
+    pfIconSize:document.getElementById("pfIconSize").value,
+    pfCardColor:document.getElementById("pfCardColor").value,
+    pfCardRadius:document.getElementById("pfCardRadius").value,
+    pfCardY:document.getElementById("pfCardY").value,
+    pfCardH:document.getElementById("pfCardH").value,
+    pfAvatarSize:document.getElementById("pfAvatarSize").value,
+    pfAvatarX:document.getElementById("pfAvatarX").value,
+    pfAvatarY:document.getElementById("pfAvatarY").value,
+    pfRingColor:document.getElementById("pfRingColor").value,
+    pfRingW:document.getElementById("pfRingW").value,
+    pfName:document.getElementById("pfName").value,
+    pfNameFont:document.getElementById("pfNameFont").value,
+    pfNameColor:document.getElementById("pfNameColor").value,
+    pfNameSize:document.getElementById("pfNameSize").value,
+    pfNameX:document.getElementById("pfNameX").value,
+    pfNameY:document.getElementById("pfNameY").value,
+    pfOnlineText:document.getElementById("pfOnlineText").value,
+    pfFans:document.getElementById("pfFans").value,
+    pfFansLabel:document.getElementById("pfFansLabel").value,
+    pfFollow:document.getElementById("pfFollow").value,
+    pfFollowLabel:document.getElementById("pfFollowLabel").value,
+    pfLike:document.getElementById("pfLike").value,
+    pfLikeLabel:document.getElementById("pfLikeLabel").value,
+    pfStatColor:document.getElementById("pfStatColor").value,
+    pfStatLabelColor:document.getElementById("pfStatLabelColor").value,
+    pfStatsSize:document.getElementById("pfStatsSize").value,
+    pfStatsX:document.getElementById("pfStatsX").value,
+    pfStatsY:document.getElementById("pfStatsY").value,
+    pfPlayText:document.getElementById("pfPlayText").value,
+    pfPlayColor:document.getElementById("pfPlayColor").value,
+    pfSignText:document.getElementById("pfSignText").value,
+    pfSignColor:document.getElementById("pfSignColor").value,
+    pfSignSize:document.getElementById("pfSignSize").value,
+    pfSignX:document.getElementById("pfSignX").value,
+    pfSignY:document.getElementById("pfSignY").value,
+    pfSignIcon:chk("pfSignIcon"),
+    pfDateText:document.getElementById("pfDateText").value,
+    pfDateColor:document.getElementById("pfDateColor").value,
+    pfDateSize:document.getElementById("pfDateSize").value,
+    pfBodyText:document.getElementById("pfBodyText").value,
+    pfBodyFont:document.getElementById("pfBodyFont").value,
+    pfBodyColor:document.getElementById("pfBodyColor").value,
+    pfBodySize:document.getElementById("pfBodySize").value,
+    pfBodyWidth:document.getElementById("pfBodyWidth").value,
+    pfBodyX:document.getElementById("pfBodyX").value,
+    pfBodyY:document.getElementById("pfBodyY").value,
+    pfMusicText:document.getElementById("pfMusicText").value,
+    pfMusicColor:document.getElementById("pfMusicColor").value,
+    pfMusicSize:document.getElementById("pfMusicSize").value,
+    pfMusicX:document.getElementById("pfMusicX").value,
+    pfMusicY:document.getElementById("pfMusicY").value,
+    pfTextShadow:document.getElementById("pfTextShadow").value,
+    pfVignette:document.getElementById("pfVignette").value
   };
 }
 function applySettings(s){
@@ -3316,6 +3998,78 @@ function applySettings(s){
   set("poFrameTexAmt",s.poFrameTexAmt||"35");
   set("poFilter",s.poFilter||"none");
   set("poFilterStrength",s.poFilterStrength||"100");
+  // ===== 个人主页参数 =====
+  chk("pfStatusBar",s.pfStatusBar!==false);
+  chk("pfTopIcons",s.pfTopIcons!==false);
+  chk("pfCard",s.pfCard!==false);
+  chk("pfAvatar",s.pfAvatar!==false);
+  chk("pfPlus",s.pfPlus!==false);
+  chk("pfOnline",s.pfOnline!==false);
+  chk("pfVip",s.pfVip||false);
+  chk("pfStats",s.pfStats!==false);
+  chk("pfPlay",s.pfPlay!==false);
+  chk("pfSign",s.pfSign!==false);
+  chk("pfDate",s.pfDate||false);
+  chk("pfBody",s.pfBody!==false);
+  chk("pfMusic",s.pfMusic!==false);
+  set("pfTime",s.pfTime||"18:57");
+  set("pfNet",s.pfNet||"5G");
+  set("pfBattery",s.pfBattery||"28");
+  set("pfStatusColor",s.pfStatusColor||"#ffffff");
+  set("pfStatusSize",s.pfStatusSize||"4.2");
+  set("pfIconSize",s.pfIconSize||"3.1");
+  set("pfCardColor",s.pfCardColor||"#ffffff");
+  set("pfCardRadius",s.pfCardRadius||"32");
+  set("pfCardY",s.pfCardY||"72");
+  set("pfCardH",s.pfCardH||"28");
+  set("pfAvatarSize",s.pfAvatarSize||"19");
+  set("pfAvatarX",s.pfAvatarX||"17");
+  set("pfAvatarY",s.pfAvatarY||"72");
+  set("pfRingColor",s.pfRingColor||"#ffffff");
+  set("pfRingW",s.pfRingW||"5");
+  set("pfName",s.pfName||"林夏爱吃葵花菜");
+  if(s.pfNameFont)set("pfNameFont",s.pfNameFont);
+  set("pfNameColor",s.pfNameColor||"#1a1a1a");
+  set("pfNameSize",s.pfNameSize||"5.0");
+  set("pfNameX",s.pfNameX||"40");
+  set("pfNameY",s.pfNameY||"73.5");
+  set("pfOnlineText",s.pfOnlineText||"在线");
+  set("pfFans",s.pfFans||"18");
+  set("pfFansLabel",s.pfFansLabel||"粉丝");
+  set("pfFollow",s.pfFollow||"128");
+  set("pfFollowLabel",s.pfFollowLabel||"关注");
+  set("pfLike",s.pfLike||"375");
+  set("pfLikeLabel",s.pfLikeLabel||"转评赞");
+  set("pfStatColor",s.pfStatColor||"#1a1a1a");
+  set("pfStatLabelColor",s.pfStatLabelColor||"#9a9a9a");
+  set("pfStatsSize",s.pfStatsSize||"4.4");
+  set("pfStatsX",s.pfStatsX||"6");
+  set("pfStatsY",s.pfStatsY||"84.5");
+  set("pfPlayText",s.pfPlayText||"视频累计播放量193");
+  set("pfPlayColor",s.pfPlayColor||"#e8913a");
+  set("pfSignText",s.pfSignText||"My best love with KUN");
+  set("pfSignColor",s.pfSignColor||"#9a9a9a");
+  set("pfSignSize",s.pfSignSize||"3.4");
+  set("pfSignX",s.pfSignX||"6");
+  set("pfSignY",s.pfSignY||"96.5");
+  chk("pfSignIcon",s.pfSignIcon!==false);
+  set("pfDateText",s.pfDateText||"2025.5.20");
+  set("pfDateColor",s.pfDateColor||"#9a9a9a");
+  set("pfDateSize",s.pfDateSize||"3.4");
+  set("pfBodyText",s.pfBodyText||"#Handwriting #Board writing Welcome to enjoy my works");
+  if(s.pfBodyFont)set("pfBodyFont",s.pfBodyFont);
+  set("pfBodyColor",s.pfBodyColor||"#ffffff");
+  set("pfBodySize",s.pfBodySize||"4.6");
+  set("pfBodyWidth",s.pfBodyWidth||"88");
+  set("pfBodyX",s.pfBodyX||"7");
+  set("pfBodyY",s.pfBodyY||"56");
+  set("pfMusicText",s.pfMusicText||"hug me");
+  set("pfMusicColor",s.pfMusicColor||"#ffffff");
+  set("pfMusicSize",s.pfMusicSize||"4.6");
+  set("pfMusicX",s.pfMusicX||"25");
+  set("pfMusicY",s.pfMusicY||"66");
+  set("pfTextShadow",s.pfTextShadow||"45");
+  set("pfVignette",s.pfVignette||"25");
   // 同步显示值
   document.getElementById("blurVal").textContent=s.bgBlur;
   document.getElementById("scaleVal").textContent=s.artScale;
@@ -3390,6 +4144,34 @@ function applySettings(s){
   document.getElementById("poFooterRotVal").textContent=s.poFooterRot||0;
   document.getElementById("poFrameTexAmtVal").textContent=s.poFrameTexAmt||35;
   document.getElementById("poFilterVal").textContent=s.poFilterStrength||100;
+  document.getElementById("pfStatusSizeVal").textContent=s.pfStatusSize||4.2;
+  document.getElementById("pfIconSizeVal").textContent=s.pfIconSize||3.1;
+  document.getElementById("pfCardRadiusVal").textContent=s.pfCardRadius||32;
+  document.getElementById("pfCardYVal").textContent=s.pfCardY||72;
+  document.getElementById("pfCardHVal").textContent=s.pfCardH||28;
+  document.getElementById("pfAvatarSizeVal").textContent=s.pfAvatarSize||19;
+  document.getElementById("pfAvatarXVal").textContent=s.pfAvatarX||17;
+  document.getElementById("pfAvatarYVal").textContent=s.pfAvatarY||72;
+  document.getElementById("pfRingWVal").textContent=s.pfRingW||5;
+  document.getElementById("pfNameSizeVal").textContent=s.pfNameSize||5;
+  document.getElementById("pfNameXVal").textContent=s.pfNameX||40;
+  document.getElementById("pfNameYVal").textContent=s.pfNameY||73.5;
+  document.getElementById("pfStatsSizeVal").textContent=s.pfStatsSize||4.4;
+  document.getElementById("pfStatsXVal").textContent=s.pfStatsX||6;
+  document.getElementById("pfSignSizeVal").textContent=s.pfSignSize||3.4;
+  document.getElementById("pfSignXVal").textContent=s.pfSignX||6;
+  document.getElementById("pfSignYVal").textContent=s.pfSignY||96.5;
+  document.getElementById("pfStatsYVal").textContent=s.pfStatsY||84.5;
+  document.getElementById("pfDateSizeVal").textContent=s.pfDateSize||3.4;
+  document.getElementById("pfBodySizeVal").textContent=s.pfBodySize||4.6;
+  document.getElementById("pfBodyWidthVal").textContent=s.pfBodyWidth||88;
+  document.getElementById("pfBodyXVal").textContent=s.pfBodyX||7;
+  document.getElementById("pfBodyYVal").textContent=s.pfBodyY||56;
+  document.getElementById("pfMusicSizeVal").textContent=s.pfMusicSize||4.6;
+  document.getElementById("pfMusicXVal").textContent=s.pfMusicX||25;
+  document.getElementById("pfMusicYVal").textContent=s.pfMusicY||66;
+  document.getElementById("pfShadowVal").textContent=s.pfTextShadow||45;
+  document.getElementById("pfVignetteVal").textContent=s.pfVignette||25;
   onTexSourceChange();
   if((s.texSource||"preset")==="preset"){onTexPresetChange();}
   resizeCanvas();
@@ -3443,12 +4225,13 @@ function resetAll(){
   document.getElementById("texUpload").value="";
   document.getElementById("avatarUpload").value="";
   document.getElementById("wmUpload").value="";
+  document.getElementById("pfAvatarUpload").value="";
   requestDraw();
 }
 
 // ============ 模板选择首页 / 工作区 ============
 let currentTemplate="normal";
-const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscript:"字稿风预览",polaroid:"拍立得预览"};
+const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscript:"字稿风预览",polaroid:"拍立得预览",profile:"个人主页"};
 function selectTemplate(type){
   currentTemplate=type;
   document.getElementById("tplPicker").style.display="none";
@@ -3491,6 +4274,35 @@ function applyTemplatePreset(type){
     set("bgColor1","#f5ecd8");
     set("bgColor2","#e8dcc0");
     set("bgDir","d");
+  }else if(type==="profile"){
+    chk("msMode",false);
+    chk("lockScreen",false);
+    set("size","1080,2340");
+    // 未上传作品图时的兜底背景：蓝天 → 沙滩
+    set("bgType","gradient");
+    set("bgColor1","#bfe0ea");
+    set("bgColor2","#e9d6ad");
+    set("bgDir","v");
+    set("bgBlur","0");
+    set("featherMode","none");
+    // 个人主页各元素恢复默认
+    const pfDef={
+      pfTime:"18:57",pfNet:"5G",pfBattery:"28",pfStatusColor:"#ffffff",pfStatusSize:"4.2",pfIconSize:"3.1",
+      pfCardColor:"#ffffff",pfCardRadius:"32",pfCardY:"72",pfCardH:"28",
+      pfAvatarSize:"19",pfAvatarX:"17",pfAvatarY:"72",pfRingColor:"#ffffff",pfRingW:"5",
+      pfName:"林夏爱吃葵花菜",pfNameColor:"#1a1a1a",pfNameSize:"5.0",pfNameX:"40",pfNameY:"73.5",pfOnlineText:"在线",
+      pfFans:"18",pfFansLabel:"粉丝",pfFollow:"128",pfFollowLabel:"关注",pfLike:"375",pfLikeLabel:"转评赞",
+      pfStatColor:"#1a1a1a",pfStatLabelColor:"#9a9a9a",pfStatsSize:"4.4",pfStatsX:"6",pfStatsY:"84.5",
+      pfPlayText:"视频累计播放量193",pfPlayColor:"#e8913a",pfSignText:"My best love with KUN",pfSignColor:"#9a9a9a",pfSignSize:"3.4",pfSignX:"6",pfSignY:"96.5",
+      pfDateText:"2025.5.20",pfDateColor:"#9a9a9a",pfDateSize:"3.4",
+      pfBodyText:"kissovo",pfBodyColor:"#ffffff",pfBodySize:"4.6",pfBodyWidth:"88",pfBodyX:"7",pfBodyY:"56",
+      pfMusicText:"hug me",pfMusicColor:"#ffffff",pfMusicSize:"4.6",pfMusicX:"25",pfMusicY:"66",
+      pfTextShadow:"45",pfVignette:"25"
+    };
+    Object.keys(pfDef).forEach(k=>set(k,pfDef[k]));
+    chk("pfStatusBar",true);chk("pfTopIcons",true);chk("pfCard",true);chk("pfAvatar",true);
+    chk("pfPlus",true);chk("pfOnline",true);chk("pfVip",false);chk("pfStats",true);
+    chk("pfPlay",true);chk("pfSign",true);chk("pfSignIcon",true);chk("pfDate",false);chk("pfBody",true);chk("pfMusic",true);
   }else{
     chk("msMode",false);
     chk("lockScreen",false);
@@ -3906,7 +4718,7 @@ requestDraw();
 // 字体全部本地内置：只预加载当前各下拉框已选中的字体族，其余在切换时按需加载（移动端更稳）
 (function preloadSelectedFonts(){
   if(!(document.fonts&&document.fonts.load))return;
-  var ids=["fontEN","fontCN","poDateFont","poDecoFont","poCaptionFont","poFooterFont","msAuthorFont","msScatterFont","msMainFont","msPreviewFont"];
+  var ids=["fontEN","fontCN","poDateFont","poDecoFont","poCaptionFont","poFooterFont","msAuthorFont","msScatterFont","msMainFont","msPreviewFont","pfNameFont","pfBodyFont"];
   var all=[];
   ids.forEach(function(id){
     var el=document.getElementById(id);
