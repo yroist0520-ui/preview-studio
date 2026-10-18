@@ -1221,16 +1221,16 @@ love
           <input type="range" id="clkH" min="50" max="260" step="1" value="100" oninput="document.getElementById('clkHVal').textContent=this.value;requestDraw()">
           <label>时钟整体宽度: <span id="clkWVal">100</span>%</label>
           <input type="range" id="clkW" min="50" max="140" step="1" value="100" oninput="document.getElementById('clkWVal').textContent=this.value;requestDraw()">
-          <label>实验性纵向缩放（非 iOS 原生）: <span id="clkStretchVal">100</span>%</label>
+          <label>纵向拉伸: <span id="clkStretchVal">100</span>%</label>
           <input type="range" id="clkStretch" min="70" max="220" step="1" value="100" oninput="document.getElementById('clkStretchVal').textContent=this.value;requestDraw()">
-          <div class="hint">「时钟高度」模拟 iOS 大时钟的纵向比例；「实验性纵向缩放」会直接压扁/拉长字形，属于自定义扩展，并非苹果系统内部实现。</div>
+          <div class="hint">「时钟高度」调整整体纵向比例（含玻璃底板）；「纵向拉伸」直接拉长/压扁数字字形并同步底板高度，对应 iOS 26 时钟字形的纵向伸缩观感，两者可叠加。</div>
           <button class="clk-reset" style="margin-top:6px" onclick="resetClockSize()">恢复默认尺寸</button>
         </div>
 
         <!-- ③ 玻璃效果 -->
         <div class="clk-sub" id="clkGlassHdr">③ 玻璃效果</div>
         <div id="clkGlassBox">
-          <div class="checkbox-row"><input type="checkbox" id="clkGlass" checked onchange="requestDraw()"><span>启用液态玻璃</span></div>
+          <div class="checkbox-row"><input type="checkbox" id="clkGlass" onchange="requestDraw()"><span>玻璃底板（可选叠加；iOS 26 原版为纯玻璃数字）</span></div>
           <label>玻璃透明度: <span id="clkGlassOpVal">55</span>%</label>
           <input type="range" id="clkGlassOp" min="0" max="100" value="55" oninput="document.getElementById('clkGlassOpVal').textContent=this.value;requestDraw()">
           <label>背景模糊程度: <span id="clkGlassBlurVal">45</span>%</label>
@@ -3697,7 +3697,7 @@ function clkSaturate(hex,sat){
 const CLK_MODE_DEFAULTS={
   classic:{font:"system",weight:700,size:18,spacing:0,alpha:100,x:50,y:20,tintSat:100},
   glass:{font:"system",weight:600,size:18,spacing:0,h:100,w:100,stretch:100,alpha:100,x:50,y:20,
-         glass:true,glassOp:55,glassBlur:45,glassHi:55,glassEdge:50,glassTint:"#cfe0ff",clarity:85,glassAmt:100,tintSat:100},
+         glass:false,glassOp:55,glassBlur:45,glassHi:55,glassEdge:50,glassTint:"#cfe0ff",clarity:85,glassAmt:100,tintSat:100},
   compact:{font:"system",cmpSize:5,cmpGap:12,cmpX:50,cmpY:14,cmpOp:75,weight:600,alpha:100}
 };
 // 模式 → 控件 id 映射。经典模式的时间字号/X/Y 仍复用旧的 lockTimeSize/lockTimeX/lockTimeY，
@@ -4027,7 +4027,7 @@ function clkRoundedPath(x,y,w,h,r){
   p.closePath();
   return p;
 }
-// 玻璃底板：只对时钟本体生效 —— 采样时钟背后的画面、真实模糊、加色调与高光，再按透明度贴回
+// 玻璃底板（对齐苹果 Liquid Glass）：模糊+饱和背景 → 边缘折射透镜环 → 自适应阴影 → 色调 → 高光系统
 function clkGlassPlate(cx,cy,pw,ph,opt){
   pw=Math.max(4,Math.round(pw));ph=Math.max(4,Math.round(ph));
   const rx=Math.round(cx-pw/2),ry=Math.round(cy-ph/2);
@@ -4035,62 +4035,263 @@ function clkGlassPlate(cx,cy,pw,ph,opt){
   const ex=Math.min(c.width,rx+pw),ey=Math.min(c.height,ry+ph);
   if(ex-sx<2||ey-sy<2)return;
   const rad=Math.min(ph*0.42,pw*0.28);
+  const edge=Math.max(0,Math.min(1,opt.edge||0));
+  const hi=Math.max(0,Math.min(1,opt.hi||0));
+  const amt=Math.max(0,Math.min(1,opt.amt==null?1:opt.amt));
+  const gop=Math.max(0,Math.min(1,opt.gop==null?0.55:opt.gop));
+  // 折射环：中心弱、边缘强的透镜弯折（WWDC25 Liquid Glass 的核心观感）
+  const band=Math.max(2,Math.min(ph,pw)*0.13)*(0.45+0.55*edge)*amt;
+  const E=Math.max(2,band*0.9);
+  // 背景取样区（含折射外扩余量）
+  const tsx=Math.max(0,sx-E),tsy=Math.max(0,sy-E);
+  const tex=Math.min(c.width,ex+E),tey=Math.min(c.height,ey+E);
+  const tw=Math.round(tex-tsx),th=Math.round(tey-tsy);
+  if(tw<2||th<2)return;
   const tmp=document.createElement("canvas");
-  tmp.width=Math.round(ex-sx);tmp.height=Math.round(ey-sy);
+  tmp.width=tw;tmp.height=th;
   const t=tmp.getContext("2d");
-  if(opt.blur>0.4){
-    t.save();
-    t.beginPath();t.rect(0,0,tmp.width,tmp.height);t.clip();
-    try{t.filter=`blur(${opt.blur.toFixed(2)}px)`;}catch(e){}
-    t.drawImage(c,sx,sy,tmp.width,tmp.height,0,0,tmp.width,tmp.height);
-    t.restore();
-  }else{
-    t.drawImage(c,sx,sy,tmp.width,tmp.height,0,0,tmp.width,tmp.height);
-  }
-  // 色调
+  // ① 背景：真实高斯模糊 + 苹果材质级饱和度/亮度（Regular 材质 = blur + saturate + brightness）
+  t.save();
+  t.beginPath();t.rect(0,0,tw,th);t.clip();
+  try{t.filter=`blur(${(opt.blur||0).toFixed(2)}px) saturate(${(155+75*gop).toFixed(0)}%) brightness(${(1+0.06*gop).toFixed(3)})`;}catch(e){}
+  t.drawImage(c,tsx,tsy,tw,th,0,0,tw,th);
+  t.restore();
+  // ② 色调：冷调 tint 均匀混合 + 顶部受光提亮（tint 按背景亮度映射，禁止不透明填充）
   const [tr,tg,tb]=clkColorHex(opt.tint);
   t.save();
   t.globalCompositeOperation="source-atop";
   if(opt.tintA>0.002){
-    const g=t.createLinearGradient(0,0,tmp.width,tmp.height);
-    g.addColorStop(0,`rgba(${tr},${tg},${tb},${(opt.tintA*1.15).toFixed(3)})`);
-    g.addColorStop(0.5,`rgba(255,255,255,${(opt.tintA*0.5).toFixed(3)})`);
-    g.addColorStop(1,`rgba(${tr},${tg},${tb},${(opt.tintA*0.9).toFixed(3)})`);
-    t.fillStyle=g;t.fillRect(0,0,tmp.width,tmp.height);
+    const g=t.createLinearGradient(0,0,0,th);
+    g.addColorStop(0,`rgba(${tr},${tg},${tb},${(opt.tintA*1.05).toFixed(3)})`);
+    g.addColorStop(0.55,`rgba(${tr},${tg},${tb},${(opt.tintA*0.72).toFixed(3)})`);
+    g.addColorStop(1,`rgba(${tr},${tg},${tb},${(opt.tintA*0.92).toFixed(3)})`);
+    t.fillStyle=g;t.fillRect(0,0,tw,th);
+    const g2=t.createLinearGradient(0,0,0,th*0.5);
+    g2.addColorStop(0,`rgba(255,255,255,${(opt.tintA*0.5).toFixed(3)})`);
+    g2.addColorStop(1,"rgba(255,255,255,0)");
+    t.fillStyle=g2;t.fillRect(0,0,tw,th);
   }
   t.restore();
   const plate=clkRoundedPath(rx,ry,pw,ph,rad);
+  // ③ 自适应阴影：压在亮处变浅、暗处变深 → 用中性偏低的黑，随玻璃强度走
+  if(opt.alpha>0.05){
+    ctx.save();
+    ctx.shadowColor=`rgba(0,0,0,${(0.32*amt).toFixed(3)})`;
+    ctx.shadowBlur=Math.max(6,ph*0.30);
+    ctx.shadowOffsetY=Math.max(2,ph*0.07);
+    ctx.fillStyle="rgba(0,0,0,0.001)";
+    ctx.fill(plate);
+    ctx.restore();
+  }
+  // ④ 底板 + 边缘折射环（把「比底板更大一圈」的背景压进边缘 = 外侧内容被透镜拉入）
   ctx.save();
   ctx.globalAlpha=opt.alpha;
   ctx.clip(plate);
-  ctx.drawImage(tmp,rx,ry);
+  ctx.drawImage(tmp,tsx,tsy);
+  if(band>1.5){
+    const inner=clkRoundedPath(rx+band,ry+band,Math.max(1,pw-band*2),Math.max(1,ph-band*2),Math.max(1,rad-band));
+    const ring=new Path2D();
+    ring.addPath(plate);ring.addPath(inner);
+    ctx.save();
+    ctx.clip(ring,"evenodd");
+    ctx.drawImage(tmp,rx-tsx,ry-tsy,pw+E*2,ph+E*2,rx,ry,pw,ph);
+    ctx.restore();
+  }
   ctx.restore();
-  // 高光
-  if(opt.hi>0.02){
+  // ⑤ 高光系统：顶部内高光 + 镜面热点（光源右上 pow 聚焦）+ 底部微亮
+  if(hi>0.02){
     ctx.save();
     ctx.clip(plate);
-    const hg=ctx.createLinearGradient(rx,ry,rx+pw*0.7,ry+ph);
-    hg.addColorStop(0,`rgba(255,255,255,${(0.26*opt.hi).toFixed(3)})`);
-    hg.addColorStop(0.35,`rgba(255,255,255,0)`);
-    ctx.fillStyle=hg;
-    ctx.fillRect(rx,ry,pw,ph);
+    const hg=ctx.createLinearGradient(0,ry,0,ry+ph);
+    hg.addColorStop(0,`rgba(255,255,255,${(0.40*hi*amt).toFixed(3)})`);
+    hg.addColorStop(0.16,`rgba(255,255,255,${(0.10*hi*amt).toFixed(3)})`);
+    hg.addColorStop(0.5,`rgba(255,255,255,0)`);
+    hg.addColorStop(0.9,`rgba(255,255,255,0)`);
+    hg.addColorStop(1,`rgba(255,255,255,${(0.12*hi*amt).toFixed(3)})`);
+    ctx.fillStyle=hg;ctx.fillRect(rx,ry,pw,ph);
+    const hxp=rx+pw*0.60,hyp=ry+ph*0.26,hr=Math.max(pw,ph)*0.5;
+    const rg=ctx.createRadialGradient(hxp,hyp,0,hxp,hyp,hr);
+    rg.addColorStop(0,`rgba(255,255,255,${(0.40*hi*amt).toFixed(3)})`);
+    rg.addColorStop(0.5,`rgba(255,255,255,${(0.10*hi*amt).toFixed(3)})`);
+    rg.addColorStop(1,"rgba(255,255,255,0)");
+    ctx.fillStyle=rg;ctx.fillRect(rx,ry,pw,ph);
     ctx.restore();
   }
-  // 边缘折射：外亮边 + 顶部内高光
-  if(opt.edge>0.02){
+  // ⑥ 外缘亮环（Fresnel）+ 底部内暗边（玻璃厚度）+ 顶部内侧细亮弧
+  ctx.save();
+  const lw=Math.max(1,Math.min(pw,ph)*0.012);
+  ctx.lineWidth=lw;
+  ctx.strokeStyle=`rgba(255,255,255,${Math.min(0.85,(0.16+0.34*edge)*amt).toFixed(3)})`;
+  ctx.stroke(clkRoundedPath(rx+lw/2,ry+lw/2,pw-lw,ph-lw,rad));
+  if(edge>0.02){
     ctx.save();
-    ctx.lineWidth=Math.max(1,ph*0.012);
-    const eg=ctx.createLinearGradient(rx,ry,rx,ry+ph);
-    eg.addColorStop(0,`rgba(255,255,255,${(0.62*opt.edge*opt.amt).toFixed(3)})`);
-    eg.addColorStop(0.5,`rgba(255,255,255,${(0.1*opt.edge*opt.amt).toFixed(3)})`);
-    eg.addColorStop(1,`rgba(${tr},${tg},${tb},${(0.42*opt.edge*opt.amt).toFixed(3)})`);
-    ctx.strokeStyle=eg;
-    ctx.stroke(clkRoundedPath(rx+ctx.lineWidth/2,ry+ctx.lineWidth/2,pw-ctx.lineWidth,ph-ctx.lineWidth,rad));
-    ctx.lineWidth=Math.max(1,ph*0.008);
-    ctx.strokeStyle=`rgba(255,255,255,${(0.45*opt.edge*opt.amt*opt.hi).toFixed(3)})`;
-    ctx.stroke(clkRoundedPath(rx+ph*0.04,ry+ph*0.04,pw-ph*0.08,ph*0.5,rad*0.8));
+    ctx.clip(plate);
+    ctx.lineWidth=Math.max(1.5,ph*0.022);
+    ctx.strokeStyle=`rgba(0,0,0,${(0.12*edge*amt).toFixed(3)})`;
+    ctx.stroke(plate);
+    ctx.lineWidth=Math.max(1,ph*0.010);
+    ctx.strokeStyle=`rgba(255,255,255,${(0.5*edge*hi*amt).toFixed(3)})`;
+    ctx.stroke(clkRoundedPath(rx+ph*0.045,ry+ph*0.045,pw-ph*0.09,ph*0.5,rad*0.8));
     ctx.restore();
   }
+  ctx.restore();
+}
+
+// 液态玻璃数字（iOS 26：时钟数字本体由液态玻璃打造 —— 字内透出折射壁纸、边缘透镜环、镜面内描边）
+function clkGlassText(str,cx,cy,opt){
+  const fs=opt.fs,weight=opt.weight,css=opt.css,sp=opt.sp;
+  const sx=opt.sx,sy=opt.sy;
+  const alpha=Math.max(0,Math.min(1,opt.alpha));
+  const hi=Math.max(0,Math.min(1,opt.hi));
+  const edge=Math.max(0,Math.min(1,opt.edge));
+  const amt=Math.max(0,Math.min(1,opt.amt));
+  const clarity=Math.max(0,Math.min(1,opt.clarity));
+  const gop=Math.max(0,Math.min(1,opt.gop==null?0.55:opt.gop));
+  if(alpha<=0.005||amt<=0.01)return;
+  // 世界坐标包围盒（含安全边距，容纳描边与阴影）
+  ctx.save();
+  ctx.font=`${weight} ${fs}px ${css}`;
+  let meas=0;
+  for(let i=0;i<str.length;i++)meas+=ctx.measureText(str[i]).width;
+  meas+=sp*Math.max(0,str.length-1);
+  ctx.restore();
+  const bw=Math.max(6,Math.ceil((meas+fs*0.6)*sx));
+  const bh=Math.max(6,Math.ceil(fs*1.8*sy));
+  const bx=Math.round(cx-bw/2),by=Math.round(cy-bh/2);
+  const setFont=(g)=>{g.textAlign="center";g.textBaseline="middle";g.font=`${weight} ${fs}px ${css}`;};
+  const fillG=(g)=>{
+    const total=(function(){let w=0;for(let i=0;i<str.length;i++)w+=g.measureText(str[i]).width;return w+sp*Math.max(0,str.length-1);})();
+    let x=-total/2;const prev=g.textAlign;g.textAlign="left";
+    for(let i=0;i<str.length;i++){const ch=str[i];const w=g.measureText(ch).width;g.fillText(ch,x,0);x+=w+sp;}
+    g.textAlign=prev;
+  };
+  const strokeG=(g)=>{
+    const total=(function(){let w=0;for(let i=0;i<str.length;i++)w+=g.measureText(str[i]).width;return w+sp*Math.max(0,str.length-1);})();
+    let x=-total/2;const prev=g.textAlign;g.textAlign="left";
+    for(let i=0;i<str.length;i++){const ch=str[i];const w=g.measureText(ch).width;g.strokeText(ch,x,0);x+=w+sp;}
+    g.textAlign=prev;
+  };
+  // ① 字形 mask
+  const MK=document.createElement("canvas");MK.width=bw;MK.height=bh;
+  const mk=MK.getContext("2d");
+  mk.translate(bw/2,bh/2);mk.scale(sx,sy);setFont(mk);
+  mk.fillStyle="#fff";fillG(mk);
+  // ② 字内内容：壁纸（模糊+饱和+亮度）+ 低清晰度时的白雾
+  const CT=document.createElement("canvas");CT.width=bw;CT.height=bh;
+  const ct=CT.getContext("2d");
+  const blur=Math.max(0,(opt.blur||0)+(1-clarity)*fs*0.05);
+  const worldDraw=(g,srcE)=>{
+    const sxs=Math.max(0,bx-srcE),sys=Math.max(0,by-srcE);
+    const sxe=Math.min(c.width,bx+bw+srcE),sye=Math.min(c.height,by+bh+srcE);
+    if(sxe<=sxs||sye<=sys)return;
+    const dx=sxs-(bx-srcE),dy=sys-(by-srcE);
+    g.save();
+    g.beginPath();g.rect(0,0,bw,bh);g.clip();
+    try{g.filter=`blur(${blur.toFixed(2)}px) saturate(${(165+75*gop).toFixed(0)}%) brightness(${(1+0.05*gop).toFixed(3)})`;}catch(e){}
+    g.drawImage(c,sxs,sys,sxe-sxs,sye-sys,dx,dy,sxe-sxs,sye-sys);
+    g.restore();
+  };
+  worldDraw(ct,0);
+  if(clarity<0.999){
+    ct.fillStyle=`rgba(255,255,255,${((1-clarity)*0.30).toFixed(3)})`;
+    ct.fillRect(0,0,bw,bh);
+  }
+  // 轻微冷调 tint
+  const [tr2,tg2,tb2]=clkColorHex(opt.tint||"#ffffff");
+  ct.save();
+  ct.globalCompositeOperation="source-atop";
+  ct.fillStyle=`rgba(${tr2},${tg2},${tb2},${(0.12*amt).toFixed(3)})`;
+  ct.fillRect(0,0,bw,bh);
+  ct.restore();
+  // ③ 边缘透镜环：把字形轮廓带上「更大一圈」的壁纸（外侧内容被拉入字内）
+  if(edge>0.02){
+    const B=Math.max(1.2,Math.min(fs*0.10,bw*0.12));
+    const E=Math.max(1.5,fs*0.15*(0.35+0.65*edge)*amt);
+    const BK=document.createElement("canvas");BK.width=bw;BK.height=bh;
+    const bk=BK.getContext("2d");
+    bk.translate(bw/2,bh/2);bk.scale(sx,sy);setFont(bk);
+    bk.lineWidth=(B*2)/((sx+sy)/2);
+    bk.strokeStyle="#fff";strokeG(bk);
+    const SC=document.createElement("canvas");SC.width=bw;SC.height=bh;
+    const sc=SC.getContext("2d");
+    const esx=Math.max(0,bx-E),esy=Math.max(0,by-E);
+    const sex=Math.min(c.width,bx+bw+E),sey=Math.min(c.height,by+bh+E);
+    if(sex>esx&&sey>esy){
+      sc.save();
+      sc.beginPath();sc.rect(0,0,bw,bh);sc.clip();
+      try{sc.filter=`blur(${(blur*0.8).toFixed(2)}px) saturate(${(165+75*gop).toFixed(0)}%)`;}catch(e){}
+      sc.drawImage(c,esx,esy,sex-esx,sey-esy,esx-(bx-E),esy-(by-E),sex-esx,sey-esy);
+      sc.restore();
+      sc.globalCompositeOperation="destination-in";
+      sc.drawImage(BK,0,0);
+      ct.drawImage(SC,0,0);
+    }
+  }
+  // ③b 内部提亮（screen）：玻璃透光后整体比背景略亮，保证深色壁纸下数字清晰可读
+  ct.save();
+  ct.globalCompositeOperation="screen";
+  const iv=ct.createLinearGradient(0,0,0,bh);
+  iv.addColorStop(0,`rgba(255,255,255,${(0.22*amt).toFixed(3)})`);
+  iv.addColorStop(0.55,`rgba(255,255,255,${(0.10*amt).toFixed(3)})`);
+  iv.addColorStop(1,`rgba(255,255,255,${(0.16*amt).toFixed(3)})`);
+  ct.fillStyle=iv;ct.fillRect(0,0,bw,bh);
+  ct.restore();
+  // ④ 裁进字形内部
+  ct.globalCompositeOperation="destination-in";
+  ct.drawImage(MK,0,0);
+  // ⑤ 顶部受光 + 底部暗收（玻璃厚度感）
+  ct.globalCompositeOperation="source-atop";
+  const lg=ct.createLinearGradient(0,0,0,bh);
+  lg.addColorStop(0,`rgba(255,255,255,${(0.34*hi*amt).toFixed(3)})`);
+  lg.addColorStop(0.4,`rgba(255,255,255,${(0.06*hi*amt).toFixed(3)})`);
+  lg.addColorStop(1,`rgba(0,0,0,${(0.10*hi*amt).toFixed(3)})`);
+  ct.fillStyle=lg;ct.fillRect(0,0,bw,bh);
+  ct.globalCompositeOperation="source-over";
+  // ⑥ 内缘镜面描边：顶亮/中收/底再亮的方向性镜面（溢出部分最后再裁掉）
+  ct.save();
+  ct.translate(bw/2,bh/2);ct.scale(sx,sy);setFont(ct);
+  ct.lineWidth=Math.max(1,fs*0.034)/((sx+sy)/2);
+  const rim=ct.createLinearGradient(0,-fs/2,0,fs/2);
+  rim.addColorStop(0,`rgba(255,255,255,${(0.92*hi*amt).toFixed(3)})`);
+  rim.addColorStop(0.5,`rgba(255,255,255,${(0.26*hi*amt).toFixed(3)})`);
+  rim.addColorStop(1,`rgba(255,255,255,${(0.66*hi*amt).toFixed(3)})`);
+  ct.strokeStyle=rim;
+  strokeG(ct);
+  ct.restore();
+  ct.globalCompositeOperation="destination-in";
+  ct.drawImage(MK,0,0);
+  ct.globalCompositeOperation="source-over";
+  // ⑥b 外缘折射亮环：字形外侧半圈镜面勾边，让数字从壁纸上"浮"出来
+  const OX=document.createElement("canvas");OX.width=bw;OX.height=bh;
+  const ox=OX.getContext("2d");
+  ox.translate(bw/2,bh/2);ox.scale(sx,sy);setFont(ox);
+  ox.lineWidth=Math.max(1.2,fs*0.048)/((sx+sy)/2);
+  const rim2=ox.createLinearGradient(0,-fs/2,0,fs/2);
+  rim2.addColorStop(0,`rgba(255,255,255,${(0.58*hi*amt).toFixed(3)})`);
+  rim2.addColorStop(0.5,`rgba(255,255,255,${(0.13*hi*amt).toFixed(3)})`);
+  rim2.addColorStop(1,`rgba(255,255,255,${(0.36*hi*amt).toFixed(3)})`);
+  ox.strokeStyle=rim2;
+  strokeG(ox);
+  ox.setTransform(1,0,0,1,0,0);
+  ox.globalCompositeOperation="destination-out";
+  ox.drawImage(MK,0,0);
+  // ⑦ 自适应阴影：用 mask 投影后把本体挖掉，只留阴影（数字保持真透明）
+  const SH=document.createElement("canvas");SH.width=bw;SH.height=bh;
+  const sh=SH.getContext("2d");
+  sh.shadowColor=`rgba(0,0,0,${Math.max(0,Math.min(1,opt.shOp||0)).toFixed(3)})`;
+  sh.shadowBlur=fs*(opt.shBlurR==null?0.5:opt.shBlurR);
+  sh.shadowOffsetY=fs*0.03;
+  sh.drawImage(MK,0,0);
+  sh.globalCompositeOperation="destination-out";
+  sh.drawImage(MK,0,0);
+  // ⑧ 贴回：先阴影，再外缘亮环，最后玻璃数字
+  ctx.save();
+  ctx.globalAlpha=1;
+  ctx.drawImage(SH,bx,by);
+  ctx.globalAlpha=alpha;
+  ctx.drawImage(OX,bx,by);
+  ctx.drawImage(CT,bx,by);
+  ctx.restore();
 }
 
 function drawLockScreen(){
@@ -4169,8 +4370,9 @@ function drawLockScreen(){
   ctx.textAlign="center";ctx.textBaseline="middle";
   ctx.font=`${weight} ${fs}px ${f.css}`;
   const tW=clkMeasure(time,sp);
-  const plateW=(tW*wScale*stretch)+fs*0.7;
-  const plateH=fs*1.08*hScale+fs*0.42;
+  // 对齐 iOS 26：拉伸只作用于纵向 —— 宽度只由「时钟整体宽度」决定，高度×拉伸共同决定字形与底板高度
+  const plateW=(tW*wScale)+fs*0.7;
+  const plateH=fs*1.08*hScale*stretch+fs*0.42;
   const dateSize=Math.max(9,Math.floor(fs*0.2));
   const dateY=cy-((plateH/2)+dateSize*0.85);
 
@@ -4186,58 +4388,44 @@ function drawLockScreen(){
     ctx.restore();
   }
 
-  // 玻璃底板
-  if(isGlass){
-    const on=clkValIn("glass","glass");
-    const amt=Math.max(0,Math.min(1,(clkValIn("glass","glassAmt")||0)/100));
-    if(on&&amt>0.01){
-      const gop=Math.max(0,Math.min(1,(clkValIn("glass","glassOp")||0)/100));
-      clkGlassPlate(cx,cy,plateW,plateH,{
-        blur:fs*((clkValIn("glass","glassBlur")||0)/100)*0.14,
-        tint:clkSaturate(clkValIn("glass","glassTint")||"#cfe0ff",clkN("glass","tintSat",100)),
-        tintA:gop*0.42*amt,
-        alpha:Math.min(1,gop*1.25*amt),
-        hi:(clkValIn("glass","glassHi")||0)/100,
-        edge:(clkValIn("glass","glassEdge")||0)/100,
-        amt:amt
-      });
-    }
+  // 玻璃参数（底板与玻璃数字共用）
+  const gOn=isGlass&&!!clkValIn("glass","glass");
+  const gAmt=isGlass?Math.max(0,Math.min(1,(clkValIn("glass","glassAmt")||0)/100)):0;
+  const gOp=isGlass?Math.max(0,Math.min(1,(clkValIn("glass","glassOp")||0)/100)):0;
+  const gHi=isGlass?Math.max(0,Math.min(1,(clkValIn("glass","glassHi")||0)/100)):0;
+  const gEdge=isGlass?Math.max(0,Math.min(1,(clkValIn("glass","glassEdge")||0)/100)):0;
+  const gClarity=isGlass?Math.max(0,Math.min(1,(clkValIn("glass","clarity")||0)/100)):1;
+  const gBlur=isGlass?((clkValIn("glass","glassBlur")||0)/100):0;
+  const gTint=clkSaturate(clkValIn("glass","glassTint")||"#cfe0ff",clkN("glass","tintSat",100));
+
+  // 玻璃底板（可选叠加；iOS 26 原版为纯玻璃数字）
+  if(gOn&&gAmt>0.01){
+    clkGlassPlate(cx,cy,plateW,plateH,{
+      blur:fs*gBlur*0.20,
+      tint:gTint,
+      tintA:gOp*0.42*gAmt,
+      alpha:Math.min(1,gOp*1.25*gAmt),
+      hi:gHi,
+      edge:gEdge,
+      amt:gAmt,
+      gop:gOp
+    });
   }
 
-  // 时间数字
-  ctx.save();
-  ctx.translate(cx,cy);
-  ctx.scale(wScale*stretch,hScale*stretch);
-  if(isGlass){
-    const clarity=Math.max(0,Math.min(1,(clkValIn("glass","clarity")||0)/100));
-    const hi=(clkValIn("glass","glassHi")||0)/100;
-    const amt=(clkValIn("glass","glassAmt")||0)/100;
-    if(clarity<0.999){
-      ctx.save();
-      try{ctx.filter=`blur(${(fs*0.045*(1-clarity)).toFixed(2)}px)`;}catch(e){}
-      ctx.globalAlpha=alphaBase*(0.28+0.45*(1-clarity));
-      ctx.fillStyle=color;
-      clkFillSpaced(time,0,0,sp);
-      ctx.restore();
-    }
-    ctx.save();
-    ctx.globalAlpha=alphaBase;
-    ctx.fillStyle=color;
-    ctx.shadowColor=`rgba(0,0,0,${shOp*0.85})`;
-    ctx.shadowBlur=fs*shBlurRatio*(0.4+0.6*(1-clarity));
-    clkFillSpaced(time,0,0,sp);
+  // 时间数字：glass 模式下数字本体即液态玻璃（iOS 26 —— 壁纸折射进字里）
+  if(isGlass&&gAmt>0.01){
     ctx.restore();
-    if(hi>0.02&&amt>0.02){
-      ctx.save();
-      ctx.globalAlpha=alphaBase*0.45*hi*amt;
-      ctx.lineWidth=Math.max(0.6,fs*0.006);
-      ctx.strokeStyle="rgba(255,255,255,0.9)";
-      ctx.shadowColor="rgba(255,255,255,0.85)";
-      ctx.shadowBlur=fs*0.03*hi;
-      ctx.strokeText(time,0,0);
-      ctx.restore();
-    }
+    clkGlassText(time,cx,cy,{
+      fs:fs,weight:weight,css:f.css,sp:sp,
+      sx:wScale,sy:hScale*stretch,
+      alpha:alphaBase,hi:gHi,edge:gEdge,amt:gAmt,clarity:gClarity,gop:gOp,
+      tint:gTint,blur:fs*gBlur*0.10,
+      shOp:shOp*0.85,shBlurR:shBlurRatio*0.7
+    });
   }else{
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.scale(wScale,hScale*stretch);
     ctx.save();
     ctx.globalAlpha=alphaBase;
     ctx.fillStyle=color;
@@ -4245,9 +4433,9 @@ function drawLockScreen(){
     ctx.shadowBlur=fs*shBlurRatio;
     clkFillSpaced(time,0,0,sp);
     ctx.restore();
+    ctx.restore();
+    ctx.restore();
   }
-  ctx.restore();
-  ctx.restore();
 
   pushTextHit("lockTime",cx,cy,Math.max(plateW,c.width*0.3),Math.max(plateH,fs*1.2));
   drawLockButtons(color);
@@ -4792,7 +4980,7 @@ function applySettings(s){
   set("clkColor",s.clkColor||s.lockColor||"#ffffff");
   set("clkAlpha",s.clkAlpha||"100");
   set("clkX",s.clkX||"50");set("clkY",s.clkY||"20");
-  chk("clkGlass",s.clkGlass!==false);
+  chk("clkGlass",s.clkGlass===true);
   set("clkGlassOp",s.clkGlassOp||"55");set("clkGlassBlur",s.clkGlassBlur||"45");
   set("clkGlassHi",s.clkGlassHi||"55");set("clkGlassEdge",s.clkGlassEdge||"50");
   set("clkGlassTint",s.clkGlassTint||"#cfe0ff");
