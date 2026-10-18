@@ -94,6 +94,26 @@ input[type=file]{font-size:11px}
 .ms-btn{background:#3a2a4a;border-color:#5a3a6a;color:#e8d8f8}
 .ms-btn:hover{background:#4a3a5a}
 
+/* ===== 时钟样式实验室（锁屏模板） ===== */
+.clk-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:#15151c;border:1px solid #2a2a35;border-radius:9px;padding:4px;margin:6px 0 10px}
+.clk-tab{border:none;background:transparent;color:#8b8b95;font-size:11px;line-height:1.35;padding:8px 2px;border-radius:6px;margin:0;text-align:center;transition:background .15s,color .15s}
+.clk-tab:hover{background:#22222b;color:#cfcfd6}
+.clk-tab.active{background:var(--accent);color:#1a1a1a;font-weight:700}
+.clk-pane{display:none}
+.clk-pane.active{display:block}
+.clk-sub{font-size:11px;font-weight:600;color:#c9b38a;margin:14px 0 2px;padding-top:8px;border-top:1px solid #2a2a35;letter-spacing:.5px}
+.clk-fonts{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:6px 0}
+.clk-font{display:block;width:100%;margin:0;padding:7px 6px 6px;background:#1a1a22;border:1px solid #33333f;border-radius:8px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;overflow:hidden}
+.clk-font:hover{background:#22222c;border-color:#4a4a58}
+.clk-font.active{border-color:var(--accent);background:rgba(201,163,124,.12)}
+.clk-font b{display:block;font-size:19px;line-height:1.25;color:#fff;font-weight:400;white-space:nowrap;font-variant-numeric:tabular-nums}
+.clk-font span{display:block;font-size:9.5px;color:#7f7f8a;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clk-font.active span{color:var(--accent)}
+.clk-reset{background:#2a2a35;border-color:#3f3f4c;color:#cfcfd6}
+.clk-presets{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.clk-presets button{margin:0;font-size:11px;padding:8px 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clk-presets button.wide{grid-column:span 2}
+
 /* STEPS */
 .steps-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px;margin-top:8px}
 .step{position:relative;padding-left:20px}
@@ -135,6 +155,7 @@ input[type=file]{font-size:11px}
   .stage{height:45vh}
   button,select,input[type=text],input[type=number],textarea{font-size:13px;padding:10px}
   .preset-grid{grid-template-columns:1fr 1fr;gap:6px}
+  .clk-fonts{grid-template-columns:1fr 1fr}
   .footer-cols{gap:32px}
   /* 单列网格在窄屏下用 1fr 撑满，避免 minmax 下限 > 可用宽度导致右侧留白 */
   .features-grid{grid-template-columns:1fr;gap:14px}
@@ -151,6 +172,8 @@ input[type=file]{font-size:11px}
   .container{padding:0 12px}
   .nav-inner{padding:0 12px}
   .feature{padding:16px}
+  .clk-tab{font-size:10px;padding:7px 1px}
+  .clk-font b{font-size:17px}
 }
 
 /* ===== 模板选择首页 ===== */
@@ -1047,12 +1070,12 @@ love
         </select>
         <label>背景图模糊强度: <span id="msBlurVal">12</span>px</label>
         <input type="range" id="msBlur" min="0" max="40" value="12" oninput="document.getElementById('msBlurVal').textContent=this.value;requestDraw()">
-        <label>暖金叠加强度: <span id="msWarmVal">55</span>%</label>
-        <input type="range" id="msWarm" min="0" max="100" value="55" oninput="document.getElementById('msWarmVal').textContent=this.value;requestDraw()">
+        <label>暖金叠加强度: <span id="msWarmVal">0</span>%</label>
+        <input type="range" id="msWarm" min="0" max="100" value="0" oninput="document.getElementById('msWarmVal').textContent=this.value;requestDraw()">
         <label>色温调节（左冷 → 右暖）: <span id="msToneVal">50</span></label>
         <input type="range" id="msTone" min="0" max="100" value="50" oninput="document.getElementById('msToneVal').textContent=this.value;requestDraw()">
-        <label>泛光强度: <span id="msFlareVal">35</span>%</label>
-        <input type="range" id="msFlare" min="0" max="100" value="35" oninput="document.getElementById('msFlareVal').textContent=this.value;requestDraw()">
+        <label>泛光强度: <span id="msFlareVal">0</span>%</label>
+        <input type="range" id="msFlare" min="0" max="100" value="0" oninput="document.getElementById('msFlareVal').textContent=this.value;requestDraw()">
         <div class="hint">泛黄主要来自「暖金叠加」+「右下泛光」。想清爽一点就把色温往左拉，或把叠加强度调低。</div>
 
         </div>
@@ -1143,7 +1166,7 @@ love
         </div>
         <label>时间/日期颜色</label>
         <input type="color" id="lockColor" value="#ffffff" onchange="requestDraw()">
-        <label>时间阴影透明度: <span id="lockShadowOpVal">40</span>%</label>
+        <label>阴影强度: <span id="lockShadowOpVal">40</span>%</label>
         <input type="range" id="lockShadowOp" min="0" max="100" value="40" oninput="document.getElementById('lockShadowOpVal').textContent=this.value;requestDraw()">
         <label>阴影模糊: <span id="lockShadowBlurVal">14</span></label>
         <input type="range" id="lockShadowBlur" min="0" max="50" value="14" oninput="document.getElementById('lockShadowBlurVal').textContent=this.value;requestDraw()">
@@ -1161,6 +1184,117 @@ love
         <div class="hint">彩色表情会自动栅格化为白色剪影</div>
         <div class="checkbox-row"><input type="checkbox" id="lockHomeBar" onchange="requestDraw()" checked><span>底部指示条</span></div>
 
+        </div>
+        <!-- ========== 时钟样式实验室（仅锁屏模板） ========== -->
+        <div class="tpl-sec" data-tpl="lock">
+        <h3 class="tool-h" style="margin-top:14px">⏱ 时钟样式实验室</h3>
+        <div class="clk-tabs">
+          <button class="clk-tab" data-clkmode="classic" onclick="setClockMode('classic')">经典字体</button>
+          <button class="clk-tab" data-clkmode="glass" onclick="setClockMode('glass')">iOS 26<br>液态玻璃</button>
+          <button class="clk-tab" data-clkmode="compact" onclick="setClockMode('compact')">iOS 27<br>紧凑时钟</button>
+        </div>
+        <input type="hidden" id="clkMode" value="classic">
+        <div class="hint" id="clkModeHint"></div>
+
+        <!-- ① 字体与字重 -->
+        <div class="clk-sub">① 字体与字重</div>
+        <div class="clk-fonts" id="clkFontGrid"></div>
+        <select id="clkFont" onchange="fontChanged(this)" style="display:none"><option value="system">Apple 系统风格</option></select>
+        <div id="clkWeightBox">
+          <label>字重: <span id="clkWeightVal">700</span></label>
+          <input type="range" id="clkWeight" min="100" max="900" step="100" value="700" oninput="document.getElementById('clkWeightVal').textContent=this.value;requestDraw()">
+          <button class="clk-reset" onclick="resetClockFont()">恢复默认字体</button>
+        </div>
+
+        <!-- ② 尺寸与拉伸 -->
+        <div class="clk-sub" id="clkSizeHdr">② 尺寸与拉伸</div>
+        <div id="clkSizeBox">
+          <label>数字字号: <span id="clkSizeVal">18</span>%</label>
+          <input type="range" id="clkSize" min="5" max="35" step="0.5" value="18" oninput="document.getElementById('clkSizeVal').textContent=this.value;requestDraw()">
+        </div>
+        <div id="clkClassicSizeBox" style="display:none">
+          <label>数字字号: <span id="lockTimeSizeVal">18</span>%</label>
+          <input type="range" id="lockTimeSize" min="5" max="35" value="18" oninput="document.getElementById('lockTimeSizeVal').textContent=this.value;requestDraw()">
+        </div>
+        <div id="clkSpacingBox">
+          <label>数字间距: <span id="clkSpacingVal">0</span></label>
+          <input type="range" id="clkSpacing" min="-8" max="24" step="0.5" value="0" oninput="document.getElementById('clkSpacingVal').textContent=this.value;requestDraw()">
+        </div>
+        <div id="clkStretchBox">
+          <label>时钟高度（纵向拉伸）: <span id="clkHVal">100</span>%</label>
+          <input type="range" id="clkH" min="50" max="260" step="1" value="100" oninput="document.getElementById('clkHVal').textContent=this.value;requestDraw()">
+          <label>时钟整体宽度: <span id="clkWVal">100</span>%</label>
+          <input type="range" id="clkW" min="50" max="140" step="1" value="100" oninput="document.getElementById('clkWVal').textContent=this.value;requestDraw()">
+          <label>实验性纵向缩放（非 iOS 原生）: <span id="clkStretchVal">100</span>%</label>
+          <input type="range" id="clkStretch" min="70" max="220" step="1" value="100" oninput="document.getElementById('clkStretchVal').textContent=this.value;requestDraw()">
+          <div class="hint">「时钟高度」模拟 iOS 大时钟的纵向比例；「实验性纵向缩放」会直接压扁/拉长字形，属于自定义扩展，并非苹果系统内部实现。</div>
+          <button class="clk-reset" style="margin-top:6px" onclick="resetClockSize()">恢复默认尺寸</button>
+        </div>
+
+        <!-- ③ 玻璃效果 -->
+        <div class="clk-sub" id="clkGlassHdr">③ 玻璃效果</div>
+        <div id="clkGlassBox">
+          <div class="checkbox-row"><input type="checkbox" id="clkGlass" checked onchange="requestDraw()"><span>启用液态玻璃</span></div>
+          <label>玻璃透明度: <span id="clkGlassOpVal">55</span>%</label>
+          <input type="range" id="clkGlassOp" min="0" max="100" value="55" oninput="document.getElementById('clkGlassOpVal').textContent=this.value;requestDraw()">
+          <label>背景模糊程度: <span id="clkGlassBlurVal">45</span>%</label>
+          <input type="range" id="clkGlassBlur" min="0" max="100" value="45" oninput="document.getElementById('clkGlassBlurVal').textContent=this.value;requestDraw()">
+          <label>高光强度: <span id="clkGlassHiVal">55</span>%</label>
+          <input type="range" id="clkGlassHi" min="0" max="100" value="55" oninput="document.getElementById('clkGlassHiVal').textContent=this.value;requestDraw()">
+          <label>边缘折射感: <span id="clkGlassEdgeVal">50</span>%</label>
+          <input type="range" id="clkGlassEdge" min="0" max="100" value="50" oninput="document.getElementById('clkGlassEdgeVal').textContent=this.value;requestDraw()">
+          <label>玻璃色调</label>
+          <input type="color" id="clkGlassTint" value="#cfe0ff" onchange="requestDraw()">
+          <label>玻璃色调饱和度: <span id="clkTintSatVal">100</span>%</label>
+          <input type="range" id="clkTintSat" min="0" max="100" value="100" oninput="document.getElementById('clkTintSatVal').textContent=this.value;requestDraw()">
+          <label>数字清晰度: <span id="clkClarityVal">85</span>%</label>
+          <input type="range" id="clkClarity" min="0" max="100" value="85" oninput="document.getElementById('clkClarityVal').textContent=this.value;requestDraw()">
+          <label>玻璃效果强度: <span id="clkGlassAmtVal">100</span>%</label>
+          <input type="range" id="clkGlassAmt" min="0" max="100" value="100" oninput="document.getElementById('clkGlassAmtVal').textContent=this.value;requestDraw()">
+        </div>
+
+        <!-- ④ 颜色与透明度 -->
+        <div class="clk-sub">④ 颜色与透明度</div>
+        <label>数字颜色</label>
+        <input type="color" id="clkColor" value="#ffffff" onchange="requestDraw()">
+        <label>数字透明度: <span id="clkAlphaVal">100</span>%</label>
+        <input type="range" id="clkAlpha" min="0" max="100" value="100" oninput="document.getElementById('clkAlphaVal').textContent=this.value;requestDraw()">
+
+        <!-- ⑤ 位置与布局 -->
+        <div class="clk-sub">⑤ 位置与布局</div>
+        <div id="clkPosBox">
+          <label>时钟 X: <span id="clkXVal">50</span>%</label>
+          <input type="range" id="clkX" min="0" max="100" value="50" oninput="document.getElementById('clkXVal').textContent=this.value;requestDraw()">
+          <label>时钟 Y: <span id="clkYVal">20</span>%</label>
+          <input type="range" id="clkY" min="0" max="100" value="20" oninput="document.getElementById('clkYVal').textContent=this.value;requestDraw()">
+        </div>
+        <div id="clkCompactBox" style="display:none">
+          <label>紧凑时钟字号: <span id="clkCmpSizeVal">5</span>%</label>
+          <input type="range" id="clkCmpSize" min="3" max="12" step="0.2" value="5" oninput="document.getElementById('clkCmpSizeVal').textContent=this.value;requestDraw()">
+          <label>时间与日期间距: <span id="clkCmpGapVal">1.2</span>%</label>
+          <input type="range" id="clkCmpGap" min="0" max="60" step="0.5" value="1.2" oninput="document.getElementById('clkCmpGapVal').textContent=this.value;requestDraw()">
+          <label>顶部区域 X: <span id="clkCmpXVal">50</span>%</label>
+          <input type="range" id="clkCmpX" min="0" max="100" value="50" oninput="document.getElementById('clkCmpXVal').textContent=this.value;requestDraw()">
+          <label>顶部区域 Y: <span id="clkCmpYVal">14</span>%</label>
+          <input type="range" id="clkCmpY" min="5" max="45" value="14" oninput="document.getElementById('clkCmpYVal').textContent=this.value;requestDraw()">
+          <label>紧凑模式透明度: <span id="clkCmpOpVal">75</span>%</label>
+          <input type="range" id="clkCmpOp" min="20" max="100" value="75" oninput="document.getElementById('clkCmpOpVal').textContent=this.value;requestDraw()">
+          <div class="checkbox-row"><input type="checkbox" id="clkCmpDate" checked onchange="requestDraw()"><span>日期与时间并排显示</span></div>
+          <label>日期颜色（勾选下方选项后生效）</label>
+          <input type="color" id="clkDateColor" value="#ffffff" onchange="requestDraw()">
+          <div class="checkbox-row"><input type="checkbox" id="clkDateUseOwn" onchange="requestDraw()"><span>日期使用独立颜色与透明度</span></div>
+        </div>
+        <!-- ⑥ 样式预设与恢复默认 -->
+        <div class="clk-sub">⑥ 样式预设与恢复默认</div>
+        <div class="clk-presets">
+          <button onclick="applyClockPreset('glass')">iOS 26 · 经典液态玻璃</button>
+          <button onclick="applyClockPreset('huge')">iOS 26 · 超大拉伸</button>
+          <button onclick="applyClockPreset('compact')">iOS 27 · 顶部紧凑</button>
+          <button onclick="applyClockPreset('thin')">极简细长体</button>
+          <button class="wide" onclick="applyClockPreset('serif')">艺术衬线体</button>
+        </div>
+        <button class="clk-reset" style="margin-top:6px" onclick="resetClockStyle()">恢复本模式默认样式</button>
+        <div class="hint">时钟可直接在画布上拖动；每种模式的参数互相独立，切换模式不会丢失。</div>
         </div>
         <!-- ========== 个人主页模板专属面板 ========== -->
         <div class="tpl-sec" data-tpl="profile">
@@ -2119,7 +2253,7 @@ function drawManuscriptTint(){
     const count=Math.max(500,Math.floor(c.width*c.height/6000));
     for(let i=0;i<count;i++){
       const g=Math.random()*60+100;
-      nctx.fillStyle=`rgb(${g},${g-10},${g-30})`;
+      nctx.fillStyle=`rgb(${g},${g},${g})`;
       nctx.globalAlpha=0.08;
       nctx.fillRect(Math.random()*c.width,Math.random()*c.height,1.5,1.5);
     }
@@ -2144,8 +2278,8 @@ function drawManuscriptTint(){
   if(document.getElementById("msInfoBar").checked){
     const barH=c.height*(parseInt(document.getElementById("msBarH").value)/100);
     const grad=ctx.createLinearGradient(0,barH-80,0,barH+30);
-    grad.addColorStop(0,"rgba(255,240,220,0)");
-    grad.addColorStop(1,"rgba(255,240,220,0.25)");
+    grad.addColorStop(0,"rgba(255,255,255,0)");
+    grad.addColorStop(1,"rgba(255,255,255,0.25)");
     ctx.fillStyle=grad;
     ctx.fillRect(0,barH-80,c.width,110);
   }
@@ -2541,6 +2675,15 @@ const dragMap={
   pfMusic:{xId:"pfMusicX",yId:"pfMusicY",xVal:"pfMusicXVal",yVal:"pfMusicYVal"},
   pfSign:{xId:"pfSignX",yId:"pfSignY",xVal:"pfSignXVal",yVal:"pfSignYVal"}
 };
+// 拖拽目标：时钟在紧凑模式下拖动顶部区域，其余模式拖动大时钟
+function dragTargetFor(id){
+  if(id==="lockTime"&&typeof clkMode==="function"){
+    const cm=clkMode();
+    if(cm==="compact")return {xId:"clkCmpX",yId:"clkCmpY",xVal:"clkCmpXVal",yVal:"clkCmpYVal"};
+    if(cm==="glass")return {xId:"clkX",yId:"clkY",xVal:"clkXVal",yVal:"clkYVal"};
+  }
+  return dragMap[id];
+}
 function pushTextHit(id,x,y,w,h){
   textHitRects.push({id,x,y,w,h});
 }
@@ -3442,73 +3585,617 @@ function drawCameraIcon(x,y,s,color){
   ctx.beginPath();ctx.arc(0,0,s*0.17,0,Math.PI*2);ctx.stroke();
   ctx.restore();
 }
+// ============ 锁屏时钟样式实验室 ============
+// 字体库：只声明真实存在且可加载的字体族。'system' 走设备系统字体栈（SF Pro / Helvetica Neue / 苹方），
+// 不是内嵌的苹果官方字体；其余为项目本地内置的开源字体（见 fonts.css），字重不足时由浏览器合成。
+const CLK_FONTS=[
+  {id:"system",name:"Apple 系统风格",css:"-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','PingFang SC',sans-serif",defW:700},
+  {id:"inter",name:"Inter 几何无衬线",css:"'Inter','Helvetica Neue',Arial,sans-serif",defW:600},
+  {id:"montserrat",name:"Montserrat 几何",css:"'Montserrat','Inter',Arial,sans-serif",defW:700},
+  {id:"poppins",name:"Poppins 圆润",css:"'Poppins','Montserrat',Arial,sans-serif",defW:600},
+  {id:"helvetica",name:"优雅细体 Helvetica",css:"'Helvetica Neue','Helvetica','Inter',sans-serif",defW:200},
+  {id:"bold",name:"现代粗体",css:"'Inter','Helvetica Neue',Arial,sans-serif",defW:800},
+  {id:"condensed",name:"窄体修长数字",css:"'Helvetica Neue','Arial Narrow',Arial,sans-serif",defW:400},
+  {id:"playfair",name:"Playfair 衬线",css:"'Playfair Display','EB Garamond',Georgia,serif",defW:400},
+  {id:"cormorant",name:"Cormorant 优雅衬线",css:"'Cormorant Garamond','Playfair Display',Georgia,serif",defW:400},
+  {id:"minimal",name:"极简细长体",css:"'Helvetica Neue','Inter',-apple-system,sans-serif",defW:100}
+];
+function clkFont(id){for(let i=0;i<CLK_FONTS.length;i++){if(CLK_FONTS[i].id===id)return CLK_FONTS[i];}return CLK_FONTS[0];}
+function clkNum(id){const el=document.getElementById(id);return el?parseFloat(el.value):0;}
+function clkChk(id){const el=document.getElementById(id);return !!(el&&el.checked);}
+function clkStr(id){const el=document.getElementById(id);return el?el.value:"";}
+function clkMode(){return clkStr("clkMode")||"classic";}
+function clkSetText(id,v){const el=document.getElementById(id+"Val");if(el)el.textContent=v;}
+function clkColorHex(hex){
+  const h=String(hex||"#ffffff").replace("#","");
+  const s=h.length===3?h.split("").map(function(c){return c+c;}).join(""):(h+"ffffff").slice(0,6);
+  return [parseInt(s.substr(0,2),16)||0,parseInt(s.substr(2,2),16)||0,parseInt(s.substr(4,2),16)||0];
+}
+
+// —— 每种模式各自的一套默认值（切换模式只换布局，不覆盖各模式自己的记录）——
+const CLK_MODE_DEFAULTS={
+  classic:{font:"system",weight:700,size:18,spacing:0,alpha:100,x:50,y:20,tintSat:100},
+  glass:{font:"system",weight:600,size:18,spacing:0,h:100,w:100,stretch:100,alpha:100,x:50,y:20,
+         glass:true,glassOp:55,glassBlur:45,glassHi:55,glassEdge:50,glassTint:"#cfe0ff",clarity:85,glassAmt:100,tintSat:100},
+  compact:{cmpSize:5,cmpGap:12,cmpX:50,cmpY:14,cmpOp:75,weight:600,alpha:100}
+};
+// 模式 → 控件 id 映射。经典模式的时间字号/X/Y 仍复用旧的 lockTimeSize/lockTimeX/lockTimeY，
+// 这样老的自动保存、预设槽、分享链接里的数值继续有效。
+const CLK_KEYS={
+  classic:{font:"clkFont",weight:"clkWeight",size:"lockTimeSize",spacing:"clkSpacing",alpha:"clkAlpha",x:"lockTimeX",y:"lockTimeY"},
+  glass:{font:"clkFont",weight:"clkWeight",size:"clkSize",spacing:"clkSpacing",h:"clkH",w:"clkW",stretch:"clkStretch",
+         alpha:"clkAlpha",x:"clkX",y:"clkY",glass:"clkGlass",glassOp:"clkGlassOp",glassBlur:"clkGlassBlur",glassHi:"clkGlassHi",
+         glassEdge:"clkGlassEdge",glassTint:"clkGlassTint",clarity:"clkClarity",glassAmt:"clkGlassAmt",tintSat:"clkTintSat"},
+  compact:{font:null,weight:"clkWeight",size:null,spacing:null,alpha:"clkAlpha",
+           cmpSize:"clkCmpSize",cmpGap:"clkCmpGap",cmpX:"clkCmpX",cmpY:"clkCmpY",cmpOp:"clkCmpOp"}
+};
+// 面板上“一个控件控制哪个模式”的白名单（其余模式隐藏时只能由绘制侧读默认值）
+const CLK_CTRL_MODE={
+  clkFont:["classic","glass"],clkWeight:["classic","glass","compact"],
+  clkSize:["glass"],clkSpacing:["classic","glass"],clkH:["glass"],clkW:["glass"],clkStretch:["glass"],
+  clkAlpha:["classic","glass","compact"],
+  clkX:["glass"],clkY:["glass"],
+  clkGlass:["glass"],clkGlassOp:["glass"],clkGlassBlur:["glass"],clkGlassHi:["glass"],clkGlassEdge:["glass"],
+  clkGlassTint:["glass"],clkClarity:["glass"],clkGlassAmt:["glass"],clkTintSat:["glass","classic"],
+  clkCmpSize:["compact"],clkCmpGap:["compact"],clkCmpX:["compact"],clkCmpY:["compact"],clkCmpOp:["compact"],clkCmpDate:["compact"],
+  clkDateColor:["compact"],clkDateUseOwn:["compact"]
+};
+// 每个模式“上次使用的值”：切换模式时保存，切回来时恢复
+const CLK_MEMORY={classic:null,glass:null,compact:null};
+function clkSnapshot(mode){
+  const keys=CLK_KEYS[mode],o={};
+  Object.keys(keys).forEach(function(k){
+    const id=keys[k];if(!id)return;
+    const el=document.getElementById(id);if(!el)return;
+    o[k]=el.type==="checkbox"?el.checked:el.value;
+    if(el.type==="color")o[k]=el.value;
+  });
+  if(mode==="compact"){o.cmpDate=clkChk("clkCmpDate");o.dateUseOwn=clkChk("clkDateUseOwn");o.dateColor=clkStr("clkDateColor")||"#ffffff";}
+  if(mode==="glass"){o.tintSat=clkStr("clkTintSat");}
+  return o;
+}
+function clkRestore(mode,snap){
+  if(!snap)return;
+  const keys=CLK_KEYS[mode];
+  Object.keys(keys).forEach(function(k){
+    const id=keys[k];if(!id)return;
+    const el=document.getElementById(id);if(!el||!(k in snap))return;
+    if(el.type==="checkbox")el.checked=!!snap[k];else el.value=snap[k];
+    if(el.type!=="checkbox"&&el.type!=="color")clkSetText(id,snap[k]);
+  });
+  if(mode==="compact"){
+    document.getElementById("clkCmpDate").checked=snap.cmpDate!==false;
+    document.getElementById("clkDateUseOwn").checked=!!snap.dateUseOwn;
+    if(snap.dateColor)document.getElementById("clkDateColor").value=snap.dateColor;
+  }
+}
+// 当前模式某个参数的生效值
+function clkVal(k,fallback){
+  const mode=clkMode();
+  const id=CLK_KEYS[mode][k];
+  const def=CLK_MODE_DEFAULTS[mode][k];
+  if(!id)return def!==undefined?def:fallback;
+  const el=document.getElementById(id);
+  if(!el)return def!==undefined?def:fallback;
+  if(el.type==="checkbox")return el.checked;
+  if(el.type==="color")return el.value;
+  const v=parseFloat(el.value);
+  return isNaN(v)?(def!==undefined?def:fallback):v;
+}
+// 只取某个模式的值（不管当前是什么模式）：优先当前模式控件，否则用该模式上次记录 / 默认值
+function clkValIn(mode,k){
+  const id=CLK_KEYS[mode][k];
+  const def=CLK_MODE_DEFAULTS[mode][k];
+  if(clkMode()===mode&&id){
+    const el=document.getElementById(id);
+    if(el){
+      if(el.type==="checkbox")return el.checked;
+      if(el.type==="color")return el.value;
+      const v=el.type==="range"?parseFloat(el.value):el.value;
+      if(!(v===""||isNaN(v)))return v;
+    }
+  }
+  const mem=CLK_MEMORY[mode];
+  if(mem&&(k in mem))return mem[k];
+  return def;
+}
+function clkFontIdIn(mode){
+  const id=clkValIn(mode,"font");
+  return id?String(id):"system";
+}
+
+// —— 模式切换 ——
+const CLK_HINTS={
+  classic:"经典字体模式：切换数字字体、字重、字号、间距、颜色与位置。",
+  glass:"iOS 26 风格模拟：玻璃层只作用于时钟本体，参数可逐项微调。",
+  compact:"iOS 27 风格模拟：时钟收起到顶部，与日期并排横向排列。"
+};
+function setClockMode(m){
+  const cur=clkMode();
+  if(!CLK_MODE_DEFAULTS[m])return;
+  if(m!==cur){
+    CLK_MEMORY[cur]=clkSnapshot(cur);
+    document.getElementById("clkMode").value=m;
+    // 目标模式：有记录则恢复，否则落回该模式默认值
+    if(CLK_MEMORY[m]){clkRestore(m,CLK_MEMORY[m]);}
+    else{
+      const d=CLK_MODE_DEFAULTS[m];
+      Object.keys(CLK_KEYS[m]).forEach(function(k){
+        const id=CLK_KEYS[m][k];if(!id)return;
+        const el=document.getElementById(id);if(!el||!(k in d))return;
+        if(el.type==="checkbox")el.checked=!!d[k];else el.value=d[k];
+        if(el.type!=="checkbox"&&el.type!=="color")clkSetText(id,d[k]);
+      });
+      if(m==="compact"){document.getElementById("clkCmpDate").checked=true;}
+    }
+    const lockEl=document.getElementById("lockScreen");
+    if(lockEl)lockEl.checked=true;
+    const f=clkFont(clkFontIdIn(m));
+    document.getElementById("clkFont").value=f.id;
+    loadFamilies(parseFamilies(f.css),requestDraw);
+  }
+  syncClockPanel();
+}
+function syncClockPanel(){
+  const mode=clkMode();
+  document.querySelectorAll(".clk-tab").forEach(function(b){
+    b.classList.toggle("active",b.dataset.clkmode===mode);
+  });
+  const hint=document.getElementById("clkModeHint");
+  if(hint)hint.textContent=CLK_HINTS[mode]||"";
+  // 按控件白名单逐项显隐（连同它的 label / hint）
+  const ids=Object.keys(CLK_CTRL_MODE);
+  ids.forEach(function(id){
+    const el=document.getElementById(id);
+    if(!el)return;
+    const show=CLK_CTRL_MODE[id].indexOf(mode)>=0;
+    const box=(el.parentElement&&el.parentElement.classList.contains("checkbox-row"))?el.parentElement:el;
+    box.style.display=show?"":"none";
+    if(box===el){
+      const lab=el.previousElementSibling;
+      if(lab&&lab.tagName==="LABEL")lab.style.display=show?"":"none";
+      const nx=el.nextElementSibling;
+      if(nx&&nx.classList&&nx.classList.contains("hint"))nx.style.display=show?"":"none";
+    }
+  });
+  const stretchBox=document.getElementById("clkStretchBox");
+  if(stretchBox)stretchBox.style.display=(mode==="glass")?"":"none";
+  const cmpBox=document.getElementById("clkCompactBox");
+  if(cmpBox)cmpBox.style.display=(mode==="compact")?"":"none";
+  const hdr=document.getElementById("clkSizeHdr");
+  if(hdr)hdr.textContent=mode==="compact"?"② 尺寸":"② 尺寸与拉伸";
+  const sizeLbl=document.getElementById("clkSizeLbl");
+  if(sizeLbl)sizeLbl.style.display=(mode==="glass")?"":"none";
+  document.querySelectorAll("input[type=range]").forEach(function(r){
+    if(CLK_CTRL_MODE[r.id]&&CLK_CTRL_MODE[r.id].indexOf(mode)<0){
+      const nx=r.nextElementSibling;
+      if(nx&&nx.classList&&nx.classList.contains("hint"))nx.style.display="none";
+    }
+  });
+}
+
+// —— 字体库 UI ——
+function buildClockFonts(){
+  const grid=document.getElementById("clkFontGrid");
+  const sel=document.getElementById("clkFont");
+  if(!grid||!sel)return;
+  grid.innerHTML="";sel.innerHTML="";
+  CLK_FONTS.forEach(function(f){
+    const b=document.createElement("button");
+    b.type="button";b.className="clk-font";b.dataset.font=f.id;
+    const num=document.createElement("b");
+    num.style.fontFamily=f.css;
+    num.style.fontWeight=String(f.defW);
+    num.textContent="09:41";
+    const nm=document.createElement("span");
+    nm.textContent=f.name;
+    b.appendChild(num);b.appendChild(nm);
+    b.onclick=function(){pickClockFont(f.id);};
+    grid.appendChild(b);
+    const o=document.createElement("option");
+    o.value=f.id;o.textContent=f.name;
+    sel.appendChild(o);
+  });
+  syncClockFontUI();
+}
+function pickClockFont(id){
+  const f=clkFont(id);
+  document.getElementById("clkFont").value=id;
+  const mode=clkMode();
+  const wId=CLK_KEYS[mode].weight;
+  const wEl=wId?document.getElementById(wId):null;
+  if(wEl&&wEl.type==="range"){
+    wEl.value=String(f.defW);
+    clkSetText(wId,f.defW);
+  }
+  syncClockFontUI();
+  loadFamilies(parseFamilies(f.css),requestDraw);
+  requestDraw();
+}
+function syncClockFontUI(){
+  const id=String(clkMode()==="compact"?clkValIn("compact","font"):clkStr("clkFont")||"system");
+  document.querySelectorAll(".clk-font").forEach(function(b){
+    b.classList.toggle("active",b.dataset.font===id);
+  });
+  const sel=document.getElementById("clkFont");
+  if(sel)sel.value=id;
+}
+function resetClockFont(){
+  const mode=clkMode();
+  document.getElementById("clkFont").value="system";
+  const wId=CLK_KEYS[mode].weight;
+  if(wId&&document.getElementById(wId)){
+    document.getElementById(wId).value="700";
+    clkSetText(wId,"700");
+  }
+  if(mode==="classic"){
+    const c=document.getElementById("lockColor");
+    if(c)c.value="#ffffff";
+  }
+  syncClockFontUI();
+  requestDraw();
+}
+
+// —— 样式预设 ——
+const CLK_PRESETS={
+  "glass":{mode:"glass",font:"system",weight:600,size:18,spacing:0,h:100,w:100,stretch:100,alpha:100,x:50,y:20,
+           glass:true,glassOp:55,glassBlur:45,glassHi:55,glassEdge:50,glassTint:"#cfe0ff",clarity:85,glassAmt:100,tintSat:100},
+  "huge":{mode:"glass",font:"system",weight:500,size:18,spacing:2,h:170,w:100,stretch:100,alpha:100,x:50,y:20,
+          glass:true,glassOp:45,glassBlur:40,glassHi:65,glassEdge:45,glassTint:"#cfe0ff",clarity:88,glassAmt:100,tintSat:100},
+  "compact":{mode:"compact",font:"system",weight:600,cmpSize:5,cmpGap:12,cmpX:50,cmpY:14,cmpOp:75,cmpDate:true,alpha:100},
+  "thin":{mode:"classic",font:"minimal",weight:100,size:18,spacing:2,alpha:100,x:50,y:20},
+  "serif":{mode:"classic",font:"playfair",weight:400,size:18,spacing:1,alpha:100,x:50,y:20}
+};
+function applyClockPreset(name){
+  const p=CLK_PRESETS[name];
+  if(!p)return;
+  const mode=p.mode;
+  const snap=clkSnapshot(clkMode());
+  if(clkMode()!==mode)CLK_MEMORY[clkMode()]=snap;
+  document.getElementById("clkMode").value=mode;
+  const base=CLK_MODE_DEFAULTS[mode];
+  Object.keys(CLK_KEYS[mode]).forEach(function(k){
+    const id=CLK_KEYS[mode][k];if(!id)return;
+    const el=document.getElementById(id);if(!el)return;
+    if(el.type==="checkbox")el.checked=(k in p)?!!p[k]:!!base[k];
+    else el.value=(k in p)?p[k]:(base[k]!==undefined?base[k]:el.value);
+    if(el.type!=="checkbox"&&el.type!=="color")clkSetText(id,el.value);
+  });
+  if(mode==="compact"){
+    document.getElementById("clkCmpDate").checked=p.cmpDate!==false;
+  }
+  document.getElementById("clkFont").value=p.font||"system";
+  if(mode==="compact"){
+    // 紧凑模式的字体/字重走 glass 记忆共享，方便两种大时钟布局保持一致
+  }
+  syncClockFontUI();
+  syncClockPanel();
+  CLK_MEMORY[mode]=clkSnapshot(mode);
+  const f=clkFont(p.font||"system");
+  loadFamilies(parseFamilies(f.css),requestDraw);
+  requestDraw();
+}
+function resetClockSize(){
+  const mode=clkMode();
+  const d=CLK_MODE_DEFAULTS[mode];
+  const ids=(mode==="compact")?["clkCmpSize","clkCmpGap","clkCmpX","clkCmpY"]:["clkSize","clkH","clkW","clkStretch","clkX","clkY"];
+  ids.forEach(function(id){
+    const el=document.getElementById(id);
+    if(!el||!(id in d))return;
+    el.value=d[id];clkSetText(id,d[id]);
+  });
+  requestDraw();
+}
+function resetClockStyle(){
+  const mode=clkMode();
+  const d=CLK_MODE_DEFAULTS[mode];
+  Object.keys(CLK_KEYS[mode]).forEach(function(k){
+    const id=CLK_KEYS[mode][k];if(!id)return;
+    const el=document.getElementById(id);if(!el||!(k in d))return;
+    if(el.type==="checkbox")el.checked=!!d[k];else el.value=d[k];
+    if(el.type!=="checkbox"&&el.type!=="color")clkSetText(id,d[k]);
+  });
+  if(mode==="compact")document.getElementById("clkCmpDate").checked=true;
+  document.getElementById("clkFont").value=d.font||"system";
+  syncClockFontUI();
+  syncClockPanel();
+  requestDraw();
+}
+
+// —— 绘制辅助 ——
+function clkMeasure(str,spacing){
+  let w=0;
+  for(let i=0;i<str.length;i++)w+=ctx.measureText(str[i]).width;
+  return w+spacing*Math.max(0,str.length-1);
+}
+// 手动字距（ctx.letterSpacing 兼容性差），保证预览与高清导出完全一致
+function clkFillSpaced(str,cx,cy,spacing){
+  const total=clkMeasure(str,spacing);
+  let x=cx-total/2;
+  const prev=ctx.textAlign;
+  ctx.textAlign="left";
+  for(let i=0;i<str.length;i++){
+    const ch=str[i];
+    const w=ctx.measureText(ch).width;
+    ctx.fillText(ch,x,cy);
+    x+=w+spacing;
+  }
+  ctx.textAlign=prev;
+}
+function clkRoundedPath(x,y,w,h,r){
+  const rr=Math.max(0,Math.min(r,w/2,h/2));
+  const p=new Path2D();
+  p.moveTo(x+rr,y);
+  p.arcTo(x+w,y,x+w,y+h,rr);
+  p.arcTo(x+w,y+h,x,y+h,rr);
+  p.arcTo(x,y+h,x,y,rr);
+  p.arcTo(x,y,x+w,y,rr);
+  p.closePath();
+  return p;
+}
+// 玻璃底板：只对时钟本体生效 —— 采样时钟背后的画面、真实模糊、加色调与高光，再按透明度贴回
+function clkGlassPlate(cx,cy,pw,ph,opt){
+  pw=Math.max(4,Math.round(pw));ph=Math.max(4,Math.round(ph));
+  const rx=Math.round(cx-pw/2),ry=Math.round(cy-ph/2);
+  const sx=Math.max(0,rx),sy=Math.max(0,ry);
+  const ex=Math.min(c.width,rx+pw),ey=Math.min(c.height,ry+ph);
+  if(ex-sx<2||ey-sy<2)return;
+  const rad=Math.min(ph*0.42,pw*0.28);
+  const tmp=document.createElement("canvas");
+  tmp.width=Math.round(ex-sx);tmp.height=Math.round(ey-sy);
+  const t=tmp.getContext("2d");
+  if(opt.blur>0.4){
+    t.save();
+    t.beginPath();t.rect(0,0,tmp.width,tmp.height);t.clip();
+    try{t.filter=`blur(${opt.blur.toFixed(2)}px)`;}catch(e){}
+    t.drawImage(c,sx,sy,tmp.width,tmp.height,0,0,tmp.width,tmp.height);
+    t.restore();
+  }else{
+    t.drawImage(c,sx,sy,tmp.width,tmp.height,0,0,tmp.width,tmp.height);
+  }
+  // 色调
+  const [tr,tg,tb]=clkColorHex(opt.tint);
+  t.save();
+  t.globalCompositeOperation="source-atop";
+  if(opt.tintA>0.002){
+    const g=t.createLinearGradient(0,0,tmp.width,tmp.height);
+    g.addColorStop(0,`rgba(${tr},${tg},${tb},${(opt.tintA*1.15).toFixed(3)})`);
+    g.addColorStop(0.5,`rgba(255,255,255,${(opt.tintA*0.5).toFixed(3)})`);
+    g.addColorStop(1,`rgba(${tr},${tg},${tb},${(opt.tintA*0.9).toFixed(3)})`);
+    t.fillStyle=g;t.fillRect(0,0,tmp.width,tmp.height);
+  }
+  t.restore();
+  const plate=clkRoundedPath(rx,ry,pw,ph,rad);
+  ctx.save();
+  ctx.globalAlpha=opt.alpha;
+  ctx.clip(plate);
+  ctx.drawImage(tmp,rx,ry);
+  ctx.restore();
+  // 高光
+  if(opt.hi>0.02){
+    ctx.save();
+    ctx.clip(plate);
+    const hg=ctx.createLinearGradient(rx,ry,rx+pw*0.7,ry+ph);
+    hg.addColorStop(0,`rgba(255,255,255,${(0.26*opt.hi).toFixed(3)})`);
+    hg.addColorStop(0.35,`rgba(255,255,255,0)`);
+    ctx.fillStyle=hg;
+    ctx.fillRect(rx,ry,pw,ph);
+    ctx.restore();
+  }
+  // 边缘折射：外亮边 + 顶部内高光
+  if(opt.edge>0.02){
+    ctx.save();
+    ctx.lineWidth=Math.max(1,ph*0.012);
+    const eg=ctx.createLinearGradient(rx,ry,rx,ry+ph);
+    eg.addColorStop(0,`rgba(255,255,255,${(0.62*opt.edge*opt.amt).toFixed(3)})`);
+    eg.addColorStop(0.5,`rgba(255,255,255,${(0.1*opt.edge*opt.amt).toFixed(3)})`);
+    eg.addColorStop(1,`rgba(${tr},${tg},${tb},${(0.42*opt.edge*opt.amt).toFixed(3)})`);
+    ctx.strokeStyle=eg;
+    ctx.stroke(clkRoundedPath(rx+ctx.lineWidth/2,ry+ctx.lineWidth/2,pw-ctx.lineWidth,ph-ctx.lineWidth,rad));
+    ctx.lineWidth=Math.max(1,ph*0.008);
+    ctx.strokeStyle=`rgba(255,255,255,${(0.45*opt.edge*opt.amt*opt.hi).toFixed(3)})`;
+    ctx.stroke(clkRoundedPath(rx+ph*0.04,ry+ph*0.04,pw-ph*0.08,ph*0.5,rad*0.8));
+    ctx.restore();
+  }
+}
+
 function drawLockScreen(){
   if(!document.getElementById("lockScreen").checked) return;
   const time=document.getElementById("lockTime").value;
   const date=document.getElementById("lockDate").value;
   const color=document.getElementById("lockColor").value;
-  const fs=Math.floor(c.width*(parseInt(document.getElementById("lockTimeSize").value)/100));
-  const tx=parseInt(document.getElementById("lockTimeX").value)/100;
-  const ty=parseInt(document.getElementById("lockTimeY").value)/100;
-  const fontFamily="-apple-system,BlinkMacSystemFont,'SF Pro Display','Helvetica Neue','PingFang SC',sans-serif";
-  ctx.save();
-  ctx.textAlign="center";ctx.textBaseline="middle";
-  // 日期（时间正上方，小字）
+  const mode=clkMode();
+  const fid=clkFontIdIn(mode);
+  const f=clkFont(fid);
+  const weight=clkValIn(mode,"weight")||f.defW;
+  const alphaBase=Math.max(0,Math.min(1,(clkValIn(mode,"alpha")||100)/100));
+  const spacingPct=clkValIn(mode,"spacing")||0;
+  if(fid!=="system")loadFamilies(parseFamilies(f.css),null);
+
+  // —— iOS 27 紧凑时钟：小时间 + 日期并排，放在顶部区域 ——
+  if(mode==="compact"){
+    const cfs=Math.max(8,c.width*((clkValIn("compact","cmpSize")||5)/100));
+    const gap=c.width*((clkValIn("compact","cmpGap")||12)/100);
+    const cx=c.width*((clkValIn("compact","cmpX")||50)/100);
+    const cy=c.height*((clkValIn("compact","cmpY")||14)/100);
+    const op=alphaBase*Math.max(0,Math.min(1,(clkValIn("compact","cmpOp")||75)/100));
+    const showDate=clkChk("clkCmpDate")&&!!date;
+    const dateColor=clkChk("clkDateUseOwn")?(clkStr("clkDateColor")||color):color;
+    const sp=cfs*(spacingPct/100);
+    ctx.save();
+    ctx.textBaseline="middle";ctx.textAlign="left";
+    ctx.font=`${weight} ${cfs}px ${f.css}`;
+    const tW=clkMeasure(time,sp);
+    let dFont=Math.max(8,cfs*0.8);
+    ctx.font=`500 ${dFont}px 'PingFang SC','Noto Sans SC',-apple-system,sans-serif`;
+    let dW=showDate?ctx.measureText(date).width:0;
+    const total=showDate?tW+gap+dW:tW;
+    // 超出安全边距时整体等比缩小，避免顶到屏幕边缘
+    const safe=c.width*0.92;
+    let k=1;
+    if(total>safe){k=safe/total;}
+    ctx.translate(cx,cy);
+    ctx.scale(k,k);
+    const x0=-total/2;
+    ctx.font=`${weight} ${cfs}px ${f.css}`;
+    ctx.fillStyle=color;
+    ctx.globalAlpha=op;
+    ctx.shadowColor="rgba(0,0,0,0.32)";
+    ctx.shadowBlur=cfs*0.35;
+    clkFillSpaced(time,x0+tW/2,0,sp);
+    let hitW=total;
+    if(showDate){
+      ctx.shadowBlur=cfs*0.25;
+      ctx.font=`500 ${dFont}px 'PingFang SC','Noto Sans SC',-apple-system,sans-serif`;
+      ctx.globalAlpha=op*0.94;
+      ctx.fillStyle=dateColor;
+      ctx.textAlign="left";
+      ctx.fillText(date,x0+tW+gap,0);
+    }
+    ctx.restore();
+    pushTextHit("lockTime",cx,cy,Math.max(hitW*k,c.width*0.28),cfs*1.7);
+    drawLockButtons(color);
+    drawLockHomeBar(color);
+    return;
+  }
+
+  // —— 经典 / iOS 26 大时钟 ——
+  const fs=Math.max(12,Math.floor(c.width*((clkValIn(mode,"size")||18)/100)));
+  const cx=c.width*((clkValIn(mode,"x")||50)/100);
+  const cy=c.height*((clkValIn(mode,"y")||20)/100);
   const shOp=parseInt(document.getElementById("lockShadowOp").value)/100;
   const shBlurRatio=parseInt(document.getElementById("lockShadowBlur").value)/100;
+  const sp=fs*(spacingPct/100);
+  const wScale=(clkValIn(mode,"w")||100)/100;
+  const hScale=(clkValIn(mode,"h")||100)/100;
+  const stretch=(clkValIn(mode,"stretch")||100)/100;
+  const isGlass=mode==="glass";
+
+  ctx.save();
+  ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.font=`${weight} ${fs}px ${f.css}`;
+  const tW=clkMeasure(time,sp);
+  const plateW=(tW*wScale*stretch)+fs*0.7;
+  const plateH=fs*1.08*hScale+fs*0.42;
+  const dateSize=Math.max(9,Math.floor(fs*0.2));
+  const dateY=cy-((plateH/2)+dateSize*0.85);
+
+  // 日期（沿用旧逻辑：位于时间正上方）
   if(date){
-    ctx.font=`500 ${Math.floor(fs*0.2)}px ${fontFamily}`;
+    ctx.save();
+    ctx.font=`500 ${dateSize}px 'PingFang SC','Noto Sans SC',-apple-system,sans-serif`;
     ctx.fillStyle=color;
+    ctx.globalAlpha=alphaBase;
     ctx.shadowColor=`rgba(0,0,0,${shOp*0.88})`;
     ctx.shadowBlur=fs*shBlurRatio*0.43;
-    ctx.fillText(date,c.width*tx,c.height*ty-fs*0.62);
-    ctx.shadowBlur=0;
+    ctx.fillText(date,cx,dateY);
+    ctx.restore();
   }
-  // 时间（大号粗体数字，SF Pro 风格）
-  ctx.font=`700 ${fs}px ${fontFamily}`;
-  ctx.fillStyle=color;
-  ctx.shadowColor=`rgba(0,0,0,${shOp})`;
-  ctx.shadowBlur=fs*shBlurRatio;
-  ctx.fillText(time,c.width*tx,c.height*ty);
-  ctx.shadowBlur=0;
-  pushTextHit("lockTime",c.width*tx,c.height*ty,c.width*0.5,fs*1.3);
-  // 底部手电筒 / 相机按钮（白色矢量图标）
-  if(document.getElementById("lockButtons").checked){
-    const r=c.width*(parseFloat(document.getElementById("lockBtnSize").value)/100);
-    const gap=parseFloat(document.getElementById("lockBtnGap").value)/100;
-    const bx1=c.width*gap, bx2=c.width*(1-gap);
-    const by=c.height*(parseFloat(document.getElementById("lockBtnY").value)/100);
-    const leftIcon=document.getElementById("lockLeftIcon").value.trim();
-    const rightIcon=document.getElementById("lockRightIcon").value.trim();
-    const drawBtn=(x,icon,isLeft)=>{
-      ctx.beginPath();
-      ctx.arc(x,by,r,0,Math.PI*2);
-      ctx.fillStyle="rgba(0,0,0,0.25)";
-      ctx.fill();
-      const is=Math.floor(r*1.05);
-      if(icon){
-        // 自定义文字/emoji → 栅格化白色剪影
-        const white=iconToWhite(icon,is);
-        ctx.drawImage(white,x-white.width/2,by-white.height/2);
-      }else if(isLeft){
-        drawFlashlightIcon(x,by,is,color);
-      }else{
-        drawCameraIcon(x,by,is,color);
-      }
-    };
-    drawBtn(bx1,leftIcon,true);
-    drawBtn(bx2,rightIcon,false);
+
+  // 玻璃底板
+  if(isGlass){
+    const on=clkValIn("glass","glass");
+    const amt=Math.max(0,Math.min(1,(clkValIn("glass","glassAmt")||0)/100));
+    if(on&&amt>0.01){
+      const gop=Math.max(0,Math.min(1,(clkValIn("glass","glassOp")||0)/100));
+      clkGlassPlate(cx,cy,plateW,plateH,{
+        blur:fs*((clkValIn("glass","glassBlur")||0)/100)*0.14,
+        tint:clkValIn("glass","glassTint")||"#cfe0ff",
+        tintA:gop*0.42*amt,
+        alpha:Math.min(1,gop*1.25*amt),
+        hi:(clkValIn("glass","glassHi")||0)/100,
+        edge:(clkValIn("glass","glassEdge")||0)/100,
+        amt:amt
+      });
+    }
   }
-  // 底部 Home 指示条
-  if(document.getElementById("lockHomeBar").checked){
-    const bw=c.width*0.28, bh=Math.max(6,c.width*0.006);
-    const bx=c.width/2-bw/2, by=c.height*0.975;
-    rrPath(bx,by,bw,bh,bh/2);
+
+  // 时间数字
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.scale(wScale*stretch,hScale*stretch);
+  if(isGlass){
+    const clarity=Math.max(0,Math.min(1,(clkValIn("glass","clarity")||0)/100));
+    const hi=(clkValIn("glass","glassHi")||0)/100;
+    const amt=(clkValIn("glass","glassAmt")||0)/100;
+    if(clarity<0.999){
+      ctx.save();
+      try{ctx.filter=`blur(${(fs*0.045*(1-clarity)).toFixed(2)}px)`;}catch(e){}
+      ctx.globalAlpha=alphaBase*(0.28+0.45*(1-clarity));
+      ctx.fillStyle=color;
+      clkFillSpaced(time,0,0,sp);
+      ctx.restore();
+    }
+    ctx.save();
+    ctx.globalAlpha=alphaBase;
     ctx.fillStyle=color;
-    ctx.globalAlpha=0.9;
-    ctx.fill();
-    ctx.globalAlpha=1;
+    ctx.shadowColor=`rgba(0,0,0,${shOp*0.85})`;
+    ctx.shadowBlur=fs*shBlurRatio*(0.4+0.6*(1-clarity));
+    clkFillSpaced(time,0,0,sp);
+    ctx.restore();
+    if(hi>0.02&&amt>0.02){
+      ctx.save();
+      ctx.globalAlpha=alphaBase*0.45*hi*amt;
+      ctx.lineWidth=Math.max(0.6,fs*0.006);
+      ctx.strokeStyle="rgba(255,255,255,0.9)";
+      ctx.shadowColor="rgba(255,255,255,0.85)";
+      ctx.shadowBlur=fs*0.03*hi;
+      ctx.strokeText(time,0,0);
+      ctx.restore();
+    }
+  }else{
+    ctx.save();
+    ctx.globalAlpha=alphaBase;
+    ctx.fillStyle=color;
+    ctx.shadowColor=`rgba(0,0,0,${shOp})`;
+    ctx.shadowBlur=fs*shBlurRatio;
+    clkFillSpaced(time,0,0,sp);
+    ctx.restore();
   }
+  ctx.restore();
+  ctx.restore();
+
+  pushTextHit("lockTime",cx,cy,Math.max(plateW,c.width*0.3),Math.max(plateH,fs*1.2));
+  drawLockButtons(color);
+  drawLockHomeBar(color);
+}
+function drawLockButtons(color){
+  if(!document.getElementById("lockButtons").checked) return;
+  const r=c.width*(parseFloat(document.getElementById("lockBtnSize").value)/100);
+  const gap=parseFloat(document.getElementById("lockBtnGap").value)/100;
+  const bx1=c.width*gap, bx2=c.width*(1-gap);
+  const by=c.height*(parseFloat(document.getElementById("lockBtnY").value)/100);
+  const leftIcon=document.getElementById("lockLeftIcon").value.trim();
+  const rightIcon=document.getElementById("lockRightIcon").value.trim();
+  const drawBtn=(x,icon,isLeft)=>{
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x,by,r,0,Math.PI*2);
+    ctx.fillStyle="rgba(0,0,0,0.25)";
+    ctx.fill();
+    const is=Math.floor(r*1.05);
+    if(icon){
+      const white=iconToWhite(icon,is);
+      ctx.drawImage(white,x-white.width/2,by-white.height/2);
+    }else if(isLeft){
+      drawFlashlightIcon(x,by,is,color);
+    }else{
+      drawCameraIcon(x,by,is,color);
+    }
+    ctx.restore();
+  };
+  drawBtn(bx1,leftIcon,true);
+  drawBtn(bx2,rightIcon,false);
+}
+function drawLockHomeBar(color){
+  if(!document.getElementById("lockHomeBar").checked) return;
+  ctx.save();
+  const bw=c.width*0.28, bh=Math.max(6,c.width*0.006);
+  const bx=c.width/2-bw/2, by=c.height*0.975;
+  rrPath(bx,by,bw,bh,bh/2);
+  ctx.fillStyle=color;
+  ctx.globalAlpha=0.9;
+  ctx.fill();
   ctx.restore();
 }
 
@@ -3518,10 +4205,10 @@ function applyManuscriptPreset(silent){
   const chk=(id,val)=>{const el=document.getElementById(id);if(el)el.checked=val;};
   // 画布：3:4 竖版 1500×2000（匹配竖版海报）
   set("size","1500,2000");
-  // 背景：暖米金渐变
+  // 背景：中性浅灰渐变（避免整体泛黄）
   set("bgType","gradient");
-  set("bgColor1","#f5ead4");
-  set("bgColor2","#e8d4a8");
+  set("bgColor1","#ffffff");
+  set("bgColor2","#f0efed");
   set("bgDir","v");
   set("bgBlur","0");
   // 作品图：铺满、无描边、无投影
@@ -3578,10 +4265,10 @@ function applyManuscriptPreset(silent){
   set("msScatterColor","#fff0d2");
   set("msScatterFont",'"Cormorant Garamond","Great Vibes",serif"');
   set("msBlur","12");
-  // 调色：暖金叠加 / 色温 / 泛光
-  set("msWarm","55");
+  // 调色：默认全部中性，不叠加暖色（用户可自行调高）
+  set("msWarm","0");
   set("msTone","50");
-  set("msFlare","35");
+  set("msFlare","0");
   set("msMainSize","55");
   set("msMainFont","'KaiTi','Kaiti SC','STKaiti',serif");
   set("msMainX","50");set("msMainY","60");
@@ -3622,9 +4309,9 @@ function applyManuscriptPreset(silent){
   document.getElementById("texOpVal").textContent="35";
   document.getElementById("tornVal").textContent="15";
   document.getElementById("msBlurVal").textContent="12";
-  document.getElementById("msWarmVal").textContent="55";
+  document.getElementById("msWarmVal").textContent="0";
   document.getElementById("msToneVal").textContent="50";
-  document.getElementById("msFlareVal").textContent="35";
+  document.getElementById("msFlareVal").textContent="0";
   document.getElementById("msMainSizeVal").textContent="55";
   document.getElementById("msPreviewSizeVal").textContent="45";
   document.getElementById("msAvatarSizeVal").textContent="32";
@@ -3771,6 +4458,37 @@ function getSettings(){
     lockBtnGap:document.getElementById("lockBtnGap").value,
     lockShadowOp:document.getElementById("lockShadowOp").value,
     lockShadowBlur:document.getElementById("lockShadowBlur").value,
+    // 时钟样式实验室
+    clkMode:document.getElementById("clkMode").value,
+    clkFont:document.getElementById("clkFont").value,
+    clkWeight:document.getElementById("clkWeight").value,
+    clkSpacing:document.getElementById("clkSpacing").value,
+    clkSize:document.getElementById("clkSize").value,
+    clkH:document.getElementById("clkH").value,
+    clkW:document.getElementById("clkW").value,
+    clkStretch:document.getElementById("clkStretch").value,
+    clkColor:document.getElementById("clkColor").value,
+    clkAlpha:document.getElementById("clkAlpha").value,
+    clkX:document.getElementById("clkX").value,
+    clkY:document.getElementById("clkY").value,
+    clkGlass:chk("clkGlass"),
+    clkGlassOp:document.getElementById("clkGlassOp").value,
+    clkGlassBlur:document.getElementById("clkGlassBlur").value,
+    clkGlassHi:document.getElementById("clkGlassHi").value,
+    clkGlassEdge:document.getElementById("clkGlassEdge").value,
+    clkGlassTint:document.getElementById("clkGlassTint").value,
+    clkClarity:document.getElementById("clkClarity").value,
+    clkGlassAmt:document.getElementById("clkGlassAmt").value,
+    clkTintSat:document.getElementById("clkTintSat").value,
+    clkCmpSize:document.getElementById("clkCmpSize").value,
+    clkCmpGap:document.getElementById("clkCmpGap").value,
+    clkCmpX:document.getElementById("clkCmpX").value,
+    clkCmpY:document.getElementById("clkCmpY").value,
+    clkCmpOp:document.getElementById("clkCmpOp").value,
+    clkCmpDate:chk("clkCmpDate"),
+    clkDateColor:document.getElementById("clkDateColor").value,
+    clkDateUseOwn:chk("clkDateUseOwn"),
+    clkMem:CLK_MEMORY,
     wmEnable:chk("wmEnable"),
     wmBlend:document.getElementById("wmBlend").value,
     wmScale:document.getElementById("wmScale").value,
@@ -3946,9 +4664,9 @@ function applySettings(s){
   set("msScatterColor",s.msScatterColor||"#fff0d2");
   set("msScatterFont",s.msScatterFont||'"Cormorant Garamond","Great Vibes",serif"');
   set("msBlur",s.msBlur||"12");
-  set("msWarm",s.msWarm||"55");
+  set("msWarm",s.msWarm||"0");
   set("msTone",s.msTone||"50");
-  set("msFlare",s.msFlare||"35");
+  set("msFlare",s.msFlare||"0");
   set("msMainSize",s.msMainSize||"55");
   set("msMainFont",s.msMainFont);
   set("msMainX",s.msMainX||"50");set("msMainY",s.msMainY||"60");
@@ -3971,6 +4689,32 @@ function applySettings(s){
   set("lockLeftIcon",s.lockLeftIcon||"");set("lockRightIcon",s.lockRightIcon||"");
   set("lockBtnSize",s.lockBtnSize||"4.5");set("lockBtnY",s.lockBtnY||"94");set("lockBtnGap",s.lockBtnGap||"14");
   set("lockShadowOp",s.lockShadowOp||"40");set("lockShadowBlur",s.lockShadowBlur||"14");
+  // 时钟样式实验室（旧数据没有这些字段时落回默认值）
+  set("clkMode",s.clkMode||"classic");
+  set("clkFont",s.clkFont||"system");
+  set("clkWeight",s.clkWeight||"700");
+  set("clkSpacing",s.clkSpacing||"0");
+  set("clkSize",s.clkSize||"18");set("clkH",s.clkH||"100");set("clkW",s.clkW||"100");set("clkStretch",s.clkStretch||"100");
+  set("clkColor",s.clkColor||s.lockColor||"#ffffff");
+  set("clkAlpha",s.clkAlpha||"100");
+  set("clkX",s.clkX||"50");set("clkY",s.clkY||"20");
+  chk("clkGlass",s.clkGlass!==false);
+  set("clkGlassOp",s.clkGlassOp||"55");set("clkGlassBlur",s.clkGlassBlur||"45");
+  set("clkGlassHi",s.clkGlassHi||"55");set("clkGlassEdge",s.clkGlassEdge||"50");
+  set("clkGlassTint",s.clkGlassTint||"#cfe0ff");
+  set("clkClarity",s.clkClarity||"85");set("clkGlassAmt",s.clkGlassAmt||"100");
+  set("clkTintSat",s.clkTintSat||"100");
+  set("clkCmpSize",s.clkCmpSize||"5");set("clkCmpGap",s.clkCmpGap||"12");
+  set("clkCmpX",s.clkCmpX||"50");set("clkCmpY",s.clkCmpY||"14");
+  set("clkCmpOp",s.clkCmpOp||"75");
+  chk("clkCmpDate",s.clkCmpDate!==false);
+  set("clkDateColor",s.clkDateColor||s.lockColor||"#ffffff");
+  chk("clkDateUseOwn",s.clkDateUseOwn||false);
+  if(s.clkMem){
+    ["classic","glass","compact"].forEach(function(m){
+      CLK_MEMORY[m]=s.clkMem[m]||null;
+    });
+  }
   chk("wmEnable",s.wmEnable||false);
   set("wmBlend",s.wmBlend||"overlay");
   set("wmScale",s.wmScale||"40");set("wmOpacity",s.wmOpacity||"35");
@@ -4109,9 +4853,9 @@ function applySettings(s){
   document.getElementById("texOpVal").textContent=s.texOpacity;
   document.getElementById("tornVal").textContent=s.tornAmount;
   document.getElementById("msBlurVal").textContent=s.msBlur||12;
-  document.getElementById("msWarmVal").textContent=s.msWarm||55;
+  document.getElementById("msWarmVal").textContent=s.msWarm||0;
   document.getElementById("msToneVal").textContent=s.msTone||50;
-  document.getElementById("msFlareVal").textContent=s.msFlare||35;
+  document.getElementById("msFlareVal").textContent=s.msFlare||0;
   document.getElementById("msMainSizeVal").textContent=s.msMainSize||55;
   document.getElementById("msPreviewSizeVal").textContent=s.msPreviewSize||45;
   document.getElementById("msAvatarSizeVal").textContent=s.msAvatarSize||32;
@@ -4142,6 +4886,14 @@ function applySettings(s){
   document.getElementById("lockBtnGapVal").textContent=s.lockBtnGap||14;
   document.getElementById("lockShadowOpVal").textContent=s.lockShadowOp||40;
   document.getElementById("lockShadowBlurVal").textContent=s.lockShadowBlur||14;
+  // 时钟样式实验室的数值回显 + 面板/字体卡状态
+  ["clkWeight","clkSpacing","clkSize","clkH","clkW","clkStretch","clkAlpha","clkX","clkY",
+   "clkGlassOp","clkGlassBlur","clkGlassHi","clkGlassEdge","clkClarity","clkGlassAmt","clkTintSat",
+   "clkCmpSize","clkCmpGap","clkCmpX","clkCmpY","clkCmpOp"].forEach(function(k){
+    const el=document.getElementById(k+"Val");
+    if(el)el.textContent=document.getElementById(k).value;
+  });
+  syncClockPanel();syncClockFontUI();
   document.getElementById("wmScaleVal").textContent=s.wmScale||40;
   document.getElementById("wmOpacityVal").textContent=s.wmOpacity||35;
   document.getElementById("wmXVal").textContent=s.wmX||50;
@@ -4292,6 +5044,7 @@ function applyTemplatePreset(type){
     chk("msMode",false);
     chk("lockScreen",true);
     set("size","1320,2868");
+    syncClockPanel();
   }else if(type==="polaroid"){
     chk("msMode",false);
     chk("lockScreen",false);
@@ -4600,7 +5353,7 @@ c.addEventListener("mousedown",e=>{
     const r=textHitRects[i];
     const pad=Math.max(20,r.h*0.3);
     if(p.x>=r.x-r.w/2-pad && p.x<=r.x+r.w/2+pad && p.y>=r.y-r.h/2-pad && p.y<=r.y+r.h/2+pad){
-      const m=dragMap[r.id];
+      const m=dragTargetFor(r.id);
       if(!m) continue;
       dragTarget=r.id;
       dragOffX=p.x-r.x;dragOffY=p.y-r.y;
@@ -4613,7 +5366,7 @@ c.addEventListener("mousedown",e=>{
 c.addEventListener("mousemove",e=>{
   if(!dragTarget) return;
   const p=canvasPos(e);
-  const m=dragMap[dragTarget];
+  const m=dragTargetFor(dragTarget);
   if(!m) return;
   const nx=Math.max(0,Math.min(100,(p.x-dragOffX)/c.width*100));
   const ny=Math.max(0,Math.min(100,(p.y-dragOffY)/c.height*100));
@@ -4638,7 +5391,7 @@ c.addEventListener("touchstart",e=>{
     const r=textHitRects[i];
     const pad=Math.max(20,r.h*0.3);
     if(p.x>=r.x-r.w/2-pad && p.x<=r.x+r.w/2+pad && p.y>=r.y-r.h/2-pad && p.y<=r.y+r.h/2+pad){
-      const m=dragMap[r.id];
+      const m=dragTargetFor(r.id);
       if(!m) continue;
       dragTarget=r.id;
       dragOffX=p.x-r.x;dragOffY=p.y-r.y;
@@ -4651,7 +5404,7 @@ c.addEventListener("touchmove",e=>{
   if(!dragTarget) return;
   const t=e.touches[0];
   const p=canvasPos(t);
-  const m=dragMap[dragTarget];
+  const m=dragTargetFor(dragTarget);
   if(!m) return;
   const nx=Math.max(0,Math.min(100,(p.x-dragOffX)/c.width*100));
   const ny=Math.max(0,Math.min(100,(p.y-dragOffY)/c.height*100));
@@ -4699,25 +5452,32 @@ function enablePicker(){
 
 // ============ 导出（使用全分辨率） ============
 function exportPNG(){
-  const s=document.getElementById("size").value.split(",");
-  const ew=parseInt(s[0]),eh=parseInt(s[1]);
-  ensureExportCanvas(ew,eh);
-  const origC=c,origCtx=ctx;
-  c=exportCanvas;ctx=exportCtx;
-  const origScale=previewScale;
-  previewScale=1;
-  c.width=ew;c.height=eh;
-  draw();
-  previewScale=origScale;
-  c=origC;ctx=origCtx;
-  exportCanvas.toBlob(blob=>{
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement("a");
-    a.download="preview-studio.png";
-    a.href=url;
-    a.click();
-    setTimeout(()=>URL.revokeObjectURL(url),1000);
-  },"image/png");
+  // 等字体就绪再绘制，避免导出时数字还是回退字体
+  const go=()=>{
+    const s=document.getElementById("size").value.split(",");
+    const ew=parseInt(s[0]),eh=parseInt(s[1]);
+    ensureExportCanvas(ew,eh);
+    const origC=c,origCtx=ctx;
+    c=exportCanvas;ctx=exportCtx;
+    const origScale=previewScale;
+    previewScale=1;
+    c.width=ew;c.height=eh;
+    draw();
+    previewScale=origScale;
+    c=origC;ctx=origCtx;
+    exportCanvas.toBlob(blob=>{
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement("a");
+      a.download="preview-studio.png";
+      a.href=url;
+      a.click();
+      setTimeout(()=>URL.revokeObjectURL(url),1000);
+    },"image/png");
+  };
+  const fams=(document.getElementById("clkFont")?parseFamilies(clkFont(clkFontIdIn(clkMode())).css):[]);
+  loadFamilies(fams,function(){
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(go,go);else go();
+  });
 }
 
 // 初始化：恢复自动保存 + 恢复图片 + 生成纹理
@@ -4743,12 +5503,14 @@ idbGet("ps-texture").then(blob=>{
 onTexPresetChange();
 buildPresetGrid();
 refreshPresetUI();
+buildClockFonts();
+syncClockPanel();
 requestDraw();
 
 // 字体全部本地内置：只预加载当前各下拉框已选中的字体族，其余在切换时按需加载（移动端更稳）
 (function preloadSelectedFonts(){
   if(!(document.fonts&&document.fonts.load))return;
-  var ids=["fontEN","fontCN","poDateFont","poDecoFont","poCaptionFont","poFooterFont","msAuthorFont","msScatterFont","msMainFont","msPreviewFont","pfNameFont","pfBodyFont"];
+  var ids=["fontEN","fontCN","poDateFont","poDecoFont","poCaptionFont","poFooterFont","msAuthorFont","msScatterFont","msMainFont","msPreviewFont","pfNameFont","pfBodyFont","clkFont"];
   var all=[];
   ids.forEach(function(id){
     var el=document.getElementById(id);
