@@ -1165,7 +1165,7 @@ love
           <div><label>时间 Y: <span id="lockTimeYVal">20</span>%</label><input type="range" id="lockTimeY" min="0" max="100" value="20" oninput="document.getElementById('lockTimeYVal').textContent=this.value;requestDraw()"></div>
         </div>
         <label>时间/日期颜色</label>
-        <input type="color" id="lockColor" value="#ffffff" onchange="requestDraw()">
+        <input type="color" id="lockColor" value="#ffffff" onchange="document.getElementById('clkColor').value=this.value;requestDraw()">
         <label>阴影强度: <span id="lockShadowOpVal">40</span>%</label>
         <input type="range" id="lockShadowOp" min="0" max="100" value="40" oninput="document.getElementById('lockShadowOpVal').textContent=this.value;requestDraw()">
         <label>阴影模糊: <span id="lockShadowBlurVal">14</span></label>
@@ -1212,10 +1212,6 @@ love
           <label>数字字号: <span id="clkSizeVal">18</span>%</label>
           <input type="range" id="clkSize" min="5" max="35" step="0.5" value="18" oninput="document.getElementById('clkSizeVal').textContent=this.value;requestDraw()">
         </div>
-        <div id="clkClassicSizeBox" style="display:none">
-          <label>数字字号: <span id="lockTimeSizeVal">18</span>%</label>
-          <input type="range" id="lockTimeSize" min="5" max="35" value="18" oninput="document.getElementById('lockTimeSizeVal').textContent=this.value;requestDraw()">
-        </div>
         <div id="clkSpacingBox">
           <label>数字间距: <span id="clkSpacingVal">0</span></label>
           <input type="range" id="clkSpacing" min="-8" max="24" step="0.5" value="0" oninput="document.getElementById('clkSpacingVal').textContent=this.value;requestDraw()">
@@ -1256,7 +1252,7 @@ love
         <!-- ④ 颜色与透明度 -->
         <div class="clk-sub">④ 颜色与透明度</div>
         <label>数字颜色</label>
-        <input type="color" id="clkColor" value="#ffffff" onchange="requestDraw()">
+        <input type="color" id="clkColor" value="#ffffff" onchange="document.getElementById('lockColor').value=this.value;requestDraw()">
         <label>数字透明度: <span id="clkAlphaVal">100</span>%</label>
         <input type="range" id="clkAlpha" min="0" max="100" value="100" oninput="document.getElementById('clkAlphaVal').textContent=this.value;requestDraw()">
 
@@ -1811,7 +1807,9 @@ function loadFamilies(list,cb){
 function fontChanged(el){
   requestDraw();
   if(!el)return;
-  loadFamilies(parseFamilies(el.value),requestDraw);
+  // 时钟字体 select 存的是字体 id（如 playfair），其余 select 存的是 CSS 族名字符串
+  const v=(el.id==="clkFont")?clkFont(el.value).css:el.value;
+  loadFamilies(parseFamilies(v),requestDraw);
 }
 
 // ============ 导出用全分辨率 Canvas ============
@@ -2086,15 +2084,24 @@ function drawBackground(){
 }
 
 // ============ 撕纸边缘路径 ============
+// 确定性伪随机：同一参数永远得到同一条撕边，避免每次重绘都换一个形状
+// （否则拖任何拉条撕边都会整体抖动，导出的边缘也和预览对不上）
+function seededRand(seed){
+  let t=(seed|0)+0x6D2B79F5;
+  t=Math.imul(t^t>>>15,t|1);
+  t^=t+Math.imul(t^t>>>7,t|61);
+  return ((t^t>>>14)>>>0)/4294967296;
+}
 function tornPath(x,y,w,h,amount){
   const p=new Path2D();
+  const g=Math.round(x)*7+Math.round(y)*5+Math.round(w)*13+Math.round(h)*3;
   const steps=Math.max(8,Math.floor(w/30));
   p.moveTo(x,y);
-  for(let i=0;i<=steps;i++){p.lineTo(x+(w*i/steps),y+(Math.random()-0.5)*amount*2);}
+  for(let i=0;i<=steps;i++){p.lineTo(x+(w*i/steps),y+(seededRand(g+i*31)-0.5)*amount*2);}
   const stepsR=Math.max(8,Math.floor(h/30));
-  for(let i=1;i<=stepsR;i++){p.lineTo(x+w+(Math.random()-0.5)*amount*2,y+(h*i/stepsR));}
-  for(let i=1;i<=steps;i++){p.lineTo(x+w-(w*i/steps),y+h+(Math.random()-0.5)*amount*2);}
-  for(let i=1;i<=stepsR;i++){p.lineTo(x+(Math.random()-0.5)*amount*2,y+h-(h*i/stepsR));}
+  for(let i=1;i<=stepsR;i++){p.lineTo(x+w+(seededRand(g+100000+i*31)-0.5)*amount*2,y+(h*i/stepsR));}
+  for(let i=1;i<=steps;i++){p.lineTo(x+w-(w*i/steps),y+h+(seededRand(g+200000+i*31)-0.5)*amount*2);}
+  for(let i=1;i<=stepsR;i++){p.lineTo(x+(seededRand(g+300000+i*31)-0.5)*amount*2,y+h-(h*i/stepsR));}
   p.closePath();return p;
 }
 
@@ -2236,11 +2243,14 @@ function drawManuscriptTint(){
     // 色温：0=冷（压黄去暖），0.5=中性，1=更暖
     const mix=Math.min(1,Math.max(0,toneAmt/0.5));
     const L=(a,b)=>Math.round(a+(b-a)*mix);
+    // 色温 50→100 段：mix 已到顶，把这一段转成叠加浓度增益，保证整条拉条全程有效
+    const boost=Math.min(1.6,1+Math.max(0,toneAmt-0.5)*1.2);
+    const A=(a)=>Math.min(1,a*boost).toFixed(3);
     // 冷端：压红压绿、保蓝 → 去黄；暖端：保红压蓝 → 加黄
     const warmGrad=ctx.createLinearGradient(0,0,0,c.height);
-    warmGrad.addColorStop(0,`rgba(${L(140,255)},${L(178,206)},${L(255,140)},${(0.75*warmAmt).toFixed(3)})`);
-    warmGrad.addColorStop(0.5,`rgba(${L(138,252)},${L(178,212)},${L(255,140)},${(0.6*warmAmt).toFixed(3)})`);
-    warmGrad.addColorStop(1,`rgba(${L(134,244)},${L(174,198)},${L(255,128)},${(0.7*warmAmt).toFixed(3)})`);
+    warmGrad.addColorStop(0,`rgba(${L(140,255)},${L(178,206)},${L(255,140)},${A(0.75*warmAmt)})`);
+    warmGrad.addColorStop(0.5,`rgba(${L(138,252)},${L(178,212)},${L(255,140)},${A(0.6*warmAmt)})`);
+    warmGrad.addColorStop(1,`rgba(${L(134,244)},${L(174,198)},${L(255,128)},${A(0.7*warmAmt)})`);
     ctx.fillStyle=warmGrad;
     ctx.fillRect(0,0,c.width,c.height);
     ctx.restore();
@@ -2352,14 +2362,15 @@ function drawManuscriptTitle(){
     const startY=c.height*mainY-(lines.length-1)*lh/2;
     lines.forEach((line,i)=>{
       const y=startY+i*lh;
-      // 白色虚影层（错位+模糊+半透明）
+      // 虚影层（错位+模糊+半透明）：颜色跟随「虚影颜色」控件 msSubtitleColor
+      const sRGB=clkColorHex(sColor);
       ctx.save();
-      ctx.shadowColor="rgba(255,255,255,0.7)";
+      ctx.shadowColor=`rgba(${sRGB[0]},${sRGB[1]},${sRGB[2]},0.7)`;
       ctx.shadowBlur=fs*0.2;
       ctx.shadowOffsetX=fs*0.04;
       ctx.shadowOffsetY=fs*0.04;
       ctx.font=`${fs}px ${fontCN}`;
-      ctx.fillStyle="rgba(255,255,255,0.4)";
+      ctx.fillStyle=`rgba(${sRGB[0]},${sRGB[1]},${sRGB[2]},0.4)`;
       ctx.fillText(line,c.width*mainX,y);
       ctx.restore();
       // 金色主层（渐变填充）
@@ -2421,7 +2432,8 @@ function drawTornDivider(){
   ctx.moveTo(0,y);
   const steps=Math.max(20,Math.floor(c.width/40));
   for(let i=0;i<=steps;i++){
-    const jag=Math.sin(i*1.7)*c.width*0.008+(Math.random()-0.5)*c.width*0.012;
+    // 种子随机：分隔撕边形状随参数固定，不随每次重绘抖动
+    const jag=Math.sin(i*1.7)*c.width*0.008+(seededRand(c.width+i*17)-0.5)*c.width*0.012;
     ctx.lineTo(c.width*(i/steps),y+jag+c.width*0.01);
   }
   ctx.lineTo(c.width,y);
@@ -2433,7 +2445,7 @@ function drawTornDivider(){
   ctx.beginPath();
   ctx.moveTo(0,y);
   for(let i=0;i<=steps;i++){
-    const jag=Math.sin(i*1.7)*c.width*0.008+(Math.random()-0.5)*c.width*0.012;
+    const jag=Math.sin(i*1.7)*c.width*0.008+(seededRand(c.width+i*29+70000)-0.5)*c.width*0.012;
     ctx.lineTo(c.width*(i/steps),y+jag);
   }
   ctx.stroke();
@@ -2725,14 +2737,51 @@ function pfPill(x,y,w,h,r){
 }
 function drawProfile(){
   const W=c.width,H=c.height;
-  // 1) 兜底背景（未上传作品图时显示）
-  drawBackground();
-  // 2) 作品图铺满（cover，可缩放、可羽化）
+  // 1) 兜底背景（未上传作品图时显示）——与其他模板一致，仅在背景层应用背景模糊
+  const pfBlur=parseInt(document.getElementById("bgBlur").value)||0;
+  if(pfBlur>0){
+    ctx.save();
+    ctx.filter=`blur(${pfBlur}px)`;
+    drawBackground();
+    ctx.restore();
+  }else{
+    drawBackground();
+  }
+  // 2) 作品图铺满（cover，可缩放、可羽化；支持「填满宽度」与边框/投影）
   const img=layers[0]&&layers[0].img;
   if(img&&img.complete&&img.naturalWidth){
     const scale=pfVal("artScale")/100;
-    const r=Math.max(W/img.width,H/img.height)*scale;
-    const iw=img.width*r,ih=img.height*r,ix=(W-iw)/2,iy=(H-ih)/2;
+    const fillW=document.getElementById("fillWidth")&&document.getElementById("fillWidth").checked;
+    const border=parseInt(document.getElementById("artBorder").value);
+    const borderColor=document.getElementById("borderColor").value;
+    const sDist=parseInt(document.getElementById("shadowDist").value);
+    const sBlur=parseInt(document.getElementById("shadowBlur").value);
+    const sOp=parseInt(document.getElementById("shadowOp").value)/100;
+    const sAng=parseInt(document.getElementById("shadowAngle").value)*Math.PI/180;
+    let iw,ih,ix,iy;
+    if(fillW){
+      iw=W;ih=img.height*(W/img.width);ix=0;
+      const fy=parseInt(document.getElementById("fillWidthY")?document.getElementById("fillWidthY").value:50)/100;
+      iy=H*fy-ih*fy;
+    }else{
+      const r=Math.max(W/img.width,H/img.height)*scale;
+      iw=img.width*r;ih=img.height*r;ix=(W-iw)/2;iy=(H-ih)/2;
+    }
+    // 投影与边框（与通用作品图层一致）
+    if(sDist>0||sBlur>0){
+      ctx.save();
+      ctx.shadowColor=`rgba(0,0,0,${sOp})`;
+      ctx.shadowBlur=sBlur;
+      ctx.shadowOffsetX=Math.cos(sAng)*sDist;
+      ctx.shadowOffsetY=Math.max(0,Math.sin(sAng)*sDist);
+      ctx.fillStyle=`rgba(0,0,0,${sOp})`;
+      ctx.fillRect(ix-border,iy-border,iw+border*2,ih+border*2);
+      ctx.restore();
+    }
+    if(border>0){
+      ctx.fillStyle=borderColor;
+      ctx.fillRect(ix-border,iy-border,iw+border*2,ih+border*2);
+    }
     const fm=pfStr("featherMode"),fw=pfVal("featherW");
     if(fm==="none"||fw<=0){
       ctx.drawImage(img,ix,iy,iw,ih);
@@ -2855,10 +2904,23 @@ function drawProfile(){
     raw.forEach(line=>{
       if(line.trim()===""){lines.push("");return;}
       const words=line.split(/\s+/);let cur="";
-      words.forEach(w=>{
-        const t=cur?cur+" "+w:w;
-        if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w;}else{cur=t;}
-      });
+      const pushWord=function(w){
+        if(ctx.measureText(w).width<=maxW){
+          // 空格分词：整词换行
+          const t=cur?cur+" "+w:w;
+          if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w;}else{cur=t;}
+          return;
+        }
+        // 超宽词（如连续中文无空格）：按字符强制换行，否则「正文行宽」拉条对中文无效
+        if(cur){lines.push(cur);cur="";}
+        let buf="";
+        for(let i=0;i<w.length;i++){
+          const t2=buf+w[i];
+          if(ctx.measureText(t2).width>maxW&&buf){lines.push(buf);buf=w[i];}else{buf=t2;}
+        }
+        if(buf)cur=buf;
+      };
+      words.forEach(pushWord);
       if(cur)lines.push(cur);
     });
     lines.forEach((ln,i)=>ctx.fillText(ln,x,y+i*lh));
@@ -3047,6 +3109,8 @@ function draw(){
   const blurAmt=parseInt(document.getElementById("bgBlur").value);
   const lockScreen=document.getElementById("lockScreen").checked;
   const msMode=document.getElementById("msMode").checked;
+  // 字稿风「背景图模糊强度」：作用在作品图上（仅 msMode 开启时），与背景模糊 bgBlur 相互独立
+  const msBlurAmt=msMode?(parseInt(document.getElementById("msBlur").value)||0):0;
   const poEl=document.getElementById("poEnable");
   const poMode=(typeof currentTemplate!=="undefined"&&currentTemplate==="polaroid")&&(!poEl||poEl.checked);
 
@@ -3064,6 +3128,12 @@ function draw(){
   if(!lockScreen&&!poMode) drawTexture();
   if(poMode){
     drawPolaroid();
+  }else if(msBlurAmt>0){
+    // 字稿风：作品图（背景图）按 msBlur 模糊后再叠信息，保证文字可读
+    ctx.save();
+    try{ctx.filter=`blur(${msBlurAmt}px)`;}catch(e){}
+    drawArtwork();
+    ctx.restore();
   }else{
     drawArtwork();
   }
@@ -3505,10 +3575,12 @@ function drawWatermark(){
   if(tile){
     const stepX=w*(1+gap);
     const stepY=h*(1+gap);
-    const ext=Math.hypot(c.width,c.height);
+    // 平铺网格也要跟随 X/Y 拉条偏移（X/Y 默认在平铺下也生效），边距留双倍对角线保证偏移后仍铺满
+    const ext=Math.hypot(c.width,c.height)*2;
     ctx.translate(c.width/2,c.height/2);
     ctx.rotate(rot);
     ctx.translate(-c.width/2,-c.height/2);
+    ctx.translate(c.width*(wx-0.5),c.height*(wy-0.5));
     for(let y=-h-ext;y<c.height+h+ext;y+=stepY){
       for(let x=-w-ext;x<c.width+w+ext;x+=stepX){
         ctx.drawImage(watermarkImg,x,y,w,h);
@@ -3611,13 +3683,22 @@ function clkColorHex(hex){
   const s=h.length===3?h.split("").map(function(c){return c+c;}).join(""):(h+"ffffff").slice(0,6);
   return [parseInt(s.substr(0,2),16)||0,parseInt(s.substr(2,2),16)||0,parseInt(s.substr(4,2),16)||0];
 }
+// 按饱和度百分比调整颜色（0=灰度，100=原色），用于「玻璃色调饱和度」拉条
+function clkSaturate(hex,sat){
+  const s=Math.max(0,Math.min(100,parseFloat(sat)))/100;
+  if(s>=1)return hex;
+  const rgb=clkColorHex(hex);
+  const y=0.299*rgb[0]+0.587*rgb[1]+0.114*rgb[2];
+  const c=rgb.map(function(v){return Math.max(0,Math.min(255,Math.round(y+(v-y)*s)));});
+  return "#"+c.map(function(v){return ("0"+v.toString(16)).slice(-2);}).join("");
+}
 
 // —— 每种模式各自的一套默认值（切换模式只换布局，不覆盖各模式自己的记录）——
 const CLK_MODE_DEFAULTS={
   classic:{font:"system",weight:700,size:18,spacing:0,alpha:100,x:50,y:20,tintSat:100},
   glass:{font:"system",weight:600,size:18,spacing:0,h:100,w:100,stretch:100,alpha:100,x:50,y:20,
          glass:true,glassOp:55,glassBlur:45,glassHi:55,glassEdge:50,glassTint:"#cfe0ff",clarity:85,glassAmt:100,tintSat:100},
-  compact:{cmpSize:5,cmpGap:12,cmpX:50,cmpY:14,cmpOp:75,weight:600,alpha:100}
+  compact:{font:"system",cmpSize:5,cmpGap:12,cmpX:50,cmpY:14,cmpOp:75,weight:600,alpha:100}
 };
 // 模式 → 控件 id 映射。经典模式的时间字号/X/Y 仍复用旧的 lockTimeSize/lockTimeX/lockTimeY，
 // 这样老的自动保存、预设槽、分享链接里的数值继续有效。
@@ -3626,17 +3707,17 @@ const CLK_KEYS={
   glass:{font:"clkFont",weight:"clkWeight",size:"clkSize",spacing:"clkSpacing",h:"clkH",w:"clkW",stretch:"clkStretch",
          alpha:"clkAlpha",x:"clkX",y:"clkY",glass:"clkGlass",glassOp:"clkGlassOp",glassBlur:"clkGlassBlur",glassHi:"clkGlassHi",
          glassEdge:"clkGlassEdge",glassTint:"clkGlassTint",clarity:"clkClarity",glassAmt:"clkGlassAmt",tintSat:"clkTintSat"},
-  compact:{font:null,weight:"clkWeight",size:null,spacing:null,alpha:"clkAlpha",
+  compact:{font:"clkFont",weight:"clkWeight",size:null,spacing:null,alpha:"clkAlpha",
            cmpSize:"clkCmpSize",cmpGap:"clkCmpGap",cmpX:"clkCmpX",cmpY:"clkCmpY",cmpOp:"clkCmpOp"}
 };
 // 面板上“一个控件控制哪个模式”的白名单（其余模式隐藏时只能由绘制侧读默认值）
 const CLK_CTRL_MODE={
-  clkFont:["classic","glass"],clkWeight:["classic","glass","compact"],
+  clkFont:["classic","glass","compact"],clkWeight:["classic","glass","compact"],
   clkSize:["glass"],clkSpacing:["classic","glass"],clkH:["glass"],clkW:["glass"],clkStretch:["glass"],
   clkAlpha:["classic","glass","compact"],
   clkX:["glass"],clkY:["glass"],
   clkGlass:["glass"],clkGlassOp:["glass"],clkGlassBlur:["glass"],clkGlassHi:["glass"],clkGlassEdge:["glass"],
-  clkGlassTint:["glass"],clkClarity:["glass"],clkGlassAmt:["glass"],clkTintSat:["glass","classic"],
+  clkGlassTint:["glass"],clkClarity:["glass"],clkGlassAmt:["glass"],clkTintSat:["glass"],
   clkCmpSize:["compact"],clkCmpGap:["compact"],clkCmpX:["compact"],clkCmpY:["compact"],clkCmpOp:["compact"],clkCmpDate:["compact"],
   clkDateColor:["compact"],clkDateUseOwn:["compact"]
 };
@@ -3691,8 +3772,11 @@ function clkValIn(mode,k){
     if(el){
       if(el.type==="checkbox")return el.checked;
       if(el.type==="color")return el.value;
-      const v=el.type==="range"?parseFloat(el.value):el.value;
-      if(!(v===""||isNaN(v)))return v;
+      // 数字控件校验 NaN；文本控件（如字体 id）只要非空即有效——isNaN("playfair") 为 true，不能用它校验字符串
+      if(el.type==="range"||el.type==="number"){
+        const n=parseFloat(el.value);
+        if(!isNaN(n))return n;
+      }else if(el.value!==""){return el.value;}
     }
   }
   const mem=CLK_MEMORY[mode];
@@ -3702,6 +3786,13 @@ function clkValIn(mode,k){
 function clkFontIdIn(mode){
   const id=clkValIn(mode,"font");
   return id?String(id):"system";
+}
+// 数值安全取值：0 是合法值（透明度 0 / 位置 0% 等），不能用 || 兜底，否则 0 会被吞成默认值
+function clkN(mode,k,def){
+  const v=clkValIn(mode,k);
+  if(v===null||v===undefined||v==="")return def;
+  const n=parseFloat(v);
+  return isNaN(n)?def:n;
 }
 
 // —— 模式切换 ——
@@ -3750,7 +3841,8 @@ function syncClockPanel(){
     if(!el)return;
     const show=CLK_CTRL_MODE[id].indexOf(mode)>=0;
     const box=(el.parentElement&&el.parentElement.classList.contains("checkbox-row"))?el.parentElement:el;
-    box.style.display=show?"":"none";
+    // clkFont 是隐藏的同步用 select，可见的字体选择 UI 是预览卡按钮组，永远不展开它
+    box.style.display=(id==="clkFont")?"none":(show?"":"none");
     if(box===el){
       const lab=el.previousElementSibling;
       if(lab&&lab.tagName==="LABEL")lab.style.display=show?"":"none";
@@ -3831,6 +3923,8 @@ function resetClockFont(){
   if(mode==="classic"){
     const c=document.getElementById("lockColor");
     if(c)c.value="#ffffff";
+    const cc=document.getElementById("clkColor");
+    if(cc)cc.value="#ffffff";
   }
   syncClockFontUI();
   requestDraw();
@@ -4007,18 +4101,18 @@ function drawLockScreen(){
   const mode=clkMode();
   const fid=clkFontIdIn(mode);
   const f=clkFont(fid);
-  const weight=clkValIn(mode,"weight")||f.defW;
-  const alphaBase=Math.max(0,Math.min(1,(clkValIn(mode,"alpha")||100)/100));
-  const spacingPct=clkValIn(mode,"spacing")||0;
+  const weight=clkN(mode,"weight",f.defW);
+  const alphaBase=Math.max(0,Math.min(1,clkN(mode,"alpha",100)/100));
+  const spacingPct=clkN(mode,"spacing",0);
   if(fid!=="system")loadFamilies(parseFamilies(f.css),null);
 
   // —— iOS 27 紧凑时钟：小时间 + 日期并排，放在顶部区域 ——
   if(mode==="compact"){
-    const cfs=Math.max(8,c.width*((clkValIn("compact","cmpSize")||5)/100));
-    const gap=c.width*((clkValIn("compact","cmpGap")||12)/100);
-    const cx=c.width*((clkValIn("compact","cmpX")||50)/100);
-    const cy=c.height*((clkValIn("compact","cmpY")||14)/100);
-    const op=alphaBase*Math.max(0,Math.min(1,(clkValIn("compact","cmpOp")||75)/100));
+    const cfs=Math.max(8,c.width*(clkN("compact","cmpSize",5)/100));
+    const gap=c.width*(clkN("compact","cmpGap",12)/100);
+    const cx=c.width*(clkN("compact","cmpX",50)/100);
+    const cy=c.height*(clkN("compact","cmpY",14)/100);
+    const op=alphaBase*Math.max(0,Math.min(1,clkN("compact","cmpOp",75)/100));
     const showDate=clkChk("clkCmpDate")&&!!date;
     const dateColor=clkChk("clkDateUseOwn")?(clkStr("clkDateColor")||color):color;
     const sp=cfs*(spacingPct/100);
@@ -4060,15 +4154,15 @@ function drawLockScreen(){
   }
 
   // —— 经典 / iOS 26 大时钟 ——
-  const fs=Math.max(12,Math.floor(c.width*((clkValIn(mode,"size")||18)/100)));
-  const cx=c.width*((clkValIn(mode,"x")||50)/100);
-  const cy=c.height*((clkValIn(mode,"y")||20)/100);
+  const fs=Math.max(12,Math.floor(c.width*(clkN(mode,"size",18)/100)));
+  const cx=c.width*(clkN(mode,"x",50)/100);
+  const cy=c.height*(clkN(mode,"y",20)/100);
   const shOp=parseInt(document.getElementById("lockShadowOp").value)/100;
   const shBlurRatio=parseInt(document.getElementById("lockShadowBlur").value)/100;
   const sp=fs*(spacingPct/100);
-  const wScale=(clkValIn(mode,"w")||100)/100;
-  const hScale=(clkValIn(mode,"h")||100)/100;
-  const stretch=(clkValIn(mode,"stretch")||100)/100;
+  const wScale=clkN(mode,"w",100)/100;
+  const hScale=clkN(mode,"h",100)/100;
+  const stretch=clkN(mode,"stretch",100)/100;
   const isGlass=mode==="glass";
 
   ctx.save();
@@ -4100,7 +4194,7 @@ function drawLockScreen(){
       const gop=Math.max(0,Math.min(1,(clkValIn("glass","glassOp")||0)/100));
       clkGlassPlate(cx,cy,plateW,plateH,{
         blur:fs*((clkValIn("glass","glassBlur")||0)/100)*0.14,
-        tint:clkValIn("glass","glassTint")||"#cfe0ff",
+        tint:clkSaturate(clkValIn("glass","glassTint")||"#cfe0ff",clkN("glass","tintSat",100)),
         tintA:gop*0.42*amt,
         alpha:Math.min(1,gop*1.25*amt),
         hi:(clkValIn("glass","glassHi")||0)/100,
