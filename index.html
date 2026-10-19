@@ -1253,6 +1253,7 @@ love
           <label>字重: <span id="clkWeightVal">700</span></label>
           <input type="range" id="clkWeight" min="100" max="900" step="100" value="700" oninput="document.getElementById('clkWeightVal').textContent=this.value;requestDraw()">
           <button class="clk-reset" onclick="resetClockFont()">恢复默认字体</button>
+          <button class="clk-reset" onclick="startFontImport('clock')" style="margin-top:6px">＋ 导入自定义字体（TTF/OTF/WOFF）</button>
         </div>
 
         <!-- ② 尺寸与拉伸 -->
@@ -1854,11 +1855,160 @@ function loadFamilies(list,cb){
   Promise.all(jobs).then(function(){if(cb)cb();},function(){if(cb)cb();});
 }
 function fontChanged(el){
+  if(el&&el.value==="__import__")return;   //「＋ 导入字体文件…」占位项，由 wireFontSelects 处理
   requestDraw();
   if(!el)return;
   // 时钟字体 select 存的是字体 id（如 playfair），其余 select 存的是 CSS 族名字符串
   const v=(el.id==="clkFont")?clkFont(el.value).css:el.value;
   loadFamilies(parseFamilies(v),requestDraw);
+}
+
+// ============ 自定义字体导入（全模板字体下拉 + 时钟实验室通用） ============
+// 任意字体下拉末尾选「＋ 导入字体文件…」即可导入本地 TTF/OTF/WOFF；导入后自动进入
+// 所有字体下拉并可立即使用，同时写入 localStorage，刷新后自动恢复（体积过大则仅本次会话可用）。
+var CUSTOM_FONT_KEY="ps-custom-fonts-v1";
+var customFonts=[];   // [{fam:"'名字'", name:"名字", clockId?, buf:ArrayBuffer}]
+var fontFileInput=null,pendingImportTarget=null;
+function fontToast(msg){
+  var d=document.getElementById("psFontToast");
+  if(!d){
+    d=document.createElement("div");d.id="psFontToast";
+    d.style.cssText="position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:99998;"+
+      "background:#c9a37c;color:#1a1a1a;padding:9px 16px;border-radius:999px;font-size:13px;"+
+      "font-weight:600;line-height:1.4;box-shadow:0 8px 26px rgba(0,0,0,.32);max-width:92vw;text-align:center";
+    document.body.appendChild(d);
+  }
+  d.textContent=msg;d.style.display="block";
+  clearTimeout(d._t);d._t=setTimeout(function(){d.style.display="none";},4200);
+}
+function b64FromBuf(buf){
+  var bytes=new Uint8Array(buf),s="",CH=0x8000;
+  for(var i=0;i<bytes.length;i+=CH)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+CH));
+  return btoa(s);
+}
+function bufFromB64(b64){
+  var bin=atob(b64),buf=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++)buf[i]=bin.charCodeAt(i);
+  return buf.buffer;
+}
+function fontFamFromFile(file){
+  var base=String(file.name).replace(/\.(ttf|otf|woff2?)$/i,"").trim()||"自定义字体";
+  base=base.replace(/["'`\\,]/g," ").replace(/\s+/g," ").trim().slice(0,40)||"自定义字体";
+  var fam="'"+base+"'",n=2;
+  while(customFonts.some(function(f){return f.fam===fam;})){fam="'"+base+" "+n+"'";n++;}
+  return {fam:fam,name:base};
+}
+function allFontSelects(){
+  return Array.prototype.slice.call(document.querySelectorAll('select[onchange*="fontChanged"]'))
+    .filter(function(s){return s.id!=="clkFont";});
+}
+function addCustomFontOption(sel,fam,name){
+  var grp=null,i,opts=sel.querySelectorAll("optgroup");
+  for(i=0;i<opts.length;i++){if(opts[i].dataset.custom){grp=opts[i];break;}}
+  if(!grp){
+    grp=document.createElement("optgroup");grp.label="自定义字体";grp.dataset.custom="1";
+    sel.appendChild(grp);
+  }
+  var kids=grp.querySelectorAll("option");
+  for(i=0;i<kids.length;i++){if(kids[i].value===fam)return;}
+  var o=document.createElement("option");o.value=fam;o.textContent=name;grp.appendChild(o);
+}
+function clkFontHasId(id){for(var i=0;i<CLK_FONTS.length;i++){if(CLK_FONTS[i].id===id)return true;}return false;}
+function registerCustomFont(fam,name,buffer,clockId){
+  var ff=null;
+  try{ff=new FontFace(fam.replace(/^'|'$/g,""),buffer);document.fonts.add(ff);}catch(e){return false;}
+  if(ff&&ff.load)ff.load().then(function(){requestDraw();},function(){});
+  if(!customFonts.some(function(f){return f.fam===fam;}))customFonts.push({fam:fam,name:name,buf:buffer});
+  customFonts.forEach(function(f){
+    if(f.fam===fam&&clockId&&!f.clockId){
+      f.clockId=clockId;
+      if(!clkFontHasId(clockId))CLK_FONTS.push({id:clockId,name:name,css:fam,defW:400});
+    }
+  });
+  allFontSelects().forEach(function(sel){addCustomFontOption(sel,fam,name);});
+  return true;
+}
+function persistCustomFonts(){
+  if(!customFonts.length){try{localStorage.removeItem(CUSTOM_FONT_KEY);}catch(e){}return;}
+  try{
+    var list=customFonts.map(function(f){
+      return {fam:f.fam,name:f.name,clockId:f.clockId||"",b:b64FromBuf(f.buf)};
+    });
+    var json=JSON.stringify(list);
+    if(json.length>4200000)throw {quota:1};   // 逼近 localStorage 5MB 上限，宁可不存也不写坏
+    localStorage.setItem(CUSTOM_FONT_KEY,json);
+  }catch(e){
+    fontToast("字体已导入并可使用，但体积过大未能持久保存，刷新后需重新导入");
+  }
+}
+function restoreCustomFonts(){
+  var raw=null;
+  try{raw=localStorage.getItem(CUSTOM_FONT_KEY);}catch(e){}
+  if(!raw)return;
+  var list;try{list=JSON.parse(raw);}catch(e){return;}
+  if(!list||!list.length)return;
+  list.forEach(function(item){
+    if(!item||!item.fam||!item.b)return;
+    var buf;try{buf=bufFromB64(item.b);}catch(e){return;}
+    registerCustomFont(item.fam,item.name||String(item.fam).replace(/'/g,""),buf,item.clockId||"");
+  });
+}
+function ensureFontInput(){
+  if(fontFileInput)return fontFileInput;
+  fontFileInput=document.createElement("input");
+  fontFileInput.type="file";
+  fontFileInput.accept=".ttf,.otf,.woff,.woff2,font/ttf,font/otf,font/woff,font/woff2";
+  fontFileInput.style.display="none";
+  fontFileInput.addEventListener("change",function(){
+    var f=this.files&&this.files[0];
+    this.value="";
+    if(f)doImportFont(f);
+  });
+  document.body.appendChild(fontFileInput);
+  return fontFileInput;
+}
+function startFontImport(target){pendingImportTarget=target||null;ensureFontInput().click();}
+function doImportFont(file){
+  if(!/\.(ttf|otf|woff2?)$/i.test(file.name)){fontToast("暂只支持 TTF / OTF / WOFF 字体文件");return;}
+  var reader=new FileReader();
+  reader.onload=function(){
+    var info=fontFamFromFile(file);
+    var clockId=(pendingImportTarget==="clock")?("cf_"+Date.now().toString(36)):"";
+    if(!registerCustomFont(info.fam,info.name,reader.result,clockId)){
+      fontToast("字体导入失败：文件可能损坏或格式不受支持");return;
+    }
+    if(pendingImportTarget==="clock"){
+      buildClockFonts();          // 时钟字体卡加入新字体并选中
+      pickClockFont(clockId);
+    }else if(pendingImportTarget&&pendingImportTarget.tagName==="SELECT"){
+      pendingImportTarget.value=info.fam;
+      if(pendingImportTarget._syncFontPrev)pendingImportTarget._syncFontPrev();
+      fontChanged(pendingImportTarget);
+    }
+    persistCustomFonts();
+    fontToast("字体「"+info.name+"」导入成功，已加入全部字体下拉");
+  };
+  reader.onerror=function(){fontToast("字体文件读取失败");};
+  reader.readAsArrayBuffer(file);
+}
+function wireFontSelects(){
+  allFontSelects().forEach(function(sel){
+    if(sel.dataset.fontImport)return;
+    sel.dataset.fontImport="1";
+    var imp=document.createElement("option");
+    imp.value="__import__";imp.textContent="＋ 导入字体文件…";
+    sel.appendChild(imp);
+    var prev=sel.value;
+    // 鼠标点开下拉的瞬间先记住当前合法值，取消导入时原样还原
+    sel.addEventListener("pointerdown",function(){if(sel.value&&sel.value!=="__import__")prev=sel.value;});
+    sel.addEventListener("change",function(){
+      if(sel.value==="__import__"){
+        try{if(prev)sel.value=prev;}catch(e){}
+        startFontImport(sel);
+      }else if(sel.value){prev=sel.value;}
+    });
+    sel._syncFontPrev=function(){if(sel.value&&sel.value!=="__import__")prev=sel.value;};
+  });
 }
 
 // ============ 导出用全分辨率 Canvas ============
@@ -3939,6 +4089,7 @@ function buildClockFonts(){
   const grid=document.getElementById("clkFontGrid");
   const sel=document.getElementById("clkFont");
   if(!grid||!sel)return;
+  const keep=sel.value;                 // 重建会清空 option，先记住当前值（恢复的自定义/内置字体不丢）
   grid.innerHTML="";sel.innerHTML="";
   CLK_FONTS.forEach(function(f){
     const b=document.createElement("button");
@@ -3956,6 +4107,11 @@ function buildClockFonts(){
     o.value=f.id;o.textContent=f.name;
     sel.appendChild(o);
   });
+  if(keep){
+    let has=false;
+    for(let i=0;i<sel.options.length;i++){if(sel.options[i].value===keep){has=true;break;}}
+    if(has)sel.value=keep;
+  }
   syncClockFontUI();
 }
 function pickClockFont(id){
@@ -5975,7 +6131,13 @@ function exportPNG(){
 }
 
 // 初始化：恢复自动保存 + 恢复图片 + 生成纹理
+// 自定义字体：先挂载各下拉的导入项并恢复历史导入的字体（含时钟字体卡），
+// 再跑自动保存恢复，保证保存下来的自定义字体值能对上已存在的 option。
+wireFontSelects();
+restoreCustomFonts();
+buildClockFonts();
 restoreAutosave();
+allFontSelects().forEach(function(s){if(s._syncFontPrev)s._syncFontPrev();});
 idbGet("ps-avatar").then(blob=>{
   if(!blob)return;
   const img=new Image();
