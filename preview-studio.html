@@ -286,7 +286,19 @@ input[type=file]{font-size:11px}
 .mock-profile .mpf-lines i.short{width:46%;background:#9aa3ad}
 .mock-profile .mpf-stats{display:flex;gap:14px;margin-top:14px;padding-left:4px}
 .mock-profile .mpf-stats b{font-size:13px;color:#1a1a1a;font-weight:700}
-.tpl-thumb .mock-normal,.tpl-thumb .mock-lock,.tpl-thumb .mock-ms,.tpl-thumb .mock-polaroid,.tpl-thumb .mock-dual,.tpl-thumb .mock-profile{transform:scale(var(--mk,1));transform-origin:center;transition:transform .25s ease}
+.tpl-thumb .mock-normal,.tpl-thumb .mock-lock,.tpl-thumb .mock-ms,.tpl-thumb .mock-polaroid,.tpl-thumb .mock-dual,.tpl-thumb .mock-profile,.tpl-thumb .mock-frame{transform:scale(var(--mk,1));transform-origin:center;transition:transform .25s ease}
+/* 缩略 mock：相框风 */
+.mock-frame{width:150px;height:150px;border-radius:10px;position:relative;overflow:hidden;box-shadow:0 10px 26px rgba(0,0,0,.3);background:linear-gradient(150deg,#e9e3d8,#c8d5e2)}
+.mock-frame .mkf-bg{position:absolute;inset:-16px;background:linear-gradient(150deg,#f0e8da 0%,#cfd9e4 48%,#8fa3bb 100%);filter:blur(10px)}
+.mock-frame .mkf-veil{position:absolute;inset:0;background:rgba(255,255,255,.26)}
+.mock-frame .mkf-art{position:absolute;left:29px;top:24px;width:92px;height:94px;border-radius:6px;background:linear-gradient(145deg,#9fb6cf 0%,#6f8aa8 55%,#4d6480 100%)}
+.mock-frame .mkf-c{position:absolute;width:14px;height:14px;border:0 solid #fff;border-radius:3px}
+.mock-frame .mkf-c.tl{left:29px;top:24px;border-left-width:2.6px;border-top-width:2.6px}
+.mock-frame .mkf-c.tr{right:29px;top:24px;border-right-width:2.6px;border-top-width:2.6px}
+.mock-frame .mkf-c.bl{left:29px;bottom:32px;border-left-width:2.6px;border-bottom-width:2.6px}
+.mock-frame .mkf-c.br{right:29px;bottom:32px;border-right-width:2.6px;border-bottom-width:2.6px}
+.mock-frame .mkf-pill{position:absolute;left:50%;top:21px;transform:translateX(-50%);width:21px;height:4px;border-radius:2px;background:rgba(255,255,255,.62)}
+.mock-frame .mkf-bar{position:absolute;left:50%;bottom:11px;transform:translateX(-50%);width:38px;height:4px;border-radius:2px;background:rgba(255,255,255,.55)}
 /* 模板卡片响应式：必须置于基础样式之后，否则同优先级会被覆盖 */
 @media(max-width:768px){
   .tpl-grid{gap:14px}
@@ -489,6 +501,24 @@ input[type=file]{font-size:11px}
           <p>仿社交平台个人主页：状态栏 + 大图背景 + 白色信息卡（圆形头像、昵称、在线状态、粉丝/关注/转评赞统计）+ 个性签名，所有元素可拖拽可显隐。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('profile')">进入制作 →</button>
         </div>
+        <div class="tpl-card" data-tpl="frame" onclick="selectTemplate('frame')">
+          <div class="tpl-thumb">
+            <div class="mock-frame">
+              <div class="mkf-bg"></div>
+              <div class="mkf-veil"></div>
+              <div class="mkf-art"></div>
+              <div class="mkf-c tl"></div>
+              <div class="mkf-c tr"></div>
+              <div class="mkf-c bl"></div>
+              <div class="mkf-c br"></div>
+              <div class="mkf-pill"></div>
+              <div class="mkf-bar"></div>
+            </div>
+          </div>
+          <h3>相框风预览</h3>
+          <p>同一张作品图放大模糊铺满背景，中央清晰展示原图；四角白色 L 形角标 + 顶部小条 + 底部指示条，画框缩放、圆角、角标长度与粗细、模糊与薄纱全部可调。</p>
+          <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('frame')">进入制作 →</button>
+        </div>
         <div class="tpl-card" data-tpl="dual" onclick="location.href='dual-studio.html'">
           <div class="tpl-thumb">
             <div class="mock-dual">
@@ -520,7 +550,7 @@ input[type=file]{font-size:11px}
           <button class="back-btn" onclick="backToTemplates()">← 返回模板选择</button>
           <span class="tpl-name" id="tplName"></span>
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame">
         <h3 class="tool-h">① 预设存档</h3>
         <p class="preset-tip">仅保存于「<b id="presetTplName">普通作品预览</b>」工作区，与其他模板互不干扰；每个槽位左侧存档、右侧载入。</p>
         <div class="preset-grid" id="presetGrid"></div>
@@ -530,7 +560,7 @@ input[type=file]{font-size:11px}
         <div class="hint">预设只记录参数，自定义纹理图与头像需重新上传。</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame">
         <h3 class="tool-h" style="margin-top:14px">② 分享预设</h3>
         <button class="primary" onclick="sharePreset()" style="margin-bottom:6px">🔗 生成短链接</button>
         <label>导入预设（粘贴链接或短码）</label>
@@ -542,7 +572,7 @@ input[type=file]{font-size:11px}
         <div class="hint" id="shareHint">生成短链接复制给别人，打开即自动应用；也可手动粘贴导入。</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame">
         <h3 class="tool-h">③ 画布尺寸</h3>
         <select id="size">
           <optgroup label="手机锁屏尺寸">
@@ -586,6 +616,7 @@ input[type=file]{font-size:11px}
             <option value="1080,1080">正方形 1080×1080</option>
             <option value="2048,2048">正方形 2048×2048</option>
             <option value="1500,1500" selected>正方形 1500×1500</option>
+            <option value="1600,1600">正方形 1600×1600</option>
           </optgroup>
           <optgroup label="3:4 竖版">
             <option value="1500,2000">3:4 竖 1500×2000</option>
@@ -673,6 +704,33 @@ input[type=file]{font-size:11px}
         </div>
         <div class="hint">作品图边缘会渐变透明，融合到背景中。</div>
 
+        </div>
+        <div class="tpl-sec" data-tpl="frame">
+        <h3 class="tool-h" style="margin-top:14px">⑦ 相框风预览（Frame）</h3>
+        <div class="po-group">作品图</div>
+        <input type="file" id="fmArtUpload" accept="image/*">
+        <button class="warn small" onclick="fmRemoveArt()">× 删除作品图</button>
+        <label>画框缩放: <span id="fmScaleVal">100</span>%</label>
+        <input type="range" id="fmScale" min="40" max="100" value="100" oninput="document.getElementById('fmScaleVal').textContent=this.value;requestDraw()">
+        <label>圆角: <span id="fmRadiusVal">5</span>%</label>
+        <input type="range" id="fmRadius" min="0" max="12" value="5" oninput="document.getElementById('fmRadiusVal').textContent=this.value;requestDraw()">
+        <div class="hint">画框为正方形，作品图铺满画框，超出部分自动裁切。</div>
+        <div class="po-group">四角角标</div>
+        <label>角标长度: <span id="fmArmVal">20</span>%</label>
+        <input type="range" id="fmArm" min="0" max="40" value="20" oninput="document.getElementById('fmArmVal').textContent=this.value;requestDraw()">
+        <label>角标粗细: <span id="fmArmWVal">1.6</span>%</label>
+        <input type="range" id="fmArmW" min="0" max="4" step="0.1" value="1.6" oninput="document.getElementById('fmArmWVal').textContent=this.value;requestDraw()">
+        <label>角标颜色</label>
+        <input type="color" id="fmArmColor" value="#ffffff" onchange="requestDraw()">
+        <div class="hint">长度/粗细均按画框短边百分比计算，设为 0 可隐藏角标。</div>
+        <div class="po-group">背景</div>
+        <label>背景模糊: <span id="fmBlurVal">40</span></label>
+        <input type="range" id="fmBlur" min="0" max="100" value="40" oninput="document.getElementById('fmBlurVal').textContent=this.value;requestDraw()">
+        <label>白色薄纱: <span id="fmVeilVal">24</span>%</label>
+        <input type="range" id="fmVeil" min="0" max="80" value="24" oninput="document.getElementById('fmVeilVal').textContent=this.value;requestDraw()">
+        <div class="checkbox-row"><input type="checkbox" id="fmPill" checked onchange="requestDraw()"><span>顶部小条（Dynamic Island）</span></div>
+        <div class="checkbox-row"><input type="checkbox" id="fmBar" checked onchange="requestDraw()"><span>底部指示条（Home Bar）</span></div>
+        <div class="hint">背景为同一张作品图放大模糊 + 白色薄纱；未上传作品图时使用浅蓝灰渐变兜底。</div>
         </div>
         <div class="tpl-sec" data-tpl="polaroid">
         <h3 class="tool-h" style="margin-top:14px">⑦ 拍立得风格（Polaroid）</h3>
@@ -1514,7 +1572,7 @@ love
         <div class="hint">💡 头像 / 昵称 / 统计 / 正文 / 音乐栏都可以直接在画布上拖拽移动</div>
         </div>
 
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame">
         <h3 class="tool-h" style="margin-top:14px">⑬ 全屏水印</h3>
         <div class="checkbox-row"><input type="checkbox" id="wmEnable" onchange="requestDraw()"><span>启用全屏水印</span></div>
         <input type="file" id="wmUpload" accept="image/*">
@@ -1565,7 +1623,7 @@ love
         <div class="hint" id="pickerHint" style="display:none;color:#f4c842">吸管模式已开启：点击右侧画布任意位置吸取颜色</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame">
         <h3 class="tool-h">⑮ 导出</h3>
         <button class="primary" onclick="exportPNG()">导出 PNG</button>
         <div class="hint" style="margin-top:10px">提示：预设只保存参数，自定义纹理图和头像需重新上传。</div>
@@ -2259,6 +2317,194 @@ function removeArt(){
   layers.splice(0,layers.length);
   requestDraw();
 }
+
+// 带四角独立圆角的路径（r 可以是数字或 [左上,右上,右下,左下]）
+function ptPath(x,y,w,h,r){
+  const a=Array.isArray(r)?r.slice():[r,r,r,r];
+  const m=Math.min(w/2,h/2);
+  for(let i=0;i<4;i++)a[i]=Math.max(0,Math.min(a[i],m));
+  ctx.beginPath();
+  ctx.moveTo(x+a[0],y);
+  ctx.lineTo(x+w-a[1],y);
+  if(a[1])ctx.arcTo(x+w,y,x+w,y+a[1],a[1]);else ctx.lineTo(x+w,y);
+  ctx.lineTo(x+w,y+h-a[2]);
+  if(a[2])ctx.arcTo(x+w,y+h,x+w-a[2],y+h,a[2]);else ctx.lineTo(x+w,y+h);
+  ctx.lineTo(x+a[3],y+h);
+  if(a[3])ctx.arcTo(x,y+h,x,y+h-a[3],a[3]);else ctx.lineTo(x,y+h);
+  ctx.lineTo(x,y+a[0]);
+  if(a[0])ctx.arcTo(x,y,x+a[0],y,a[0]);else ctx.lineTo(x,y);
+  ctx.closePath();
+}
+
+
+// ============ 相框风预览（Frame） ============
+function fmV(id){const el=document.getElementById(id);return el?el.value:"";}
+function fmN(id,d){const v=parseInt(fmV(id),10);return isNaN(v)?d:v;}
+// 跨浏览器背景模糊：支持 ctx.filter 时用高斯模糊，否则用离屏降采样近似（Safari 不支持 ctx.filter）
+const FM_FILTER_OK=(function(){
+  try{const t=document.createElement("canvas").getContext("2d");t.filter="blur(2px)";return t.filter!=="none"&&!!t.filter;}catch(e){return false;}
+})();
+function fmDrawBlurred(img,dx,dy,dw,dh,blurPx){
+  if(blurPx<0.5){ctx.drawImage(img,dx,dy,dw,dh);return;}
+  if(FM_FILTER_OK){
+    ctx.save();
+    ctx.filter="blur("+blurPx.toFixed(2)+"px)";
+    ctx.drawImage(img,dx,dy,dw,dh);
+    ctx.restore();
+    return;
+  }
+  // 回退：逐级降采样再放大，视觉近似高斯模糊
+  const ratio=dw/dh;
+  const tw=Math.max(8,Math.round(Math.min(dw,dh)/(1+blurPx*0.35)));
+  const th=Math.max(8,Math.round(tw/ratio));
+  const c1=document.createElement("canvas");c1.width=tw;c1.height=th;
+  const g1=c1.getContext("2d");g1.imageSmoothingEnabled=true;g1.imageSmoothingQuality="high";
+  g1.drawImage(img,0,0,tw,th);
+  const c2=document.createElement("canvas");c2.width=Math.max(4,tw>>1);c2.height=Math.max(4,th>>1);
+  const g2=c2.getContext("2d");g2.imageSmoothingEnabled=true;g2.imageSmoothingQuality="high";
+  g2.drawImage(c1,0,0,c2.width,c2.height);
+  const c3=document.createElement("canvas");c3.width=tw;c3.height=th;
+  const g3=c3.getContext("2d");g3.imageSmoothingEnabled=true;g3.imageSmoothingQuality="high";
+  g3.drawImage(c2,0,0,tw,th);
+  ctx.save();
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";
+  ctx.drawImage(c3,dx,dy,dw,dh);
+  ctx.restore();
+}
+
+function drawFrame(){
+  const W=c.width,H=c.height;
+  const art=(layers.length&&layers[0].img)?layers[0].img:null;
+
+  // 1) 背景：作品图放大模糊铺满，无图时浅蓝灰渐变兜底
+  const blurPct=Math.max(0,Math.min(100,fmN("fmBlur",40)));
+  const blurPx=blurPct/100*Math.min(W,H)*0.11;
+  if(art&&art.width&&art.height){
+    const grow=1.12+blurPx/Math.min(W,H)*1.6;
+    const sc=Math.max(W/art.width,H/art.height)*grow;
+    const dw=art.width*sc,dh=art.height*sc;
+    fmDrawBlurred(art,(W-dw)/2,(H-dh)/2,dw,dh,blurPx);
+  }else{
+    const g=ctx.createLinearGradient(0,0,W,H);
+    g.addColorStop(0,"#d6dfe9");g.addColorStop(1,"#9fb2c8");
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  }
+
+  // 2) 白色薄纱
+  const veil=Math.max(0,Math.min(80,fmN("fmVeil",24)))/100;
+  if(veil>0){ctx.fillStyle="rgba(255,255,255,"+veil+")";ctx.fillRect(0,0,W,H);}
+
+  // 3) 中央画框：固定正方形，作品图铺满（cover）
+  const scalePct=Math.max(40,Math.min(100,fmN("fmScale",100)))/100;
+  const box=Math.min(W,H)*0.72*scalePct;
+  const aw=box,ah=box;
+  const ax=W/2-aw/2,ay=H*0.48-ah/2;
+  const radPct=Math.max(0,Math.min(12,fmN("fmRadius",5)))/100;
+  const rad=Math.min(radPct*Math.min(aw,ah),Math.min(aw,ah)/2);
+
+  // 画框底：白底 + 柔和投影
+  ctx.save();
+  ctx.shadowColor="rgba(38,52,76,.22)";
+  ctx.shadowBlur=Math.max(6,Math.min(aw,ah)*0.045);
+  ctx.shadowOffsetY=Math.max(2,Math.min(aw,ah)*0.012);
+  ctx.fillStyle="#ffffff";
+  ctx.beginPath();ptPath(ax,ay,aw,ah,rad);ctx.fill();
+  ctx.restore();
+
+  // 作品图（圆角裁切，铺满画框）
+  if(art&&art.width&&art.height){
+    ctx.save();
+    ctx.beginPath();ptPath(ax,ay,aw,ah,rad);ctx.clip();
+    const sc=Math.max(aw/art.width,ah/art.height);
+    const dw=art.width*sc,dh=art.height*sc;
+    ctx.drawImage(art,ax+(aw-dw)/2,ay+(ah-dh)/2,dw,dh);
+    ctx.restore();
+  }else{
+    ctx.save();
+    const g2=ctx.createLinearGradient(ax,ay,ax+aw,ay+ah);
+    g2.addColorStop(0,"#c3d2e2");g2.addColorStop(1,"#8ea3bb");
+    ctx.fillStyle=g2;
+    ctx.beginPath();ptPath(ax,ay,aw,ah,rad);ctx.fill();
+    ctx.restore();
+  }
+
+  // 4) 细白描边
+  ctx.save();
+  ctx.strokeStyle="rgba(255,255,255,.35)";
+  ctx.lineWidth=Math.max(1,Math.min(aw,ah)*0.0022);
+  ctx.beginPath();ptPath(ax,ay,aw,ah,rad);ctx.stroke();
+  ctx.restore();
+
+  // 5) 四角 L 形角标（圆头端点 + 圆角转角）
+  const armPct=Math.max(0,Math.min(40,fmN("fmArm",20)))/100;
+  const armW=Math.max(0,parseFloat(fmV("fmArmW"))||0)/100*Math.min(aw,ah);
+  if(armPct>0&&armW>0){
+    const arm=armPct*Math.min(aw,ah);
+    const rr=rad;
+    const corners=[
+      {cx:ax,cy:ay,sx:1,sy:1,a0:-Math.PI/2,a1:Math.PI,ccw:true},
+      {cx:ax+aw,cy:ay,sx:-1,sy:1,a0:-Math.PI/2,a1:0,ccw:false},
+      {cx:ax+aw,cy:ay+ah,sx:-1,sy:-1,a0:Math.PI/2,a1:0,ccw:true},
+      {cx:ax,cy:ay+ah,sx:1,sy:-1,a0:Math.PI/2,a1:Math.PI,ccw:false}
+    ];
+    ctx.save();
+    ctx.strokeStyle=fmV("fmArmColor")||"#ffffff";
+    ctx.lineWidth=armW;
+    ctx.lineCap="round";
+    ctx.lineJoin="round";
+    ctx.shadowColor="rgba(0,0,0,.18)";
+    ctx.shadowBlur=armW*1.2;
+    corners.forEach(function(o){
+      const ccx=o.cx+o.sx*rr,ccy=o.cy+o.sy*rr;
+      ctx.beginPath();
+      ctx.moveTo(o.cx+o.sx*arm,o.cy);
+      if(rr>0.5){
+        ctx.lineTo(ccx,ccy-o.sy*rr);
+        ctx.arc(ccx,ccy,rr,o.a0,o.a1,o.ccw);
+        ctx.lineTo(o.cx,o.cy+o.sy*arm);
+      }else{
+        ctx.lineTo(o.cx,o.cy);
+        ctx.lineTo(o.cx,o.cy+o.sy*arm);
+      }
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
+
+  // 6) 顶部小条（贴合画框顶边内侧）
+  if(document.getElementById("fmPill").checked){
+    const pw=aw*0.23,ph=Math.max(4,pw*0.15);
+    ctx.save();
+    ctx.fillStyle="rgba(255,255,255,.55)";
+    ctx.shadowColor="rgba(0,0,0,.10)";
+    ctx.shadowBlur=ph*1.4;
+    ctx.beginPath();ptPath(ax+(aw-pw)/2,ay,pw,ph,ph/2);ctx.fill();
+    ctx.restore();
+  }
+
+  // 7) 底部指示条
+  if(document.getElementById("fmBar").checked){
+    const bw=Math.min(W*0.52,aw*0.42);
+    const bh=Math.max(W*0.012,H*0.026);
+    const barCY=Math.min(H*0.90,ay+ah+Math.max(W*0.042,H*0.028));
+    ctx.save();
+    ctx.fillStyle="rgba(255,255,255,.5)";
+    ctx.shadowColor="rgba(0,0,0,.10)";
+    ctx.shadowBlur=bh*1.2;
+    ctx.beginPath();ptPath((W-bw)/2,barCY-bh/2,bw,bh,bh/2);ctx.fill();
+    ctx.restore();
+  }
+
+  // 8) 记录照片区域：全屏水印只覆盖中央画框内的作品图，不涉及背景
+  wmClip={ox:0,oy:0,rot:0,x:ax,y:ay,w:aw,h:ah,r:rad};
+}
+
+// —— 相框风控件绑定 ——
+document.getElementById("fmArtUpload").onchange=e=>{
+  addImageFiles(e.target.files);
+  e.target.value="";
+};
+function fmRemoveArt(){removeArt();}
 
 // ============ 背景绘制 ============
 function drawBackground(){
@@ -3317,6 +3563,13 @@ function draw(){
   // 个人主页模板：独立渲染管线
   if(typeof currentTemplate!=="undefined"&&currentTemplate==="profile"){
     drawProfile();
+    drawWatermark();
+    scheduleAutosave();
+    return;
+  }
+  // 相框风模板：独立渲染管线
+  if(typeof currentTemplate!=="undefined"&&currentTemplate==="frame"){
+    drawFrame();
     drawWatermark();
     scheduleAutosave();
     return;
@@ -5238,7 +5491,17 @@ function getSettings(){
     pfMusicX:document.getElementById("pfMusicX").value,
     pfMusicY:document.getElementById("pfMusicY").value,
     pfTextShadow:document.getElementById("pfTextShadow").value,
-    pfVignette:document.getElementById("pfVignette").value
+    pfVignette:document.getElementById("pfVignette").value,
+    // 相框风预览
+    fmScale:document.getElementById("fmScale").value,
+    fmRadius:document.getElementById("fmRadius").value,
+    fmArm:document.getElementById("fmArm").value,
+    fmArmW:document.getElementById("fmArmW").value,
+    fmArmColor:document.getElementById("fmArmColor").value,
+    fmBlur:document.getElementById("fmBlur").value,
+    fmVeil:document.getElementById("fmVeil").value,
+    fmPill:chk("fmPill"),
+    fmBar:chk("fmBar")
   };
 }
 function applySettings(s){
@@ -5465,7 +5728,21 @@ function applySettings(s){
   set("pfMusicY",s.pfMusicY||"66");
   set("pfTextShadow",s.pfTextShadow||"45");
   set("pfVignette",s.pfVignette||"25");
+  // 相框风预览（旧存档没有这些字段时落回默认值）
+  const fmSet=(id,d)=>set(id,s[id]!==undefined?s[id]:d);
+  fmSet("fmScale",100);fmSet("fmRadius",5);
+  fmSet("fmArm",20);fmSet("fmArmW","1.6");
+  set("fmArmColor",s.fmArmColor||"#ffffff");
+  fmSet("fmBlur",40);fmSet("fmVeil",24);
+  chk("fmPill",s.fmPill!==false);
+  chk("fmBar",s.fmBar!==false);
   // 同步显示值
+  document.getElementById("fmScaleVal").textContent=document.getElementById("fmScale").value;
+  document.getElementById("fmRadiusVal").textContent=document.getElementById("fmRadius").value;
+  document.getElementById("fmArmVal").textContent=document.getElementById("fmArm").value;
+  document.getElementById("fmArmWVal").textContent=document.getElementById("fmArmW").value;
+  document.getElementById("fmBlurVal").textContent=document.getElementById("fmBlur").value;
+  document.getElementById("fmVeilVal").textContent=document.getElementById("fmVeil").value;
   document.getElementById("blurVal").textContent=s.bgBlur;
   document.getElementById("scaleVal").textContent=s.artScale;
   document.getElementById("borderVal").textContent=s.artBorder;
@@ -5662,7 +5939,7 @@ function renumberSections(){
 
 // ============ 模板选择首页 / 工作区 ============
 let currentTemplate="normal";
-const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscript:"字稿风预览",polaroid:"拍立得预览",profile:"个人主页"};
+const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscript:"字稿风预览",polaroid:"拍立得预览",profile:"个人主页",frame:"相框风预览"};
 // 每个模板的工作区图片互相独立：切走时存档当前模板的图片，切回时恢复，首次进入未存档则为空
 const tplImages={};
 function selectTemplate(type){
@@ -5746,6 +6023,13 @@ function applyTemplatePreset(type){
     chk("pfStatusBar",true);chk("pfTopIcons",true);chk("pfCard",true);chk("pfAvatar",true);
     chk("pfPlus",true);chk("pfOnline",true);chk("pfVip",false);chk("pfStats",true);
     chk("pfPlay",true);chk("pfSign",true);chk("pfSignIcon",true);chk("pfDate",false);chk("pfBody",true);chk("pfMusic",true);
+  }else if(type==="frame"){
+    chk("msMode",false);
+    chk("lockScreen",false);
+    // 相框风：正方形画布，背景由作品图自身模糊铺满，不动共享背景控件
+    set("size","1500,1500");
+    set("featherMode","none");
+    set("bgBlur","0");
   }else{
     chk("msMode",false);
     chk("lockScreen",false);
