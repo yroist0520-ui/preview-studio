@@ -630,8 +630,8 @@ input[type=file]{font-size:11px}
         <input type="range" id="artScale" min="20" max="150" value="100" oninput="document.getElementById('scaleVal').textContent=this.value;requestDraw()">
         <div class="checkbox-row"><input type="checkbox" id="fillWidth" onchange="requestDraw()"><span>填满宽度（上下可调）</span></div>
         <label>图片位置（上下）: <span id="fillWidthYVal">50</span>%</label>
-        <input type="range" id="fillWidthY" min="0" max="100" value="50" oninput="document.getElementById('fillWidthYVal').textContent=this.value;requestDraw()">
-        <div class="hint">开启后图片填满画布宽度，Y滑块控制上下位置（配合羽化效果）</div>
+        <input type="range" id="fillWidthY" min="0" max="100" value="50" oninput="document.getElementById('fillWidth').checked=true;document.getElementById('fillWidthYVal').textContent=this.value;requestDraw()">
+        <div class="hint">Y滑块直接拖就生效（自动开启「填满宽度」），控制图片上下位置（配合羽化效果）</div>
         <div class="tpl-sec" data-tpl="normal lock manuscript profile">
         <label>描边颜色</label>
         <input type="color" id="borderColor" value="#ffffff" onchange="requestDraw()">
@@ -2285,7 +2285,11 @@ function drawManuscriptTint(){
   const warmAmt=parseFloat(document.getElementById("msWarm").value)/100;
   const toneAmt=parseFloat(document.getElementById("msTone").value)/100;
   const flareAmt=parseFloat(document.getElementById("msFlare").value)/100;
-  if(warmAmt>0){
+  // 色温独立生效：暖金=0 时，色温偏离中点 50 也出层（左拉压黄去暖 / 右拉加暖）。
+  // 否则提示文案让用户「把色温往左拉去黄」，暖金为 0 时怎么拉都没反应。
+  const toneOnly=Math.abs(toneAmt-0.5)*2;
+  const tintAmt=warmAmt>0?warmAmt:toneOnly*0.55;
+  if(tintAmt>0.02){
     ctx.save();
     // 用 multiply：对纯色/低对比背景也有效，调多少肉眼可见
     ctx.globalCompositeOperation="multiply";
@@ -2297,9 +2301,9 @@ function drawManuscriptTint(){
     const A=(a)=>Math.min(1,a*boost).toFixed(3);
     // 冷端：压红压绿、保蓝 → 去黄；暖端：保红压蓝 → 加黄
     const warmGrad=ctx.createLinearGradient(0,0,0,c.height);
-    warmGrad.addColorStop(0,`rgba(${L(140,255)},${L(178,206)},${L(255,140)},${A(0.75*warmAmt)})`);
-    warmGrad.addColorStop(0.5,`rgba(${L(138,252)},${L(178,212)},${L(255,140)},${A(0.6*warmAmt)})`);
-    warmGrad.addColorStop(1,`rgba(${L(134,244)},${L(174,198)},${L(255,128)},${A(0.7*warmAmt)})`);
+    warmGrad.addColorStop(0,`rgba(${L(140,255)},${L(178,206)},${L(255,140)},${A(0.75*tintAmt)})`);
+    warmGrad.addColorStop(0.5,`rgba(${L(138,252)},${L(178,212)},${L(255,140)},${A(0.6*tintAmt)})`);
+    warmGrad.addColorStop(1,`rgba(${L(134,244)},${L(174,198)},${L(255,128)},${A(0.7*tintAmt)})`);
     ctx.fillStyle=warmGrad;
     ctx.fillRect(0,0,c.width,c.height);
     ctx.restore();
@@ -2336,9 +2340,11 @@ function drawManuscriptTint(){
   }
   if(document.getElementById("msInfoBar").checked){
     const barH=c.height*(parseInt(document.getElementById("msBarH").value)/100);
+    // 信息栏下缘提亮带：两端都渐隐成 0，避免在 barH+30 处硬切出一条生硬的横向亮边
     const grad=ctx.createLinearGradient(0,barH-80,0,barH+30);
     grad.addColorStop(0,"rgba(255,255,255,0)");
-    grad.addColorStop(1,"rgba(255,255,255,0.25)");
+    grad.addColorStop(0.55,"rgba(255,255,255,0.16)");
+    grad.addColorStop(1,"rgba(255,255,255,0)");
     ctx.fillStyle=grad;
     ctx.fillRect(0,barH-80,c.width,110);
   }
@@ -2544,15 +2550,25 @@ function drawInfoBar(){
 
   // 顶部信息栏：半透明米色底（不画深灰，保留暖金氛围）
   ctx.save();
+  const tornOn=document.getElementById("msTornDivider").checked;
   const g=ctx.createLinearGradient(0,0,0,barH);
   g.addColorStop(0,"rgba(255,248,235,0.55)");
-  g.addColorStop(1,"rgba(255,248,235,0.15)");
+  if(tornOn){
+    // 撕纸开启：底部浓度与撕纸毛边（0.6）平滑衔接，交界处无亮度落差、无生硬矩形横边
+    g.addColorStop(0.65,"rgba(255,248,235,0.5)");
+    g.addColorStop(1,"rgba(255,248,235,0.5)");
+  }else{
+    g.addColorStop(0.6,"rgba(255,248,235,0.3)");
+    g.addColorStop(1,"rgba(255,248,235,0)");   // 底部渐隐，避免硬切矩形边
+  }
   ctx.fillStyle=g;
   ctx.fillRect(0,0,c.width,barH);
-  // 底部分隔细线
-  ctx.strokeStyle="rgba(150,120,80,0.35)";
-  ctx.lineWidth=Math.max(1,c.width*0.0008);
-  ctx.beginPath();ctx.moveTo(0,barH);ctx.lineTo(c.width,barH);ctx.stroke();
+  // 底部分隔细线：撕纸边缘开启时交给撕纸毛边过渡，只在关闭撕纸时画直线
+  if(!tornOn){
+    ctx.strokeStyle="rgba(150,120,80,0.35)";
+    ctx.lineWidth=Math.max(1,c.width*0.0008);
+    ctx.beginPath();ctx.moveTo(0,barH);ctx.lineTo(c.width,barH);ctx.stroke();
+  }
 
   // 头像（圆形裁切，左上）
   const avatarR=barH*(parseInt(document.getElementById("msAvatarSize").value)/100);
@@ -3160,6 +3176,9 @@ function draw(){
   const msMode=document.getElementById("msMode").checked;
   // 字稿风「背景图模糊强度」：作用在作品图上（仅 msMode 开启时），与背景模糊 bgBlur 相互独立
   const msBlurAmt=msMode?(parseInt(document.getElementById("msBlur").value)||0):0;
+  // 背景高斯模糊（普通模板）：同时作用到作品图本身，拖动即时可见（原实现只模糊纯色/渐变背景，肉眼无感）
+  const bgArtBlur=(!msMode&&currentTemplate==="normal")?(blurAmt||0):0;
+  const artBlurAmt=Math.max(msBlurAmt,bgArtBlur);
   const poEl=document.getElementById("poEnable");
   const poMode=(typeof currentTemplate!=="undefined"&&currentTemplate==="polaroid")&&(!poEl||poEl.checked);
 
@@ -3177,10 +3196,10 @@ function draw(){
   if(!lockScreen&&!poMode) drawTexture();
   if(poMode){
     drawPolaroid();
-  }else if(msBlurAmt>0){
-    // 字稿风：作品图（背景图）按 msBlur 模糊后再叠信息，保证文字可读
+  }else if(artBlurAmt>0){
+    // 作品图模糊：字稿风用「背景图模糊强度」；普通模板用「背景高斯模糊」（作用到照片本身）
     ctx.save();
-    try{ctx.filter=`blur(${msBlurAmt}px)`;}catch(e){}
+    try{ctx.filter=`blur(${artBlurAmt}px)`;}catch(e){}
     drawArtwork();
     ctx.restore();
   }else{
