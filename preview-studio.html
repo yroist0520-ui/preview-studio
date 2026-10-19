@@ -1222,7 +1222,7 @@ love
           <label>时钟整体宽度: <span id="clkWVal">100</span>%</label>
           <input type="range" id="clkW" min="50" max="140" step="1" value="100" oninput="document.getElementById('clkWVal').textContent=this.value;requestDraw()">
           <label>纵向拉伸: <span id="clkStretchVal">100</span>%</label>
-          <input type="range" id="clkStretch" min="70" max="220" step="1" value="100" oninput="document.getElementById('clkStretchVal').textContent=this.value;requestDraw()">
+          <input type="range" id="clkStretch" min="70" max="460" step="1" value="100" oninput="document.getElementById('clkStretchVal').textContent=this.value;requestDraw()">
           <div class="hint">「时钟高度」调整整体纵向比例（含玻璃底板）；「纵向拉伸」直接拉长/压扁数字字形并同步底板高度，对应 iOS 26 时钟字形的纵向伸缩观感，两者可叠加。</div>
           <button class="clk-reset" style="margin-top:6px" onclick="resetClockSize()">恢复默认尺寸</button>
         </div>
@@ -3696,7 +3696,7 @@ function clkSaturate(hex,sat){
 // —— 每种模式各自的一套默认值（切换模式只换布局，不覆盖各模式自己的记录）——
 const CLK_MODE_DEFAULTS={
   classic:{font:"system",weight:700,size:18,spacing:0,alpha:100,x:50,y:20,tintSat:100},
-  glass:{font:"system",weight:600,size:18,spacing:0,h:100,w:100,stretch:100,alpha:100,x:50,y:20,
+  glass:{font:"system",weight:300,size:18,spacing:0,h:100,w:100,stretch:100,alpha:100,x:50,y:20,
          glass:false,glassOp:55,glassBlur:45,glassHi:55,glassEdge:50,glassTint:"#cfe0ff",clarity:85,glassAmt:100,tintSat:100},
   compact:{font:"system",cmpSize:5,cmpGap:12,cmpX:50,cmpY:14,cmpOp:75,weight:600,alpha:100}
 };
@@ -3932,10 +3932,10 @@ function resetClockFont(){
 
 // —— 样式预设 ——
 const CLK_PRESETS={
-  "glass":{mode:"glass",font:"system",weight:600,size:18,spacing:0,h:100,w:100,stretch:100,alpha:100,x:50,y:20,
-           glass:true,glassOp:55,glassBlur:45,glassHi:55,glassEdge:50,glassTint:"#cfe0ff",clarity:85,glassAmt:100,tintSat:100},
+  "glass":{mode:"glass",font:"system",weight:300,size:18,spacing:0,h:100,w:100,stretch:100,alpha:100,x:50,y:20,
+           glass:false,glassOp:55,glassBlur:45,glassHi:55,glassEdge:50,glassTint:"#cfe0ff",clarity:85,glassAmt:100,tintSat:100},
   "huge":{mode:"glass",font:"system",weight:500,size:18,spacing:2,h:170,w:100,stretch:100,alpha:100,x:50,y:20,
-          glass:true,glassOp:45,glassBlur:40,glassHi:65,glassEdge:45,glassTint:"#cfe0ff",clarity:88,glassAmt:100,tintSat:100},
+          glass:false,glassOp:45,glassBlur:40,glassHi:65,glassEdge:45,glassTint:"#cfe0ff",clarity:88,glassAmt:100,tintSat:100},
   "compact":{mode:"compact",font:"system",weight:600,cmpSize:5,cmpGap:12,cmpX:50,cmpY:14,cmpOp:75,cmpDate:true,alpha:100},
   "thin":{mode:"classic",font:"minimal",weight:100,size:18,spacing:2,alpha:100,x:50,y:20},
   "serif":{mode:"classic",font:"playfair",weight:400,size:18,spacing:1,alpha:100,x:50,y:20}
@@ -4053,7 +4053,7 @@ function clkGlassPlate(cx,cy,pw,ph,opt){
   // ① 背景：真实高斯模糊 + 苹果材质级饱和度/亮度（Regular 材质 = blur + saturate + brightness）
   t.save();
   t.beginPath();t.rect(0,0,tw,th);t.clip();
-  try{t.filter=`blur(${(opt.blur||0).toFixed(2)}px) saturate(${(155+75*gop).toFixed(0)}%) brightness(${(1+0.06*gop).toFixed(3)})`;}catch(e){}
+  try{t.filter=`blur(${(opt.blur||0).toFixed(2)}px) saturate(${(175+65*gop).toFixed(0)}%) brightness(${(1+0.12*gop).toFixed(3)})`;}catch(e){}
   t.drawImage(c,tsx,tsy,tw,th,0,0,tw,th);
   t.restore();
   // ② 色调：冷调 tint 均匀混合 + 顶部受光提亮（tint 按背景亮度映射，禁止不透明填充）
@@ -4156,7 +4156,8 @@ function clkGlassText(str,cx,cy,opt){
   meas+=sp*Math.max(0,str.length-1);
   ctx.restore();
   const bw=Math.max(6,Math.ceil((meas+fs*0.6)*sx));
-  const bh=Math.max(6,Math.ceil(fs*1.8*sy));
+  const bh=Math.max(6,Math.ceil(fs*1.25*sy));
+  const gy0=bh/2-fs*0.40*sy,gy1=bh/2+fs*0.40*sy;
   const bx=Math.round(cx-bw/2),by=Math.round(cy-bh/2);
   const setFont=(g)=>{g.textAlign="center";g.textBaseline="middle";g.font=`${weight} ${fs}px ${css}`;};
   const fillG=(g)=>{
@@ -4165,21 +4166,91 @@ function clkGlassText(str,cx,cy,opt){
     for(let i=0;i<str.length;i++){const ch=str[i];const w=g.measureText(ch).width;g.fillText(ch,x,0);x+=w+sp;}
     g.textAlign=prev;
   };
-  const strokeG=(g)=>{
-    const total=(function(){let w=0;for(let i=0;i<str.length;i++)w+=g.measureText(str[i]).width;return w+sp*Math.max(0,str.length-1);})();
-    let x=-total/2;const prev=g.textAlign;g.textAlign="left";
-    for(let i=0;i<str.length;i++){const ch=str[i];const w=g.measureText(ch).width;g.strokeText(ch,x,0);x+=w+sp;}
-    g.textAlign=prev;
-  };
-  // ① 字形 mask
-  const MK=document.createElement("canvas");MK.width=bw;MK.height=bh;
-  const mk=MK.getContext("2d");
+  // ① 字形 mask（按 sx/sy 非等比缩放：横向收紧、纵向拉伸）
+  const MK0=document.createElement("canvas");MK0.width=bw;MK0.height=bh;
+  const mk=MK0.getContext("2d");
   mk.translate(bw/2,bh/2);mk.scale(sx,sy);setFont(mk);
   mk.fillStyle="#fff";fillG(mk);
+  // ①b 横向膨胀：非等比缩放会让竖笔画按 sx 变细、横笔画按 sy 变粗（横竖比恒为 sy/sx），
+  // 在最终像素空间对 mask 做水平形态学膨胀，把笔画补回「等宽实心玻璃带」（对齐 iOS 参考图）
+  const dR=Math.max(0,Math.min(fs*0.06,fs*(0.0727-0.0000718*weight)));
+  const dilH=(src,r)=>{
+    const n=Math.round(r);
+    const o=document.createElement("canvas");o.width=bw;o.height=bh;
+    const g=o.getContext("2d");
+    if(n<=0){g.drawImage(src,0,0);return o;}
+    for(let i=-n;i<=n;i++)g.drawImage(src,i,0);
+    return o;
+  };
+  const eroH=(src,r)=>{
+    const n=Math.round(r);
+    if(n<=0)return src;
+    const inv=document.createElement("canvas");inv.width=bw;inv.height=bh;
+    const ig=inv.getContext("2d");
+    ig.fillStyle="#fff";ig.fillRect(0,0,bw,bh);
+    ig.globalCompositeOperation="destination-out";ig.drawImage(src,0,0);
+    const d=dilH(inv,n);
+    const o=document.createElement("canvas");o.width=bw;o.height=bh;
+    const g=o.getContext("2d");
+    g.fillStyle="#fff";g.fillRect(0,0,bw,bh);
+    g.globalCompositeOperation="destination-out";g.drawImage(d,0,0);
+    return o;
+  };
+  // 冒号：参考图中冒号是正圆（不随纵向拉伸变椭圆），单独按「圆点」重建
+  const dots=[];
+  if(str.indexOf(":")>=0){
+    let tot=0;for(let i=0;i<str.length;i++)tot+=mk.measureText(str[i]).width;
+    tot+=sp*Math.max(0,str.length-1);
+    const boxes=[];let acc=-tot/2;
+    for(let i=0;i<str.length;i++){
+      const ch=str[i],w=mk.measureText(ch).width;
+      if(ch===":")boxes.push([acc,acc+w]);
+      acc+=w+sp;
+    }
+    boxes.forEach(([x0,x1])=>{
+      const c0=Math.max(0,Math.floor(bw/2+sx*x0)-2),c1=Math.min(bw,Math.ceil(bw/2+sx*x1)+2);
+      const W=Math.max(1,c1-c0);
+      const dat=mk.getImageData(c0,0,W,bh).data;
+      const on=[],mn=[],mx=[];
+      for(let y=0;y<bh;y++){
+        let a=1e9,b=-1;
+        for(let x=0;x<W;x++){if(dat[(y*W+x)*4+3]>40){if(x<a)a=x;if(x>b)b=x;}}
+        on.push(b>=0);mn.push(a);mx.push(b);
+      }
+      let s=-1;
+      for(let y=0;y<=bh;y++){
+        if(y<bh&&on[y]){if(s<0)s=y;}
+        else if(s>=0){
+          let a=1e9,b=-1;
+          for(let k=s;k<y;k++){if(mn[k]<a)a=mn[k];if(mx[k]>b)b=mx[k];}
+          if(b>=0)dots.push({cx:c0+(a+b+1)/2,cy:(s+y-1)/2,r:(b-a+1)/2});
+          s=-1;
+        }
+      }
+      mk.clearRect(c0,0,W,bh);
+    });
+  }
+  const MK=dilH(MK0,dR);
+  if(dots.length){
+    const mg=MK.getContext("2d");
+    mg.fillStyle="#fff";
+    dots.forEach(d=>{mg.beginPath();mg.arc(d.cx,d.cy,d.r+dR,0,Math.PI*2);mg.fill();});
+  }
+  // 环带：从膨胀后的 mask 取「距边缘 [w1,w2) 像素」的一圈
+  const eroCache={};
+  const ero=(r)=>{const k=Math.round(r);if(!(k in eroCache))eroCache[k]=eroH(MK,k);return eroCache[k];};
+  const band=(w1,w2)=>{
+    const o=document.createElement("canvas");o.width=bw;o.height=bh;
+    const g=o.getContext("2d");
+    g.drawImage(ero(w1),0,0);
+    g.globalCompositeOperation="destination-out";
+    g.drawImage(ero(w2),0,0);
+    return o;
+  };
   // ② 字内内容：壁纸（模糊+饱和+亮度）+ 低清晰度时的白雾
   const CT=document.createElement("canvas");CT.width=bw;CT.height=bh;
   const ct=CT.getContext("2d");
-  const blur=Math.max(0,(opt.blur||0)+(1-clarity)*fs*0.05);
+  const blur=Math.max(0,(opt.blur||0)+(1-clarity)*fs*0.004);
   const worldDraw=(g,srcE)=>{
     const sxs=Math.max(0,bx-srcE),sys=Math.max(0,by-srcE);
     const sxe=Math.min(c.width,bx+bw+srcE),sye=Math.min(c.height,by+bh+srcE);
@@ -4187,31 +4258,56 @@ function clkGlassText(str,cx,cy,opt){
     const dx=sxs-(bx-srcE),dy=sys-(by-srcE);
     g.save();
     g.beginPath();g.rect(0,0,bw,bh);g.clip();
-    try{g.filter=`blur(${blur.toFixed(2)}px) saturate(${(165+75*gop).toFixed(0)}%) brightness(${(1+0.05*gop).toFixed(3)})`;}catch(e){}
-    g.drawImage(c,sxs,sys,sxe-sxs,sye-sys,dx,dy,sxe-sxs,sye-sys);
+    try{g.filter=`blur(${blur.toFixed(2)}px) saturate(${(98+10*gop).toFixed(0)}%) brightness(${(1.04+0.03*gop).toFixed(3)})`;}catch(e){}
+    // Lensing：从比字形更小的区域取样，壁纸内容在字内被放大/弯折（iOS 26 Liquid Glass 的核心观感）
+    const LZ=1+0.16*amt;
+    const lcx=(sxs+sxe)/2,lcy=(sys+sye)/2;
+    const lhw=(sxe-sxs)/2/LZ,lhh=(sye-sys)/2/LZ;
+    g.drawImage(c,lcx-lhw,lcy-lhh,lhw*2,lhh*2,dx,dy,sxe-sxs,sye-sys);
     g.restore();
   };
   worldDraw(ct,0);
+  // ②b 玻璃本体：字内保留壁纸纹理，但整体提亮成「乳白通透玻璃」（参考图核心观感：笔画是实心玻璃，而非两条细描边）
+  ct.save();
+  ct.globalCompositeOperation="source-atop";
+  const bodyW=ct.createLinearGradient(0,gy0,0,gy1);
+  bodyW.addColorStop(0,`rgba(255,255,255,${(0.13*amt).toFixed(3)})`);
+  bodyW.addColorStop(0.45,`rgba(255,255,255,${(0.08*amt).toFixed(3)})`);
+  bodyW.addColorStop(1,`rgba(255,255,255,${(0.03*amt).toFixed(3)})`);
+  ct.fillStyle=bodyW;ct.fillRect(0,0,bw,bh);
+  ct.restore();
   if(clarity<0.999){
-    ct.fillStyle=`rgba(255,255,255,${((1-clarity)*0.30).toFixed(3)})`;
+    ct.fillStyle=`rgba(255,255,255,${((1-clarity)*0.015).toFixed(3)})`;
     ct.fillRect(0,0,bw,bh);
   }
-  // 轻微冷调 tint
+  // 轻微冷调 tint（克制：玻璃主要从附近内容拾取颜色，不覆盖固定色）
   const [tr2,tg2,tb2]=clkColorHex(opt.tint||"#ffffff");
   ct.save();
   ct.globalCompositeOperation="source-atop";
-  ct.fillStyle=`rgba(${tr2},${tg2},${tb2},${(0.12*amt).toFixed(3)})`;
+  ct.fillStyle=`rgba(${tr2},${tg2},${tb2},${(0.05*amt).toFixed(3)})`;
   ct.fillRect(0,0,bw,bh);
   ct.restore();
+  // ②c 自适应可读性（WWDC25：材质的 tint 量与动态范围会随内容移动以保证可读性——背景越暗，玻璃越磨砂提亮）
+  try{
+    const SM=document.createElement("canvas");SM.width=SM.height=8;
+    const sm=SM.getContext("2d");
+    sm.drawImage(CT,0,0,8,8);
+    const px=sm.getImageData(0,0,8,8).data;
+    let lum=0;for(let i=0;i<px.length;i+=4)lum+=0.2126*px[i]+0.7152*px[i+1]+0.0722*px[i+2];
+    lum=lum/(px.length/4)/255;
+    const frost=Math.max(0,Math.min(0.07,(0.45-lum)*0.8))*(0.30+0.70*gop)*amt;
+    if(frost>0.005){
+      ct.save();
+      ct.globalCompositeOperation="source-atop";
+      ct.fillStyle=`rgba(255,255,255,${frost.toFixed(3)})`;
+      ct.fillRect(0,0,bw,bh);
+      ct.restore();
+    }
+  }catch(e){}
   // ③ 边缘透镜环：把字形轮廓带上「更大一圈」的壁纸（外侧内容被拉入字内）
   if(edge>0.02){
-    const B=Math.max(1.2,Math.min(fs*0.10,bw*0.12));
     const E=Math.max(1.5,fs*0.15*(0.35+0.65*edge)*amt);
-    const BK=document.createElement("canvas");BK.width=bw;BK.height=bh;
-    const bk=BK.getContext("2d");
-    bk.translate(bw/2,bh/2);bk.scale(sx,sy);setFont(bk);
-    bk.lineWidth=(B*2)/((sx+sy)/2);
-    bk.strokeStyle="#fff";strokeG(bk);
+    const BK=band(0,Math.max(2,fs*0.05));
     const SC=document.createElement("canvas");SC.width=bw;SC.height=bh;
     const sc=SC.getContext("2d");
     const esx=Math.max(0,bx-E),esy=Math.max(0,by-E);
@@ -4219,21 +4315,24 @@ function clkGlassText(str,cx,cy,opt){
     if(sex>esx&&sey>esy){
       sc.save();
       sc.beginPath();sc.rect(0,0,bw,bh);sc.clip();
-      try{sc.filter=`blur(${(blur*0.8).toFixed(2)}px) saturate(${(165+75*gop).toFixed(0)}%)`;}catch(e){}
+      try{sc.filter=`blur(${(blur*0.8).toFixed(2)}px) saturate(${(110+30*gop).toFixed(0)}%) brightness(1.15)`;}catch(e){}
       sc.drawImage(c,esx,esy,sex-esx,sey-esy,esx-(bx-E),esy-(by-E),sex-esx,sey-esy);
       sc.restore();
       sc.globalCompositeOperation="destination-in";
       sc.drawImage(BK,0,0);
+      // 半透明叠加：透镜环只加强边缘，不整体覆盖字内的磨砂提亮
+      ct.globalAlpha=0.45;
       ct.drawImage(SC,0,0);
+      ct.globalAlpha=1;
     }
   }
-  // ③b 内部提亮（screen）：玻璃透光后整体比背景略亮，保证深色壁纸下数字清晰可读
+  // ③b 内部提亮（screen）：玻璃"汇聚"光线，整体比背景更亮更通透
   ct.save();
   ct.globalCompositeOperation="screen";
-  const iv=ct.createLinearGradient(0,0,0,bh);
-  iv.addColorStop(0,`rgba(255,255,255,${(0.22*amt).toFixed(3)})`);
-  iv.addColorStop(0.55,`rgba(255,255,255,${(0.10*amt).toFixed(3)})`);
-  iv.addColorStop(1,`rgba(255,255,255,${(0.16*amt).toFixed(3)})`);
+  const iv=ct.createLinearGradient(0,gy0,0,gy1);
+  iv.addColorStop(0,`rgba(255,255,255,${(0.02*amt).toFixed(3)})`);
+  iv.addColorStop(0.55,`rgba(255,255,255,0)`);
+  iv.addColorStop(1,`rgba(255,255,255,${(0.01*amt).toFixed(3)})`);
   ct.fillStyle=iv;ct.fillRect(0,0,bw,bh);
   ct.restore();
   // ④ 裁进字形内部
@@ -4241,40 +4340,56 @@ function clkGlassText(str,cx,cy,opt){
   ct.drawImage(MK,0,0);
   // ⑤ 顶部受光 + 底部暗收（玻璃厚度感）
   ct.globalCompositeOperation="source-atop";
-  const lg=ct.createLinearGradient(0,0,0,bh);
-  lg.addColorStop(0,`rgba(255,255,255,${(0.34*hi*amt).toFixed(3)})`);
-  lg.addColorStop(0.4,`rgba(255,255,255,${(0.06*hi*amt).toFixed(3)})`);
-  lg.addColorStop(1,`rgba(0,0,0,${(0.10*hi*amt).toFixed(3)})`);
+  const lg=ct.createLinearGradient(0,gy0,0,gy1);
+  lg.addColorStop(0,`rgba(255,255,255,${(0.01*hi*amt).toFixed(3)})`);
+  lg.addColorStop(0.4,`rgba(255,255,255,0)`);
+  lg.addColorStop(1,`rgba(0,0,0,${(0.035*hi*amt).toFixed(3)})`);
   ct.fillStyle=lg;ct.fillRect(0,0,bw,bh);
   ct.globalCompositeOperation="source-over";
-  // ⑥ 内缘镜面描边：顶亮/中收/底再亮的方向性镜面（溢出部分最后再裁掉）
-  ct.save();
-  ct.translate(bw/2,bh/2);ct.scale(sx,sy);setFont(ct);
-  ct.lineWidth=Math.max(1,fs*0.034)/((sx+sy)/2);
-  const rim=ct.createLinearGradient(0,-fs/2,0,fs/2);
-  rim.addColorStop(0,`rgba(255,255,255,${(0.92*hi*amt).toFixed(3)})`);
-  rim.addColorStop(0.5,`rgba(255,255,255,${(0.26*hi*amt).toFixed(3)})`);
-  rim.addColorStop(1,`rgba(255,255,255,${(0.66*hi*amt).toFixed(3)})`);
-  ct.strokeStyle=rim;
-  strokeG(ct);
-  ct.restore();
-  ct.globalCompositeOperation="destination-in";
-  ct.drawImage(MK,0,0);
-  ct.globalCompositeOperation="source-over";
+  // ⑥a 内发光：从边缘向内逐层衰减，让笔画读作「实心亮玻璃带」而不是两条细线
+  const GL=document.createElement("canvas");GL.width=bw;GL.height=bh;
+  const gl=GL.getContext("2d");
+  const gw=Math.max(1.2,fs*0.020);
+  [0.16,0.10,0.05,0.025].forEach((a,k)=>{
+    const bd=band(k*gw,(k+1)*gw);
+    bd.getContext("2d").globalCompositeOperation="source-in";
+    bd.getContext("2d").fillStyle="#fff";
+    bd.getContext("2d").fillRect(0,0,bw,bh);
+    gl.globalAlpha=a*amt;
+    gl.drawImage(bd,0,0);
+  });
+  gl.globalAlpha=1;
+  ct.drawImage(GL,0,0);
+  // ⑥ 内缘镜面描边：从膨胀后 mask 形态学生成，沿玻璃带两侧各一条细亮边（顶亮/中收/底再亮）
+  const rimW=Math.max(1.4,fs*0.017);
+  const DG=document.createElement("canvas");DG.width=bw;DG.height=bh;
+  const dg=DG.getContext("2d");
+  dg.fillStyle=`rgba(18,24,38,${(0.16*hi*amt).toFixed(3)})`;
+  dg.fillRect(0,0,bw,bh);
+  dg.globalCompositeOperation="destination-in";
+  dg.drawImage(band(rimW,rimW+Math.max(1.2,fs*0.026)),0,0);
+  ct.drawImage(DG,0,0);
+  const RG=document.createElement("canvas");RG.width=bw;RG.height=bh;
+  const rg=RG.getContext("2d");
+  const rim=rg.createLinearGradient(0,gy0,0,gy1);
+  rim.addColorStop(0,`rgba(255,255,255,${Math.min(1,1.25*hi*amt).toFixed(3)})`);
+  rim.addColorStop(0.5,`rgba(255,255,255,${(0.55*hi*amt).toFixed(3)})`);
+  rim.addColorStop(1,`rgba(255,255,255,${(0.90*hi*amt).toFixed(3)})`);
+  rg.fillStyle=rim;rg.fillRect(0,0,bw,bh);
+  rg.globalCompositeOperation="destination-in";
+  rg.drawImage(band(0,rimW),0,0);
+  ct.drawImage(RG,0,0);
   // ⑥b 外缘折射亮环：字形外侧半圈镜面勾边，让数字从壁纸上"浮"出来
+  const OXB=dilH(MK,Math.max(0.8,fs*0.012));
   const OX=document.createElement("canvas");OX.width=bw;OX.height=bh;
   const ox=OX.getContext("2d");
-  ox.translate(bw/2,bh/2);ox.scale(sx,sy);setFont(ox);
-  ox.lineWidth=Math.max(1.2,fs*0.048)/((sx+sy)/2);
-  const rim2=ox.createLinearGradient(0,-fs/2,0,fs/2);
-  rim2.addColorStop(0,`rgba(255,255,255,${(0.58*hi*amt).toFixed(3)})`);
-  rim2.addColorStop(0.5,`rgba(255,255,255,${(0.13*hi*amt).toFixed(3)})`);
-  rim2.addColorStop(1,`rgba(255,255,255,${(0.36*hi*amt).toFixed(3)})`);
-  ox.strokeStyle=rim2;
-  strokeG(ox);
-  ox.setTransform(1,0,0,1,0,0);
-  ox.globalCompositeOperation="destination-out";
-  ox.drawImage(MK,0,0);
+  const rim2=ox.createLinearGradient(0,gy0,0,gy1);
+  rim2.addColorStop(0,`rgba(255,255,255,${(0.70*hi*amt).toFixed(3)})`);
+  rim2.addColorStop(0.5,`rgba(255,255,255,${(0.12*hi*amt).toFixed(3)})`);
+  rim2.addColorStop(1,`rgba(255,255,255,${(0.40*hi*amt).toFixed(3)})`);
+  ox.fillStyle=rim2;ox.fillRect(0,0,bw,bh);
+  ox.globalCompositeOperation="destination-in";ox.drawImage(OXB,0,0);
+  ox.globalCompositeOperation="destination-out";ox.drawImage(MK,0,0);
   // ⑦ 自适应阴影：用 mask 投影后把本体挖掉，只留阴影（数字保持真透明）
   const SH=document.createElement("canvas");SH.width=bw;SH.height=bh;
   const sh=SH.getContext("2d");
@@ -4419,8 +4534,8 @@ function drawLockScreen(){
       fs:fs,weight:weight,css:f.css,sp:sp,
       sx:wScale,sy:hScale*stretch,
       alpha:alphaBase,hi:gHi,edge:gEdge,amt:gAmt,clarity:gClarity,gop:gOp,
-      tint:gTint,blur:fs*gBlur*0.10,
-      shOp:shOp*0.85,shBlurR:shBlurRatio*0.7
+      tint:gTint,blur:fs*gBlur*0.070,
+      shOp:shOp*0.18,shBlurR:shBlurRatio*0.35
     });
   }else{
     ctx.save();
@@ -4633,7 +4748,7 @@ function applyManuscriptPreset(silent){
   onTexSourceChange();
   resizeCanvas();
   if(silent===true)return;
-  alert("字稿风预设已应用（IMG_6729 暖金风）！\n\n下一步：\n1. 在「⑤ 作品图」上传你的摄影图\n2. 点「从图片提取主色填入背景」自动配色\n3. 在「⑩ 字稿风模式」上传头像\n4. 调整署名 / 营业时间 / 版权 / 散落小字\n5. 点「导出 PNG」");
+  alert("字稿风预设已应用（IMG_6729 暖金风）！\n\n下一步：\n1. 在「⑤ 作品图」上传你的摄影图\n2. 点「从图片提取主色填入背景」自动配色\n3. 在「字稿风模式」上传头像\n4. 调整署名 / 营业时间 / 版权 / 散落小字\n5. 点「导出 PNG」");
 }
 
 // ============ 预设系统（按模板隔离） ============
@@ -4753,6 +4868,7 @@ function getSettings(){
     clkAlpha:document.getElementById("clkAlpha").value,
     clkX:document.getElementById("clkX").value,
     clkY:document.getElementById("clkY").value,
+    clkGlassVer:"2",
     clkGlass:chk("clkGlass"),
     clkGlassOp:document.getElementById("clkGlassOp").value,
     clkGlassBlur:document.getElementById("clkGlassBlur").value,
@@ -4903,6 +5019,8 @@ function getSettings(){
 }
 function applySettings(s){
   if(!s)return;
+  // 旧版本保存的状态里 clkGlass 是"玻璃底板默认开"的旧语义：无版本标记时丢弃，避免矩形玻璃卡片被恢复
+  if(String(s.clkGlassVer||"")!=="2")delete s.clkGlass;
   const set=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val;};
   const chk=(id,val)=>{const el=document.getElementById(id);if(el)el.checked=val;};
   set("size",s.size);set("bgType",s.bgType);set("bgColor1",s.bgColor1);
@@ -5293,6 +5411,31 @@ function resetAll(){
   requestDraw();
 }
 
+// ============ 分区序号：每个模板内部按 1..N 连续编号 ============
+// 小标题上的①..⑮ 是「全部分区合集」的静态编号，而每个模板只显示属于自己的子集，
+// 于是字稿风会显示 ①②③④⑤⑥ 之后直接跳到 ⑩（第 7 步看着像被删掉/跳号）。
+// 这里在切换模板后按「当前实际可见的分区」重新编号，功能本身没有被覆盖。
+const CIRCLED_NUM="①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳";
+function renumberSections(){
+  const root=document.getElementById("toolShell");
+  if(!root||root.style.display==="none")return;
+  let n=0;
+  root.querySelectorAll("h3.tool-h").forEach(function(h){
+    let p=h,hidden=false;
+    while(p&&p!==root){
+      if(p.style&&p.style.display==="none"){hidden=true;break;}
+      p=p.parentElement;
+    }
+    if(hidden)return;                       // 隐藏分区不占号
+    const txt=h.textContent.trim();
+    const m=txt.match(/^([①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳])\s*(.*)$/);
+    n++;
+    if(n>CIRCLED_NUM.length)return;
+    const circ=CIRCLED_NUM.charAt(n-1);
+    h.textContent=m?circ+" "+m[2]:circ+" "+txt;   // 没编号的标题（⏱）一并补上号
+  });
+}
+
 // ============ 模板选择首页 / 工作区 ============
 let currentTemplate="normal";
 const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscript:"字稿风预览",polaroid:"拍立得预览",profile:"个人主页"};
@@ -5304,6 +5447,7 @@ function selectTemplate(type){
     const tpls=(el.getAttribute("data-tpl")||"").split(/\s+/);
     el.style.display=tpls.indexOf(type)>=0?"":"none";
   });
+  renumberSections();
   const nameEl=document.getElementById("tplName");
   if(nameEl)nameEl.textContent=TPL_NAMES[type]||"";
   applyTemplatePreset(type);
