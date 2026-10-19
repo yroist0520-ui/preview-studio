@@ -5663,8 +5663,18 @@ function renumberSections(){
 // ============ 模板选择首页 / 工作区 ============
 let currentTemplate="normal";
 const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscript:"字稿风预览",polaroid:"拍立得预览",profile:"个人主页"};
+// 每个模板的工作区图片互相独立：切走时存档当前模板的图片，切回时恢复，首次进入未存档则为空
+const tplImages={};
 function selectTemplate(type){
-  currentTemplate=type;
+  if(currentTemplate&&currentTemplate!==type){
+    tplImages[currentTemplate]=layers.slice();
+    currentTemplate=type;
+    layers.length=0;
+    (tplImages[type]||[]).forEach(function(L){layers.push(L);});
+    requestDraw();
+  }else{
+    currentTemplate=type;
+  }
   document.getElementById("tplPicker").style.display="none";
   document.getElementById("toolShell").style.display="";
   document.querySelectorAll(".tpl-sec").forEach(el=>{
