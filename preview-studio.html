@@ -55,6 +55,8 @@ window.PS_BUILD="50bdc26";
 </script>
 <!-- 字体全部本地内置（真·离线），见 fonts.css + fonts/ 目录；均为 OFL 可商用授权 -->
 <link href="fonts.css" rel="stylesheet">
+<!-- Sortable.js 用于拼图缩略图拖动排序 -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -259,6 +261,23 @@ input[type=file]{font-size:11px}
 .mock-axis{width:196px;height:88px;position:relative;background:#fff;border-radius:8px;box-shadow:0 10px 26px rgba(0,0,0,.22);overflow:hidden;display:flex;align-items:center;justify-content:center}
 /* 缩略 mock：自由拼图 */
 .mock-collage{width:132px;height:132px;border-radius:10px;box-shadow:0 10px 26px rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;background:#f8f6f2}
+/* 自由拼图工作区（内联面板） */
+.cg-upload-zone{display:block;border:1.5px dashed #3a3a48;border-radius:10px;padding:18px 10px;text-align:center;color:#8b8b95;font-size:12px;background:#14141a;transition:border-color .2s,color .2s;-webkit-tap-highlight-color:transparent}
+.cg-upload-zone:hover{border-color:var(--accent);color:var(--accent)}
+.cg-img-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px;margin-top:8px}
+.cg-img-item{position:relative;aspect-ratio:1;border-radius:7px;overflow:hidden;border:1.5px solid #2a2a35;background:#0f0f14;cursor:grab;touch-action:manipulation}
+.cg-img-item:active{cursor:grabbing}
+.cg-img-item img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.cg-img-item .num{position:absolute;left:2px;top:2px;background:rgba(0,0,0,.62);color:#fff;font-size:9px;line-height:1;padding:2px 4px;border-radius:4px}
+.cg-img-item .del{position:absolute;right:2px;top:2px;width:16px;height:16px;border-radius:50%;background:rgba(220,60,60,.9);color:#fff;font-size:12px;line-height:16px;text-align:center;cursor:pointer}
+.cg-sortable-ghost{opacity:.35;border-color:var(--accent)!important;border-style:dashed!important}
+.cg-img-item.selected{border-color:#4a9eff!important;box-shadow:0 0 0 2px rgba(74,158,255,.35)}
+.cg-tpl-scroll{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:8px;max-height:320px;overflow-y:auto;padding:2px}
+.cg-tpl-item{border:1.5px solid #2a2a35;border-radius:8px;padding:4px;cursor:pointer;background:#14141a;transition:border-color .18s,transform .18s}
+.cg-tpl-item:hover{border-color:#4a4a5a;transform:translateY(-1px)}
+.cg-tpl-item.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.cg-tpl-item canvas{width:100%;height:auto;border-radius:5px;display:block}
+.cg-tpl-item .tag{font-size:9px;color:#8b8b95;text-align:center;margin-top:3px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* 模板卡片响应式：必须置于基础样式之后，否则同优先级会被覆盖 */
 @media(max-width:768px){
   .tpl-grid{gap:14px}
@@ -528,7 +547,7 @@ input[type=file]{font-size:11px}
           <p>一次上传多张作品，横向铺成一条展轴：中间最大、两侧递减，垂直错落叠压，白底柔和投影，长横幅画布适合系列作品陈列。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('axis')">进入制作 →</button>
         </div>
-        <div class="tpl-card" data-tpl="collage" onclick="location.href='collage-studio.html'">
+        <div class="tpl-card" data-tpl="collage" onclick="selectTemplate('collage')">
           <div class="tpl-thumb">
             <div class="mock-collage">
               <svg viewBox="0 0 132 132" width="132" height="132" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -552,7 +571,7 @@ input[type=file]{font-size:11px}
           </div>
           <h3>自由拼图</h3>
           <p>多张图片任意排列成网格拼图，自由设置行列数、间距、圆角、边框，支持等宽/等高等比铺满，图片清晰不模糊。</p>
-          <button class="tpl-enter" onclick="event.stopPropagation();location.href='collage-studio.html'">进入制作 →</button>
+          <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('collage')">进入制作 →</button>
         </div>
         <div class="tpl-card" data-tpl="dual" onclick="location.href='dual-studio.html'">
           <div class="tpl-thumb">
@@ -816,27 +835,42 @@ input[type=file]{font-size:11px}
         </div>
         <div class="tpl-sec" data-tpl="collage">
         <h3 class="tool-h" style="margin-top:14px">⑧ 自由拼图（Collage）</h3>
-        <div class="po-group">多图上传</div>
-        <input type="file" id="cgUpload" accept="image/*" multiple>
-        <div class="hint" id="cgCount">一次可选多张，按选择顺序排列进网格。</div>
+        <div class="po-group">多图上传（最多 12 张）</div>
+        <label class="cg-upload-zone" style="cursor:pointer">
+          <input type="file" id="cgUpload" accept="image/jpeg,image/png,image/webp" multiple style="display:none">
+          ＋ 点击上传多张图片（JPG/PNG/WebP）
+        </label>
+        <div class="hint" id="cgCount">任意图片数量均可套用任意模板，拖动缩略图可调整顺序。</div>
+        <div class="cg-img-list" id="cgImgList"></div>
+        <label class="btn small" style="width:100%;margin-top:6px;cursor:pointer;text-align:center">
+          <input type="file" id="cgUpload2" accept="image/jpeg,image/png,image/webp" multiple style="display:none">
+          ＋ 继续添加图片
+        </label>
         <button class="warn small" onclick="cgClear()" style="margin-top:6px">× 清空全部图片</button>
-        <div class="po-group">网格布局</div>
-        <label>列数: <span id="cgColsVal">2</span></label>
-        <input type="range" id="cgCols" min="1" max="6" value="2" oninput="document.getElementById('cgColsVal').textContent=this.value;requestDraw()">
-        <label>行数: <span id="cgRowsVal">3</span></label>
-        <input type="range" id="cgRows" min="1" max="6" value="3" oninput="document.getElementById('cgRowsVal').textContent=this.value;requestDraw()">
-        <div class="po-group">外观</div>
-        <label>图片间距: <span id="cgGapVal">4</span>%</label>
-        <input type="range" id="cgGap" min="0" max="12" value="4" oninput="document.getElementById('cgGapVal').textContent=this.value;requestDraw()">
-        <label>外边框: <span id="cgBorderVal">6</span>%</label>
-        <input type="range" id="cgBorder" min="0" max="20" value="6" oninput="document.getElementById('cgBorderVal').textContent=this.value;requestDraw()">
-        <label>图片圆角: <span id="cgRadiusVal">2</span>%</label>
-        <input type="range" id="cgRadius" min="0" max="24" value="2" oninput="document.getElementById('cgRadiusVal').textContent=this.value;requestDraw()">
-        <label>图片填充方式</label>
-        <select id="cgFit" onchange="requestDraw()">
-          <option value="cover" selected>铺满裁切（cover，默认）</option>
-          <option value="contain">完整显示（contain，留白）</option>
+        <div class="po-group">拼图模板（任意数量通用）</div>
+        <div class="cg-tpl-scroll" id="cgTplScroll"></div>
+        <div class="po-group">画布比例</div>
+        <select id="cgRatio" onchange="cgRatioChanged()">
+          <option value="1080,1080">1:1 正方形 1080</option>
+          <option value="1500,1500">1:1 正方形 1500</option>
+          <option value="1200,1600">3:4 竖版</option>
+          <option value="1600,1200">4:3 横版</option>
+          <option value="1080,1920">9:16 手机竖屏</option>
+          <option value="1920,1080">16:9 横版</option>
+          <option value="2048,2048">1:1 高清 2048</option>
         </select>
+        <div class="po-group">外观</div>
+        <label>填充方式（默认完整显示，不裁剪）</label>
+        <select id="cgFit" onchange="requestDraw()">
+          <option value="contain" selected>完整显示（contain，不裁剪）</option>
+          <option value="cover">铺满裁切（cover）</option>
+        </select>
+        <label>图片间距: <span id="cgGapVal">8</span></label>
+        <input type="range" id="cgGap" min="0" max="40" value="8" oninput="document.getElementById('cgGapVal').textContent=this.value;requestDraw()">
+        <label>外边距: <span id="cgMarginVal">12</span></label>
+        <input type="range" id="cgMargin" min="0" max="60" value="12" oninput="document.getElementById('cgMarginVal').textContent=this.value;requestDraw()">
+        <label>图片圆角: <span id="cgRadiusVal">4</span></label>
+        <input type="range" id="cgRadius" min="0" max="40" value="4" oninput="document.getElementById('cgRadiusVal').textContent=this.value;requestDraw()">
         <div class="po-group">背景</div>
         <label>背景样式</label>
         <select id="cgBgType" onchange="cgBgModeChanged();requestDraw()">
@@ -856,7 +890,48 @@ input[type=file]{font-size:11px}
             <option value="r">径向</option>
           </select>
         </div>
-        <div class="hint">网格自动铺满画布；列×行需 ≥ 图片数，多余的格子留空。导出为全分辨率，图片清晰不模糊。</div>
+        <button class="btn small" onclick="cgPickColorsFromImage()" style="margin-top:6px;width:100%">🎨 从图片智能取色（与字稿风一致）</button>
+        
+        <!-- 单图属性面板 -->
+        <div id="cgItemPanel" style="display:none;margin-top:12px;border-top:1px solid #2a2a35;padding-top:12px">
+          <h4 id="cgItemTitle" style="margin:0 0 8px 0;font-size:13px;color:#c9a37c">第 1 张图片设置</h4>
+          <div class="po-group">形状裁剪（保持比例）</div>
+          <select id="cgShape" style="width:100%;margin-bottom:6px">
+            <option value="rect">矩形（默认）</option>
+            <option value="stamp">邮票齿孔</option>
+            <option value="circle">圆形</option>
+            <option value="rounded">圆角矩形</option>
+            <option value="arch">拱门</option>
+            <option value="hexagon">六边形</option>
+            <option value="star">五角星</option>
+            <option value="heart">心形</option>
+            <option value="triangle">三角形</option>
+            <option value="diamond">菱形</option>
+            <option value="parallelogram">平行四边形</option>
+            <option value="film">胶片</option>
+          </select>
+          <button class="ghost small" onclick="cgApplyShapeToAll()" style="width:100%;margin-bottom:8px">应用到全部图片</button>
+          
+          <div class="po-group">变换调整</div>
+          <label>缩放：<span id="cgScaleVal">100%</span></label>
+          <input type="range" id="cgScale" min="0.3" max="2" step="0.05" value="1" style="width:100%">
+          <label>旋转：<span id="cgRotateVal">0°</span></label>
+          <input type="range" id="cgRotate" min="-180" max="180" value="0" style="width:100%">
+          <label>水平偏移：<span id="cgPosXVal">0</span></label>
+          <input type="range" id="cgPosX" min="-0.5" max="0.5" step="0.01" value="0" style="width:100%">
+          <label>垂直偏移：<span id="cgPosYVal">0</span></label>
+          <input type="range" id="cgPosY" min="-0.5" max="0.5" step="0.01" value="0" style="width:100%">
+          <button class="warn small" onclick="cgResetSelectedTransform()" style="width:100%;margin-top:6px">重置变换</button>
+          
+          <div class="po-group">边框</div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="cgBorderColorOn"><span>启用边框色</span>
+          </div>
+          <label>边框颜色</label>
+          <input type="color" id="cgBorderColor" value="#ffffff" style="width:100%">
+        </div>
+        
+        <div class="hint">任意模板适配任意图片数量；默认「完整显示」保留每张图的原始比例，绝不裁剪。点击缩略图可选中单张图，在下方单独调整形状/缩放/旋转/位置。导出走右上「导出 PNG」。</div>
         </div>
         <div class="tpl-sec" data-tpl="polaroid">
         <h3 class="tool-h" style="margin-top:14px">⑦ 拍立得风格（Polaroid）</h3>
@@ -2685,6 +2760,624 @@ document.getElementById("axUpload").onchange=e=>{
   e.target.value="";
 };
 
+// ========== 自由拼图（Collage）完整引擎 ==========
+let cgImages=[];      // [{img:Image|null, url:string, loaded:boolean, x:number,y:number,scale:number,rotation:number,borderShape:string,borderColor:string}]
+let cgFillMode='contain';   // 'cover' 铺满裁切 | 'contain' 完整显示留白
+let cgGap=8, cgMargin=12, cgRadius=4;
+let cgRatio=[1500,1500];
+let cgBgType='solid', cgBg='#ffffff', cgBg2='#f0f4f8', cgBgDir='h';
+let currentCgTpl=0;
+let cgSelectedIdx=-1;  // 当前选中的图片索引
+let cgIsDragging=false;
+let cgDragStart={x:0,y:0};
+
+// 布局生成器：每个模板 = 一个按图片数量生成单元格的函数
+function gUniform(cols){
+  return function(n){
+    const rows=Math.ceil(n/cols),cw=100/cols,ch=100/rows,cells=[];
+    for(let i=0;i<n;i++){
+      const col=i%cols,row=Math.floor(i/cols);
+      const inRow=Math.min(cols,n-row*cols);
+      const w=100/inRow;
+      cells.push({x:(i-row*cols)*w,y:row*ch,w:w,h:ch});
+    }
+    return cells;
+  };
+}
+function gHero(heroWRatio,heroHRatio,restCols){
+  return function(n){
+    if(n<=1)return [{x:0,y:0,w:100,h:100}];
+    const cells=[{x:0,y:0,w:100*heroWRatio,h:100*heroHRatio}];
+    const rest=n-1;
+    const heroW=100*heroWRatio,heroH=100*heroHRatio;
+    const areaX=heroW,areaY=0,areaW=100-heroW,areaH=100;
+    const cols=restCols||Math.ceil(Math.sqrt(rest));
+    const rows=Math.ceil(rest/cols);
+    const cw=areaW/cols,ch=areaH/rows;
+    for(let i=0;i<rest;i++){
+      const col=i%cols,row=Math.floor(i/cols);
+      const inRow=Math.min(cols,rest-row*cols);
+      const w=areaW/inRow;
+      cells.push({x:areaX+(i-row*cols)*w,y:areaY+row*ch,w:w,h:ch});
+    }
+    return cells;
+  };
+}
+function gLeftMain(){
+  return function(n){
+    if(n<=1)return [{x:0,y:0,w:100,h:100}];
+    const leftW=58,rightW=42;
+    const rest=n-1,rows=rest;
+    const ch=100/rows;
+    const cells=[{x:0,y:0,w:leftW,h:100}];
+    for(let i=0;i<rest;i++)cells.push({x:leftW,y:i*ch,w:rightW,h:ch});
+    return cells;
+  };
+}
+function gTopMain(){
+  return function(n){
+    if(n<=1)return [{x:0,y:0,w:100,h:100}];
+    const topH=60,botH=40;
+    const rest=n-1,cols=rest;
+    const cw=100/cols;
+    const cells=[{x:0,y:0,w:100,h:topH}];
+    for(let i=0;i<rest;i++)cells.push({x:i*cw,y:topH,w:cw,h:botH});
+    return cells;
+  };
+}
+function gStagger(){
+  return function(n){
+    if(n<=1)return [{x:0,y:0,w:100,h:100}];
+    const cells=[];
+    const rows=2;
+    const perRow=Math.ceil(n/rows);
+    const rowH=100/rows;
+    for(let i=0;i<n;i++){
+      const row=Math.floor(i/perRow);
+      const idxInRow=i%perRow;
+      const cntInRow=Math.min(perRow,n-row*perRow);
+      const wideFirst=(row%2===0);
+      const widths=[];
+      for(let k=0;k<cntInRow;k++){
+        widths.push(wideFirst?(k===0?62:38/(cntInRow-1||1)):(k===cntInRow-1?62:38/(cntInRow-1||1)));
+      }
+      let x=0;
+      for(let k=0;k<idxInRow;k++)x+=widths[k];
+      cells.push({x:x,y:row*rowH,w:widths[idxInRow],h:rowH});
+    }
+    return cells;
+  };
+}
+function gOneBigTwo(){
+  return function(n){
+    if(n<=1)return [{x:0,y:0,w:100,h:100}];
+    if(n===2)return [{x:0,y:0,w:100,h:60},{x:0,y:60,w:100,h:40}];
+    const cells=[{x:0,y:0,w:100,h:58}];
+    const rest=n-1,cols=2,rows=Math.ceil(rest/cols);
+    const cw=100/cols,ch=42/rows;
+    for(let i=0;i<rest;i++){
+      const col=i%cols,row=Math.floor(i/cols);
+      cells.push({x:col*cw,y:58+row*ch,w:cw,h:ch});
+    }
+    return cells;
+  };
+}
+function gNine(){return gUniform(3)}
+
+const CG_TPL=[
+  {name:'左右双图', gen:gUniform(2)},
+  {name:'上下双图', gen:gUniform(1)},
+  {name:'三横排',   gen:gUniform(3)},
+  {name:'三纵排',   gen:gUniform(1)},
+  {name:'一大两小', gen:gOneBigTwo()},
+  {name:'2×2 网格', gen:gUniform(2)},
+  {name:'左主右二', gen:gLeftMain()},
+  {name:'上二下一', gen:gTopMain()},
+  {name:'主图加四小',gen:gHero(1,0.55,4)},
+  {name:'五格阶梯', gen:gStagger()},
+  {name:'3×2 网格', gen:gUniform(3)},
+  {name:'2×3 网格', gen:gUniform(2)},
+  {name:'主图三辅', gen:gHero(0.6,0.6,2)},
+  {name:'四 + 三 分层',gen:gHero(1,0.5,3)},
+  {name:'4×2 网格', gen:gUniform(4)},
+  {name:'大主图七辅',gen:gHero(0.55,0.68,2)},
+  {name:'3×3 九宫格',gen:gNine()},
+  {name:'九宫大主', gen:gHero(0.5,0.6,3)},
+];
+
+function getCgCells(){
+  const n=cgImages.length;
+  if(n===0)return [];
+  const tpl=CG_TPL[currentCgTpl];
+  if(!tpl)return [];
+  return tpl.gen(n);
+}
+
+// 形状路径：返回一个 Path2D，用于裁剪图片（保持图片比例不变）
+function cgShapePath(shape,x,y,w,h){
+  const p=new Path2D();
+  const r=Math.min(w,h)*0.06;
+  if(shape==='stamp'){
+    // 邮票齿孔：沿四条边打半圆缺口
+    const teeth=Math.max(6,Math.round(Math.min(w,h)/22));
+    const stepW=w/teeth, stepH=h/teeth;
+    // 顺时针描边，齿孔用 arc 反向挖
+    p.moveTo(x,y);
+    // 上边
+    for(let i=0;i<teeth;i++){
+      const sx=x+i*stepW+stepW/2;
+      p.lineTo(sx-stepW*0.22,y);
+      p.arc(sx,y,stepW*0.28,Math.PI,0,true);
+      p.lineTo(sx+stepW*0.28,y);
+    }
+    p.lineTo(x+w,y);
+    // 右边
+    for(let i=0;i<teeth;i++){
+      const sy=y+i*stepH+stepH/2;
+      p.lineTo(x+w,sy-stepH*0.22);
+      p.arc(x+w,sy,stepH*0.28,-Math.PI/2,Math.PI/2,true);
+      p.lineTo(x+w,sy+stepH*0.28);
+    }
+    p.lineTo(x+w,y+h);
+    // 下边
+    for(let i=teeth-1;i>=0;i--){
+      const sx=x+i*stepW+stepW/2;
+      p.lineTo(sx+stepW*0.22,y+h);
+      p.arc(sx,y+h,stepW*0.28,0,Math.PI,true);
+      p.lineTo(sx-stepW*0.28,y+h);
+    }
+    p.lineTo(x,y+h);
+    // 左边
+    for(let i=teeth-1;i>=0;i--){
+      const sy=y+i*stepH+stepH/2;
+      p.lineTo(x,sy+stepH*0.22);
+      p.arc(x,sy,stepH*0.28,Math.PI/2,-Math.PI/2,true);
+      p.lineTo(x,sy-stepH*0.28);
+    }
+    p.closePath();
+  }else if(shape==='circle'){
+    p.ellipse(x+w/2,y+h/2,w/2,h/2,0,0,Math.PI*2);
+  }else if(shape==='rounded'){
+    const rr=Math.min(w,h)*0.16;
+    p.moveTo(x+rr,y);p.lineTo(x+w-rr,y);
+    p.quadraticCurveTo(x+w,y,x+w,y+rr);
+    p.lineTo(x+w,y+h-rr);
+    p.quadraticCurveTo(x+w,y+h,x+w-rr,y+h);
+    p.lineTo(x+rr,y+h);
+    p.quadraticCurveTo(x,y+h,x,y+h-rr);
+    p.lineTo(x,y+rr);
+    p.quadraticCurveTo(x,y,x+rr,y);
+    p.closePath();
+  }else if(shape==='arch'){
+    // 拱门：上方半圆 + 下方矩形
+    const ar=w/2;
+    p.moveTo(x,y+h);
+    p.lineTo(x,y+ar);
+    p.arc(x+ar,y+ar,ar,Math.PI,0,false);
+    p.lineTo(x+w,y+h);
+    p.closePath();
+  }else if(shape==='hexagon'){
+    const cx=x+w/2, cy=y+h/2;
+    const rx=w/2, ry=h/2;
+    p.moveTo(cx,cy-ry);
+    p.lineTo(cx+rx,cy-ry*0.5);
+    p.lineTo(cx+rx,cy+ry*0.5);
+    p.lineTo(cx,cy+ry);
+    p.lineTo(cx-rx,cy+ry*0.5);
+    p.lineTo(cx-rx,cy-ry*0.5);
+    p.closePath();
+  }else if(shape==='star'){
+    const cx=x+w/2, cy=y+h/2;
+    const R=Math.min(w,h)/2, r=R*0.45;
+    for(let i=0;i<10;i++){
+      const ang=-Math.PI/2+i*Math.PI/5;
+      const rad=(i%2===0)?R:r;
+      const px=cx+Math.cos(ang)*rad*(w/h>1?1:1);
+      const py=cy+Math.sin(ang)*rad;
+      if(i===0)p.moveTo(px,py);else p.lineTo(px,py);
+    }
+    p.closePath();
+  }else if(shape==='heart'){
+    const cx=x+w/2, cy=y+h*0.36;
+    const s=Math.min(w,h);
+    p.moveTo(cx,y+h*0.95);
+    p.bezierCurveTo(x-w*0.05,y+h*0.55,x+w*0.02,cy-s*0.42,cx,cy-s*0.08);
+    p.bezierCurveTo(x+w*0.98,cy-s*0.42,x+w*1.05,y+h*0.55,cx,y+h*0.95);
+    p.closePath();
+  }else if(shape==='triangle'){
+    p.moveTo(x+w/2,y);
+    p.lineTo(x+w,y+h);
+    p.lineTo(x,y+h);
+    p.closePath();
+  }else if(shape==='diamond'){
+    p.moveTo(x+w/2,y);
+    p.lineTo(x+w,y+h/2);
+    p.lineTo(x+w/2,y+h);
+    p.lineTo(x,y+h/2);
+    p.closePath();
+  }else if(shape==='parallelogram'){
+    const off=w*0.18;
+    p.moveTo(x+off,y);
+    p.lineTo(x+w,y);
+    p.lineTo(x+w-off,y+h);
+    p.lineTo(x,y+h);
+    p.closePath();
+  }else if(shape==='film'){
+    // 胶片：左右两侧打方孔
+    const holes=Math.max(4,Math.round(h/26));
+    const hs=h/holes;
+    const hw=Math.min(w*0.09,hs*0.6);
+    p.rect(x,y,w,h);
+    for(let i=0;i<holes;i++){
+      const hy=y+i*hs+hs/2;
+      p.moveTo(x+hw*0.3,hy-hs*0.22);
+      p.rect(x+hw*0.3,hy-hs*0.22,hw*0.4,hs*0.44);
+      p.moveTo(x+w-hw*0.7,hy-hs*0.22);
+      p.rect(x+w-hw*0.7,hy-hs*0.22,hw*0.4,hs*0.44);
+    }
+  }else{
+    // rect 默认
+    p.rect(x,y,w,h);
+  }
+  return p;
+}
+
+function drawCgCollage(g,W,H){
+  const cells=getCgCells();
+  if(!cells.length)return;
+  const mRatio=cgMargin/100;
+  const innerX=W*mRatio,innerY=H*mRatio;
+  const innerW=W*(1-2*mRatio),innerH=H*(1-2*mRatio);
+  const rMax=Math.max(0,cgRadius*(H/1000));
+  const gapPx=cgGap*(Math.min(W,H)/1000)*(1000/1000);
+  const half=gapPx/2;
+  cells.forEach(function(c,i){
+    const item=cgImages[i];
+    const im=item&&item.img;
+    if(!im||!im.width)return;
+    let cx=innerX+c.x/100*innerW;
+    let cy=innerY+c.y/100*innerH;
+    let cw=c.w/100*innerW;
+    let ch=c.h/100*innerH;
+    cx+=half;cy+=half;cw-=gapPx;ch-=gapPx;
+    if(cw<=0||ch<=0)return;
+    
+    // 应用用户自定义的变换（位置、缩放、旋转）
+    const userScale=item.scale||1;
+    const userRotation=item.rotation||0;
+    const userX=(item.x||0)*cw;
+    const userY=(item.y||0)*ch;
+    const shape=item.borderShape||'rect';
+    
+    g.save();
+    g.translate(cx+cw/2,cy+ch/2);
+    g.rotate(userRotation*Math.PI/180);
+    g.scale(userScale,userScale);
+    g.translate(-(cw/2+userX/2),-(ch/2+userY/2));
+    
+    // 形状裁剪（保持图片比例不变，只裁剪外形）
+    const clipPath=cgShapePath(shape,cx,cy,cw,ch);
+    g.save();
+    g.clip(clipPath);
+    
+    if(cgFillMode==='contain'){
+      const sc=Math.min(cw/im.width, ch/im.height);
+      const dw=im.width*sc, dh=im.height*sc;
+      g.drawImage(im,(cx+(cw-dw)/2),(cy+(ch-dh)/2),dw,dh);
+    }else{
+      const sc=Math.max(cw/im.width, ch/im.height);
+      g.drawImage(im,cx+(cw-im.width*sc)/2,cy+(ch-im.height*sc)/2,im.width*sc,im.height*sc);
+    }
+    g.restore();
+    
+    // 形状描边（如有边框色）
+    if(item.borderColor){
+      g.strokeStyle=item.borderColor;
+      g.lineWidth=Math.max(1.5,H/600);
+      g.stroke(clipPath);
+    }
+    
+    // 选中态虚线框
+    if(i===cgSelectedIdx){
+      g.setLineDash([Math.max(4,H/300),Math.max(3,H/400)]);
+      g.strokeStyle='#4a9eff';
+      g.lineWidth=Math.max(1.5,H/700);
+      g.strokeRect(cx-2,cy-2,cw+4,ch+4);
+      g.setLineDash([]);
+    }
+    
+    g.restore();
+  });
+}
+
+function drawCollageFull(){
+  const W=c.width,H=c.height;
+  // 背景：纯色 / 渐变
+  if(cgBgType==="gradient"){
+    const c1=cgBg||"#ffffff", c2=cgBg2||"#f0f4f8", dir=cgBgDir||"h";
+    let grad;
+    if(dir==="v")grad=ctx.createLinearGradient(0,0,0,H);
+    else if(dir==="h")grad=ctx.createLinearGradient(0,0,W,0);
+    else if(dir==="d")grad=ctx.createLinearGradient(0,0,W,H);
+    else grad=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.1,W/2,H/2,Math.max(W,H)*0.7);
+    grad.addColorStop(0,c1);grad.addColorStop(1,c2);
+    ctx.fillStyle=grad;
+  }else{
+    ctx.fillStyle=cgBg||"#ffffff";
+  }
+  ctx.fillRect(0,0,W,H);
+  if(!cgImages.length){
+    const ph=H*0.12;
+    ctx.save();
+    ctx.fillStyle="#eef2f6";
+    ctx.fillRect(W*0.14,H*0.5-ph/2,W*0.72,ph);
+    ctx.fillStyle="#9aa7b6";
+    ctx.font="500 "+Math.max(11,Math.round(H*0.028))+"px 'PingFang SC','Noto Sans SC',sans-serif";
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText("上传多张图片，任选模板自动拼图（默认不裁剪）",W/2,H*0.5);
+    ctx.restore();
+    return;
+  }
+  drawCgCollage(ctx,W,H);
+}
+
+function renderCgTplCards(){
+  const sc=document.getElementById('cgTplScroll');if(!sc)return;
+  sc.innerHTML='';
+  const n=Math.max(cgImages.length,1);
+  CG_TPL.forEach(function(tpl,i){
+    const d=document.createElement('div');
+    d.className='cg-tpl-item'+(currentCgTpl===i?' active':'');
+    const cv=document.createElement('canvas');cv.width=120;cv.height=148;
+    const g=cv.getContext('2d');
+    const W=cv.width,H=cv.height,m=6;
+    const area=W-m*2,hArea=H-m*2;
+    g.fillStyle='#f0ede6';g.fillRect(0,0,W,H);
+    const cells=tpl.gen(n);
+    const colors=['#8fa8c4','#a8bf9e','#c9a88a','#b9c9dd','#d4b8a0','#9aab8c','#c6d8e8','#7d94b1'];
+    cells.forEach(function(c,j){
+      const x=m+c.w/100*area,y=m+c.h/100*hArea,w=c.w/100*area,h=c.h/100*hArea;
+      const r=2;
+      g.fillStyle=colors[j%colors.length];
+      g.beginPath();
+      g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();g.fill();
+    });
+    if(currentCgTpl===i){g.strokeStyle='#c9a37c';g.lineWidth=2;g.strokeRect(0.5,0.5,W-1,H-1)}
+    const tag=document.createElement('div');tag.className='tag';tag.textContent=tpl.name;
+    d.appendChild(cv);d.appendChild(tag);
+    d.onclick=function(){currentCgTpl=i;renderCgTplCards();requestDraw()};
+    sc.appendChild(d);
+  });
+}
+
+function cgClear(){
+  cgImages=[];
+  document.getElementById('cgImgList').innerHTML='';
+  document.getElementById('cgCount').textContent='任意图片数量均可套用任意模板，拖动缩略图可调整顺序。';
+  renderCgTplCards();
+  requestDraw();
+}
+
+function cgUploadHandler(e){
+  const files=Array.from(e.target.files||[]).filter(f=>f&&f.type&&/^image\/(jpeg|png|webp)/i.test(f.type));
+  if(!files.length)return;
+  const remain=12-cgImages.length;
+  const take=files.slice(0,remain);
+  if(take.length<files.length)console.log('已达上限 12 张');
+  take.forEach(file=>{
+    const url=URL.createObjectURL(file);
+    const item={img:null,url:url,loaded:false,x:0,y:0,scale:1,rotation:0,borderShape:'rect',borderColor:''};
+    cgImages.push(item);
+    const img=new Image();
+    img.onload=()=>{item.img=img;item.loaded=true;renderCgImgList();renderCgTplCards();requestDraw()};
+    img.onerror=()=>{console.log('图片加载失败:',file.name)};
+    img.src=url;
+  });
+  renderCgImgList();
+  e.target.value='';
+}
+
+function renderCgImgList(){
+  const list=document.getElementById('cgImgList');if(!list)return;
+  list.innerHTML='';
+  cgImages.forEach((item,i)=>{
+    const d=document.createElement('div');
+    d.className='cg-img-item'+(i===cgSelectedIdx?' selected':'');
+    d.setAttribute('draggable','true');
+    const im=document.createElement('img');im.src=item.url;
+    if(!item.loaded)im.style.opacity='0.4';
+    const num=document.createElement('span');num.className='num';num.textContent=i+1;
+    const del=document.createElement('span');del.className='del';del.textContent='×';
+    del.onclick=ev=>{ev.stopPropagation();cgRemoveImage(i)};
+    // 点击缩略图选中该图，用于单独调整
+    d.onclick=()=>{cgSelectedIdx=(cgSelectedIdx===i?-1:i);renderCgImgList();syncCgItemPanel();requestDraw()};
+    d.appendChild(im);d.appendChild(num);d.appendChild(del);
+    list.appendChild(d);
+  });
+  // Sortable 拖动排序
+  if(typeof Sortable!=='undefined'&&list.childNodes.length>0){
+    new Sortable(list,{
+      animation:150,
+      ghostClass:'cg-sortable-ghost',
+      onEnd:evt=>{
+        const oldIdx=evt.oldIndex,newIdx=evt.newIndex;
+        if(oldIdx===newIdx)return;
+        const item=cgImages.splice(oldIdx,1)[0];
+        cgImages.splice(newIdx,0,item);
+        cgSelectedIdx=-1;
+        renderCgImgList();renderCgTplCards();syncCgItemPanel();requestDraw();
+      }
+    });
+  }
+}
+
+// 同步单图属性面板（形状 / 缩放 / 旋转 / 位移 / 边框色）
+function syncCgItemPanel(){
+  const panel=document.getElementById('cgItemPanel');
+  if(!panel)return;
+  const item=cgImages[cgSelectedIdx];
+  if(!item){panel.style.display='none';return}
+  panel.style.display='block';
+  const title=document.getElementById('cgItemTitle');
+  if(title)title.textContent='第 '+(cgSelectedIdx+1)+' 张图片设置';
+  const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v};
+  setV('cgShape',item.borderShape||'rect');
+  setV('cgScale',item.scale||1);
+  setV('cgRotate',item.rotation||0);
+  setV('cgPosX',item.x||0);
+  setV('cgPosY',item.y||0);
+  const sv=document.getElementById('cgScaleVal');if(sv)sv.textContent=Math.round((item.scale||1)*100)+'%';
+  const rv=document.getElementById('cgRotateVal');if(rv)rv.textContent=(item.rotation||0)+'°';
+  const bc=document.getElementById('cgBorderColor');if(bc)bc.value=item.borderColor||'#ffffff';
+  const bce=document.getElementById('cgBorderColorOn');if(bce)bce.checked=!!item.borderColor;
+}
+
+function cgApplyToSelected(key,val){
+  const item=cgImages[cgSelectedIdx];
+  if(!item)return;
+  item[key]=val;
+  requestDraw();
+}
+
+// 从图片智能取色（与其它模板一致的取色逻辑）
+function cgPickColorsFromImage(){
+  const item=cgImages[cgSelectedIdx]||cgImages[0];
+  if(!item||!item.img){alert('请先上传图片');return}
+  const im=item.img;
+  const tmp=document.createElement('canvas');
+  const TW=64,TH=Math.max(1,Math.round(64*im.height/im.width));
+  tmp.width=TW;tmp.height=TH;
+  const tg=tmp.getContext('2d');
+  tg.drawImage(im,0,0,TW,TH);
+  let data;
+  try{data=tg.getImageData(0,0,TW,TH).data}catch(err){alert('取色失败（跨域图片）');return}
+  // 简易中位切分量化：统计主要颜色
+  const buckets={};
+  for(let i=0;i<data.length;i+=4){
+    const a=data[i+3];if(a<128)continue;
+    const r=data[i],g2=data[i+1],b=data[i+2];
+    const key=((r>>4)<<8)|((g2>>4)<<4)|(b>>4);
+    if(!buckets[key])buckets[key]={r:0,g:0,b:0,n:0};
+    const bk=buckets[key];bk.r+=r;bk.g+=g2;bk.b+=b;bk.n++;
+  }
+  const arr=Object.values(buckets).sort((a,b)=>b.n-a.n);
+  const toHex=(r,g2,b)=>'#'+[r,g2,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+  const c1=arr[0]?toHex(arr[0].r/arr[0].n,arr[0].g/arr[0].n,arr[0].b/arr[0].n):'#ffffff';
+  const c2=arr[1]?toHex(arr[1].r/arr[1].n,arr[1].g/arr[1].n,arr[1].b/arr[1].n):c1;
+  cgBg=c1;cgBg2=c2;
+  const bgEl=document.getElementById('cgBg');if(bgEl)bgEl.value=c1;
+  const bg2El=document.getElementById('cgBg2');if(bg2El)bg2El.value=c2;
+  // 自动切换到渐变，方便直接看到效果
+  const btEl=document.getElementById('cgBgType');
+  if(btEl&&btEl.value!=='gradient'){btEl.value='gradient';cgBgType='gradient';document.getElementById('cgBg2Row').style.display='block'}
+  requestDraw();
+}
+
+function cgResetSelectedTransform(){
+  const item=cgImages[cgSelectedIdx];
+  if(!item)return;
+  item.x=0;item.y=0;item.scale=1;item.rotation=0;
+  syncCgItemPanel();requestDraw();
+}
+
+function cgApplyShapeToAll(){
+  const item=cgImages[cgSelectedIdx];
+  if(!item)return;
+  const shape=item.borderShape||'rect';
+  const color=item.borderColor||'';
+  cgImages.forEach(it=>{it.borderShape=shape;it.borderColor=color});
+  renderCgImgList();requestDraw();
+}
+
+function cgRemoveImage(i){
+  const item=cgImages[i];
+  if(item&&item.url)URL.revokeObjectURL(item.url);
+  cgImages.splice(i,1);
+  renderCgImgList();renderCgTplCards();requestDraw();
+}
+
+function cgRatioChanged(){
+  const val=document.getElementById('cgRatio').value.split(',');
+  cgRatio=[parseInt(val[0]),parseInt(val[1])];
+  // 同步到主画布尺寸
+  if(currentTemplate==="collage"){
+    const sizeEl=document.getElementById('size');
+    if(sizeEl)sizeEl.value=cgRatio.join(',');
+    resizeCanvas();
+  }
+  requestDraw();
+}
+
+function cgBgModeChanged(){
+  cgBgType=document.getElementById('cgBgType').value;
+  document.getElementById('cgBg2Row').style.display=(cgBgType==='gradient')?'block':'none';
+  requestDraw();
+}
+
+// 绑定上传事件
+document.getElementById('cgUpload').addEventListener('change',cgUploadHandler);
+document.getElementById('cgUpload2').addEventListener('change',cgUploadHandler);
+// 绑定滑块
+['cgGap','cgMargin','cgRadius'].forEach(id=>{
+  const el=document.getElementById(id);if(!el)return;
+  el.addEventListener('input',e=>{
+    const v=parseInt(e.target.value,10);
+    if(id==='cgGap')cgGap=v;
+    else if(id==='cgMargin')cgMargin=v;
+    else cgRadius=v;
+    const valEl=document.getElementById(id+'Val');
+    if(valEl)valEl.textContent=v;
+    requestDraw();
+  });
+});
+// 绑定填充方式
+document.getElementById('cgFit').addEventListener('change',e=>{
+  cgFillMode=e.target.value;
+  requestDraw();
+});
+// 绑定背景
+document.getElementById('cgBg').addEventListener('input',e=>{cgBg=e.target.value;requestDraw()});
+document.getElementById('cgBg2').addEventListener('input',e=>{cgBg2=e.target.value;requestDraw()});
+document.getElementById('cgBgDir').addEventListener('input',e=>{cgBgDir=e.target.value;requestDraw()});
+
+// ===== 单图属性面板事件绑定 =====
+(function bindCgItemPanel(){
+  const shapeEl=document.getElementById('cgShape');
+  if(shapeEl)shapeEl.addEventListener('change',e=>cgApplyToSelected('borderShape',e.target.value));
+  const scaleEl=document.getElementById('cgScale');
+  if(scaleEl)scaleEl.addEventListener('input',e=>{
+    const v=parseFloat(e.target.value);
+    const sv=document.getElementById('cgScaleVal');if(sv)sv.textContent=Math.round(v*100)+'%';
+    cgApplyToSelected('scale',v);
+  });
+  const rotEl=document.getElementById('cgRotate');
+  if(rotEl)rotEl.addEventListener('input',e=>{
+    const v=parseInt(e.target.value,10);
+    const rv=document.getElementById('cgRotateVal');if(rv)rv.textContent=v+'°';
+    cgApplyToSelected('rotation',v);
+  });
+  const posXEl=document.getElementById('cgPosX');
+  if(posXEl)posXEl.addEventListener('input',e=>cgApplyToSelected('x',parseFloat(e.target.value)));
+  const posYEl=document.getElementById('cgPosY');
+  if(posYEl)posYEl.addEventListener('input',e=>cgApplyToSelected('y',parseFloat(e.target.value)));
+  const bcOn=document.getElementById('cgBorderColorOn');
+  if(bcOn)bcOn.addEventListener('change',e=>{
+    const item=cgImages[cgSelectedIdx];if(!item)return;
+    item.borderColor=e.target.checked?(document.getElementById('cgBorderColor').value||'#ffffff'):'';
+    requestDraw();
+  });
+  const bcEl=document.getElementById('cgBorderColor');
+  if(bcEl)bcEl.addEventListener('input',e=>{
+    const item=cgImages[cgSelectedIdx];if(!item)return;
+    const on=document.getElementById('cgBorderColorOn');
+    if(on&&on.checked)item.borderColor=e.target.value;
+    requestDraw();
+  });
+})();
+
+// 初始化拼图模板卡片
+renderCgTplCards();
+
 function axBgModeChanged(){
   const t=fmV("axBgType")||"solid";
   const row=document.getElementById("axBg2Row");
@@ -3935,6 +4628,12 @@ function draw(){
   if(typeof currentTemplate!=="undefined"&&currentTemplate==="axis"){
     drawAxis();
     drawWatermark();
+    scheduleAutosave();
+    return;
+  }
+  // 自由拼图模板：独立渲染管线
+  if(typeof currentTemplate!=="undefined"&&currentTemplate==="collage"){
+    drawCollageFull();
     scheduleAutosave();
     return;
   }
@@ -6334,7 +7033,7 @@ function renumberSections(){
 
 // ============ 模板选择首页 / 工作区 ============
 let currentTemplate="normal";
-const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscript:"字稿风预览",polaroid:"拍立得预览",profile:"个人主页",frame:"相框风预览",axis:"作品展示轴"};
+const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscript:"字稿风预览",polaroid:"拍立得预览",profile:"个人主页",frame:"相框风预览",axis:"作品展示轴",collage:"自由拼图"};
 // 每个模板的工作区图片互相独立：切走时存档当前模板的图片，切回时恢复，首次进入未存档则为空
 const tplImages={};
 function selectTemplate(type){
@@ -6359,6 +7058,7 @@ function selectTemplate(type){
   applyTemplatePreset(type);
   refreshPresetUI();
   if(type==="axis"&&typeof axSyncCount==="function")axSyncCount();
+  if(type==="collage"&&typeof renderCgTplCards==="function")renderCgTplCards();
   const tool=document.getElementById("tool");
   if(tool)tool.scrollIntoView({behavior:"smooth",block:"start"});
 }
@@ -6431,6 +7131,13 @@ function applyTemplatePreset(type){
     chk("lockScreen",false);
     // 作品展示轴：长横幅画布，白底由模板自身绘制
     set("size","3000,1300");
+    set("featherMode","none");
+    set("bgBlur","0");
+  }else if(type==="collage"){
+    chk("msMode",false);
+    chk("lockScreen",false);
+    // 自由拼图：画布比例由拼图面板的 cgRatio 决定
+    set("size",cgRatio.join(","));
     set("featherMode","none");
     set("bgBlur","0");
   }else{
@@ -6861,6 +7568,7 @@ buildPresetGrid();
 refreshPresetUI();
 buildClockFonts();
 syncClockPanel();
+cgRatioChanged();
 requestDraw();
 
 // 字体全部本地内置：只预加载当前各下拉框已选中的字体族，其余在切换时按需加载（移动端更稳）
