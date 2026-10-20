@@ -9,7 +9,7 @@
      比对下面的版本号，不一致就弹「有新版本」提示（点一下带参数跳转，必定回源）。
      每次发版请把 PS_BUILD 改成新的 git 短 hash（git rev-parse --short HEAD）。 ===== -->
 <script>
-window.PS_BUILD="5bdd3e3";
+window.PS_BUILD="f3dc0fc";
 (function(){
   var TIP_ID="psVerTip",TIP_KEY="psVerTipShown";
   function showTip(v){
@@ -257,6 +257,8 @@ input[type=file]{font-size:11px}
 .mock-frame{width:140px;height:140px;border-radius:10px;box-shadow:0 10px 26px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,#e9e3d8,#c8d5e2)}
 /* 缩略 mock：作品展示轴 */
 .mock-axis{width:196px;height:88px;position:relative;background:#fff;border-radius:8px;box-shadow:0 10px 26px rgba(0,0,0,.22);overflow:hidden;display:flex;align-items:center;justify-content:center}
+/* 缩略 mock：自由拼图 */
+.mock-collage{width:132px;height:132px;border-radius:10px;box-shadow:0 10px 26px rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;background:#f8f6f2}
 /* 模板卡片响应式：必须置于基础样式之后，否则同优先级会被覆盖 */
 @media(max-width:768px){
   .tpl-grid{gap:14px}
@@ -526,6 +528,32 @@ input[type=file]{font-size:11px}
           <p>一次上传多张作品，横向铺成一条展轴：中间最大、两侧递减，垂直错落叠压，白底柔和投影，长横幅画布适合系列作品陈列。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('axis')">进入制作 →</button>
         </div>
+        <div class="tpl-card" data-tpl="collage" onclick="location.href='collage-studio.html'">
+          <div class="tpl-thumb">
+            <div class="mock-collage">
+              <svg viewBox="0 0 132 132" width="132" height="132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="1" y="1" width="130" height="130" rx="6" fill="#f8f6f2"/>
+                <g>
+                  <rect x="7" y="7" width="56" height="38" rx="3" fill="url(#cgr1)"/>
+                  <rect x="69" y="7" width="56" height="38" rx="3" fill="url(#cgr2)"/>
+                  <rect x="7" y="51" width="56" height="38" rx="3" fill="url(#cgr3)"/>
+                  <rect x="69" y="51" width="56" height="38" rx="3" fill="url(#cgr4)"/>
+                  <rect x="7" y="95" width="56" height="30" rx="3" fill="url(#cgr1)" opacity=".65"/>
+                  <rect x="69" y="95" width="56" height="30" rx="3" fill="url(#cgr4)" opacity=".65"/>
+                </g>
+                <defs>
+                  <linearGradient id="cgr1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c6d8e8"/><stop offset="100%" stop-color="#8aa4bf"/></linearGradient>
+                  <linearGradient id="cgr2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#dfe7cf"/><stop offset="100%" stop-color="#9aab8c"/></linearGradient>
+                  <linearGradient id="cgr3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#b9c9dd"/><stop offset="100%" stop-color="#7d94b1"/></linearGradient>
+                  <linearGradient id="cgr4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8d5c0"/><stop offset="100%" stop-color="#c9a88a"/></linearGradient>
+                </defs>
+              </svg>
+            </div>
+          </div>
+          <h3>自由拼图</h3>
+          <p>多张图片任意排列成网格拼图，自由设置行列数、间距、圆角、边框，支持等宽/等高等比铺满，图片清晰不模糊。</p>
+          <button class="tpl-enter" onclick="event.stopPropagation();location.href='collage-studio.html'">进入制作 →</button>
+        </div>
         <div class="tpl-card" data-tpl="dual" onclick="location.href='dual-studio.html'">
           <div class="tpl-thumb">
             <div class="mock-dual">
@@ -785,6 +813,50 @@ input[type=file]{font-size:11px}
         </div>
         <button onclick="axExtractColors()" style="margin-top:4px">✦ 从图片提取主色渐变</button>
         <div class="hint">中间一张最大、向两侧递减；按顺序叠压，中心图显示在最上层。</div>
+        </div>
+        <div class="tpl-sec" data-tpl="collage">
+        <h3 class="tool-h" style="margin-top:14px">⑧ 自由拼图（Collage）</h3>
+        <div class="po-group">多图上传</div>
+        <input type="file" id="cgUpload" accept="image/*" multiple>
+        <div class="hint" id="cgCount">一次可选多张，按选择顺序排列进网格。</div>
+        <button class="warn small" onclick="cgClear()" style="margin-top:6px">× 清空全部图片</button>
+        <div class="po-group">网格布局</div>
+        <label>列数: <span id="cgColsVal">2</span></label>
+        <input type="range" id="cgCols" min="1" max="6" value="2" oninput="document.getElementById('cgColsVal').textContent=this.value;requestDraw()">
+        <label>行数: <span id="cgRowsVal">3</span></label>
+        <input type="range" id="cgRows" min="1" max="6" value="3" oninput="document.getElementById('cgRowsVal').textContent=this.value;requestDraw()">
+        <div class="po-group">外观</div>
+        <label>图片间距: <span id="cgGapVal">4</span>%</label>
+        <input type="range" id="cgGap" min="0" max="12" value="4" oninput="document.getElementById('cgGapVal').textContent=this.value;requestDraw()">
+        <label>外边框: <span id="cgBorderVal">6</span>%</label>
+        <input type="range" id="cgBorder" min="0" max="20" value="6" oninput="document.getElementById('cgBorderVal').textContent=this.value;requestDraw()">
+        <label>图片圆角: <span id="cgRadiusVal">2</span>%</label>
+        <input type="range" id="cgRadius" min="0" max="24" value="2" oninput="document.getElementById('cgRadiusVal').textContent=this.value;requestDraw()">
+        <label>图片填充方式</label>
+        <select id="cgFit" onchange="requestDraw()">
+          <option value="cover" selected>铺满裁切（cover，默认）</option>
+          <option value="contain">完整显示（contain，留白）</option>
+        </select>
+        <div class="po-group">背景</div>
+        <label>背景样式</label>
+        <select id="cgBgType" onchange="cgBgModeChanged();requestDraw()">
+          <option value="solid" selected>纯色</option>
+          <option value="gradient">渐变</option>
+        </select>
+        <label>背景主色</label>
+        <input type="color" id="cgBg" value="#ffffff" onchange="requestDraw()">
+        <div id="cgBg2Row" style="display:none">
+          <label>背景副色</label>
+          <input type="color" id="cgBg2" value="#f0f4f8" onchange="requestDraw()">
+          <label>渐变方向</label>
+          <select id="cgBgDir" onchange="requestDraw()">
+            <option value="v">上→下</option>
+            <option value="h" selected>左→右</option>
+            <option value="d">左上→右下</option>
+            <option value="r">径向</option>
+          </select>
+        </div>
+        <div class="hint">网格自动铺满画布；列×行需 ≥ 图片数，多余的格子留空。导出为全分辨率，图片清晰不模糊。</div>
         </div>
         <div class="tpl-sec" data-tpl="polaroid">
         <h3 class="tool-h" style="margin-top:14px">⑦ 拍立得风格（Polaroid）</h3>

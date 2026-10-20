@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
+<title>拼图编辑器 · Preview Studio</title>
+<style>
+/* ===== 设计变量（沿用 Preview Studio 风格） ===== */
+:root{
+  --bg:#f5f3ef;--panel:#fff;--panel2:#f8f7f4;
+  --line:#e5e1d8;--line2:#d5d0c4;
+  --txt:#2b2b2b;--txt2:#6b6b6b;--txt3:#9a9a9a;
+  --accent:#c9a37c;--accent2:#a8793f;
+  --danger:#d97757;--ok:#5a9e6f;
+  --radius:10px;--shadow:0 10px 30px rgba(38,52,76,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Noto Sans SC",sans-serif;
+  background:var(--bg);color:var(--txt);
+  font-size:14px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;font-size:inherit}
+input,select{font-family:inherit;font-size:inherit;color:inherit}
+/* ===== 布局 ===== */
+.app{display:flex;flex-direction:column;min-height:100vh}
+/* 顶部工具栏 */
+.topbar{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;background:var(--panel);
+  border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:100;
+}
+.topbar .back{
+  display:flex;align-items:center;gap:4px;
+  color:var(--txt2);font-weight:600;font-size:13px;
+  padding:6px 10px;border-radius:8px;
+}
+.topbar .back:hover{background:var(--panel2);color:var(--txt)}
+.topbar .title{font-weight:700;font-size:15px;flex:1;text-align:center;letter-spacing:.5px}
+.topbar .title small{display:block;font-size:11px;color:var(--txt3);font-weight:400;margin-top:1px}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px;
+  transition:all .15s;
+}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.btn-primary:disabled{background:#d8d2c4;cursor:not-allowed;opacity:.7}
+.btn-ghost{background:var(--panel2);color:var(--txt2);border:1px solid var(--line)}
+.btn-ghost:hover{background:var(--line);color:var(--txt)}
+.btn-danger{background:#fbe9e4;color:var(--danger)}
+.btn-danger:hover{background:var(--danger);color:#fff}
+.btn.small{padding:5px 10px;font-size:12px}
+/* 主体 */
+.main{flex:1;display:flex;overflow:hidden}
+/* 画布区 */
+.canvas-zone{flex:1;display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
+.canvas-wrap{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  max-width:100%;max-height:100%;
+}
+#collageCanvas{
+  display:block;background:var(--bg);
+  box-shadow:var(--shadow);border-radius:6px;
+  max-width:100%;max-height:calc(100vh - 200px);
+  object-fit:contain;
+}
+/* 侧边面板 */
+.side{
+  width:300px;background:var(--panel);
+  border-left:1px solid var(--line);
+  overflow-y:auto;flex-shrink:0;
+  display:flex;flex-direction:column;
+}
+.side .sec{padding:12px 14px;border-bottom:1px solid var(--line)}
+.side .sec h4{font-size:12px;color:var(--txt3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;font-weight:700}
+.side .row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.side .row label{flex:1;font-size:12.5px;color:var(--txt2)}
+.side .row .val{font-size:12px;color:var(--txt3);min-width:28px;text-align:right}
+input[type=range]{
+  flex:1;height:4px;-webkit-appearance:none;appearance:none;
+  background:var(--line2);border-radius:2px;outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:16px;
+  background:var(--accent);border-radius:50%;cursor:pointer;
+  box-shadow:0 1px 4px rgba(0,0,0,.2);
+}
+select{
+  padding:6px 8px;border:1px solid var(--line);border-radius:6px;
+  background:var(--panel2);color:var(--txt);font-size:12.5px;outline:none;
+}
+.color-row{display:flex;gap:6px;align-items:center}
+.swatch{
+  width:26px;height:26px;border-radius:6px;cursor:pointer;
+  border:2px solid transparent;position:relative;
+}
+.swatch.active{border-color:var(--accent)}
+.swatch input[type=color]{
+  position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;border:none;padding:0;
+}
+.swatch-custom{
+  width:26px;height:26px;border-radius:6px;cursor:pointer;
+  background:conic-gradient(red,yellow,lime,cyan,blue,magenta,red);
+  border:2px solid transparent;position:relative;overflow:hidden;
+}
+.swatch-custom input[type=color]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.checkbox-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.checkbox-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer}
+.checkbox-row label{font-size:12.5px;color:var(--txt2);cursor:pointer}
+/* 图片管理 */
+.img-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.img-item{
+  position:relative;width:52px;height:52px;border-radius:6px;overflow:hidden;
+  border:2px solid var(--line);flex-shrink:0;
+}
+.img-item img{width:100%;height:100%;object-fit:cover;display:block}
+.img-item .del{
+  position:absolute;top:2px;right:2px;width:16px;height:16px;
+  background:rgba(0,0,0,.55);color:#fff;font-size:10px;line-height:16px;
+  text-align:center;border-radius:50%;cursor:pointer;z-index:2;
+}
+.img-item .del:hover{background:var(--danger)}
+.img-item .num{
+  position:absolute;bottom:2px;left:3px;font-size:9px;color:#fff;
+  text-shadow:0 1px 3px rgba(0,0,0,.7);font-weight:700;
+}
+.img-item .ord{position:absolute;bottom:2px;right:3px;display:flex;gap:2px}
+.img-item .ord button{
+  width:14px;height:14px;font-size:8px;line-height:14px;border-radius:3px;
+  background:rgba(0,0,0,.4);color:#fff;cursor:pointer;
+}
+.img-item .ord button:hover{background:rgba(0,0,0,.7)}
+.upload-zone{
+  border:2px dashed var(--line2);border-radius:8px;padding:14px;text-align:center;
+  cursor:pointer;transition:border-color .15s;margin-bottom:8px;
+}
+.upload-zone:hover{border-color:var(--accent)}
+.upload-zone .ico{font-size:24px;margin-bottom:4px;opacity:.5}
+.upload-zone .txt{font-size:12px;color:var(--txt3)}
+.upload-zone .txt b{color:var(--txt2)}
+/* 模板选择 */
+.tpl-scroll{
+  display:flex;gap:8px;overflow-x:auto;padding:4px 0;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+}
+.tpl-scroll::-webkit-scrollbar{display:none}
+.tpl-item{
+  flex-shrink:0;width:72px;height:88px;border-radius:8px;overflow:hidden;
+  border:2px solid var(--line);cursor:pointer;position:relative;
+  transition:border-color .15s,box-shadow .15s;background:var(--panel2);
+}
+.tpl-item:hover{border-color:var(--line2)}
+.tpl-item.active{border-color:var(--accent);box-shadow:0 0 0 3px rgba(201,163,124,.2)}
+.tpl-item canvas{width:100%;height:100%;display:block}
+.tpl-item .tag{
+  position:absolute;bottom:0;left:0;right:0;
+  background:rgba(0,0,0,.55);color:#fff;font-size:9px;
+  padding:2px 4px;text-align:center;
+}
+.tpl-item .need{
+  position:absolute;top:4px;right:4px;font-size:9px;
+  background:var(--panel2);color:var(--txt3);padding:1px 4px;border-radius:4px;
+  font-weight:600;
+}
+.tpl-item.disabled{opacity:.4;cursor:not-allowed}
+.tpl-item.disabled .need{background:#fbe9e4;color:var(--danger)}
+/* 导出区 */
+.export-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.export-row select{flex:1;min-width:0}
+.toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:rgba(30,30,30,.92);color:#fff;
+  padding:10px 18px;border-radius:8px;font-size:13px;
+  z-index:999;pointer-events:none;
+  opacity:0;transition:opacity .2s;
+  box-shadow:0 4px 20px rgba(0,0,0,.3);
+}
+.toast.show{opacity:1}
+/* 空状态 */
+.empty-canvas{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:100%;height:100%;color:var(--txt3);font-size:14px;gap:8px;
+}
+.empty-canvas .big{font-size:40px;opacity:.3}
+/* ===== 响应式 ===== */
+@media(max-width:768px){
+  .main{flex-direction:column}
+  .side{
+    width:100%;border-left:none;border-top:1px solid var(--line);
+    max-height:45vh;order:2;
+  }
+  .canvas-zone{order:1;min-height:38vh}
+  .topbar .title small{display:none}
+  #collageCanvas{max-height:38vh}
+}
+/* 折叠 */
+.collapsible{overflow:hidden;transition:max-height .25s ease}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- 顶部 -->
+  <div class="topbar">
+    <button class="back" onclick="history.back()">
+      <span>←</span> 返回
+    </button>
+    <div class="title">拼图编辑器<small>Collage Maker</small></div>
+    <button class="btn btn-ghost small" id="resetBtn" onclick="resetAll()">恢复默认</button>
+    <button class="btn btn-primary" id="exportBtn" onclick="exportPNG()" disabled>导出 PNG</button>
+  </div>
+
+  <!-- 主体 -->
+  <div class="main">
+    <!-- 画布 -->
+    <div class="canvas-zone">
+      <div class="canvas-wrap">
+        <canvas id="collageCanvas"></canvas>
+      </div>
+    </div>
+
+    <!-- 侧边面板 -->
+    <div class="side">
+      <!-- 图片管理 -->
+      <div class="sec" id="secImages">
+        <h4>图片管理 <span id="imgCount" style="float:right;color:var(--txt3);font-weight:400">0/12</span></h4>
+        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+          <div class="ico">＋</div>
+          <div class="txt">点击上传 <b>多张图片</b>（JPG/PNG/WebP）</div>
+        </div>
+        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,image/jfif" multiple style="display:none">
+        <div class="img-list" id="imgList"></div>
+        <button class="btn btn-ghost small" style="width:100%;margin-top:4px" onclick="document.getElementById('fileInput').click()">＋ 继续添加图片</button>
+      </div>
+
+      <!-- 模板选择 -->
+      <div class="sec" id="secTpl">
+        <h4>拼图模板</h4>
+        <div class="tpl-scroll" id="tplScroll"></div>
+      </div>
+
+      <!-- 画布比例 -->
+      <div class="sec">
+        <h4>画布比例</h4>
+        <div class="row" style="flex-wrap:wrap;gap:6px">
+          <select id="ratioSelect" onchange="onRatioChange()" style="flex:1">
+            <option value="1:1">1:1 正方形</option>
+            <option value="3:4">3:4 竖版</option>
+            <option value="4:3">4:3 横版</option>
+            <option value="9:16">9:16 手机竖屏</option>
+            <option value="16:9">16:9 横版展示</option>
+            <option value="custom">自定义…</option>
+          </select>
+          <div id="customRatioRow" style="display:none;flex:1;gap:4px">
+            <input type="number" id="customW" value="4" min="1" max="20" style="width:40px;padding:6px 4px;border:1px solid var(--line);border-radius:6px;text-align:center">
+            <span style="align-self:center;color:var(--txt3)">:</span>
+            <input type="number" id="customH" value="3" min="1" max="20" style="width:40px;padding:6px 4px;border:1px solid var(--line);border-radius:6px;text-align:center">
+            <button class="btn btn-ghost small" onclick="onCustomRatio()">应用</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 样式调整 -->
+      <div class="sec">
+        <h4>样式调整</h4>
+        <div class="row">
+          <label>图片间距</label>
+          <input type="range" id="gapSlider" min="0" max="40" value="8" oninput="onGapChange(this)">
+          <span class="val" id="gapVal">8</span>
+        </div>
+        <div class="row">
+          <label>外边距</label>
+          <input type="range" id="marginSlider" min="0" max="60" value="12" oninput="onMarginChange(this)">
+          <span class="val" id="marginVal">12</span>
+        </div>
+        <div class="row">
+          <label>圆角</label>
+          <input type="range" id="radiusSlider" min="0" max="40" value="4" oninput="onRadiusChange(this)">
+          <span class="val" id="radiusVal">4</span>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <label style="flex:0 0 auto">背景</label>
+          <div class="color-row" style="flex:1">
+            <div class="swatch active" style="background:#fff"><input type="radio" name="bgPreset" value="#ffffff" onchange="onBgPreset(this)"></div>
+            <div class="swatch" style="background:#111"><input type="radio" name="bgPreset" value="#111111" onchange="onBgPreset(this)"></div>
+            <div class="swatch" style="background:#e8e8e8"><input type="radio" name="bgPreset" value="#e8e8e8" onchange="onBgPreset(this)"></div>
+            <div class="swatch" style="background:#f5efe4"><input type="radio" name="bgPreset" value="#f5efe4" onchange="onBgPreset(this)"></div>
+            <div class="swatch-custom"><input type="color" id="bgCustom" value="#ffffff" onchange="onBgCustom(this)"></div>
+          </div>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <label style="flex:0 0 auto">边框</label>
+          <div style="flex:1;display:flex;align-items:center;gap:6px">
+            <input type="checkbox" id="borderChk" onchange="onBorderChk(this)" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer">
+            <span style="font-size:12px;color:var(--txt3)" id="borderStatus">关闭</span>
+          </div>
+        </div>
+        <div class="row" id="borderOpts" style="display:none;gap:8px">
+          <div class="color-row" style="flex:1">
+            <div class="swatch" style="background:#fff;border:1px solid var(--line2)" id="borderColorSwatch"><input type="color" id="borderColor" value="#ffffff" onchange="onBorderColor(this)"></div>
+          </div>
+          <input type="range" id="borderW" min="0" max="20" value="4" oninput="document.getElementById('borderWVal').textContent=this.value;render()" style="flex:1">
+          <span class="val" id="borderWVal">4</span>
+        </div>
+      </div>
+
+      <!-- 导出设置 -->
+      <div class="sec">
+        <h4>导出设置</h4>
+        <div class="export-row">
+          <select id="exportSize" onchange="onExportSizeChange()">
+            <option value="1080">1080px 长边（标准）</option>
+            <option value="2048" selected>2048px 长边（高清）</option>
+            <option value="3000">3000px 长边（超清）</option>
+          </select>
+        </div>
+        <div class="hint" style="font-size:11px;color:var(--txt3);margin-top:6px" id="exportHint">导出将按画布比例自动计算另一边尺寸。</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   拼图编辑器 · Collage Maker
+   自包含模块：布局数据 + Canvas 渲染 + 图片管理 + 高清导出
+   不依赖 preview-studio.html 的任何内部函数
+   ============================================================ */
+
+// ---------- 工具函数 ----------
+function $id(id){return document.getElementById(id)}
+function toast(msg,ms){
+  const t=$id('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._tm);t._tm=setTimeout(function(){t.classList.remove('show')},ms||2600);
+}
+function hexToRgb(hex){
+  hex=hex.replace('#','');
+  if(hex.length===3)hex=hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  const n=parseInt(hex,16);
+  return {r:(n>>16)&255,g:(n>>8)&255,b:n&255};
+}
+function rgbToHex(r,g,b){
+  return '#'+[r,g,b].map(function(v){return ('0'+Math.max(0,Math.min(255,Math.round(v))).toString(16)).slice(-2)}).join('');
+}
+function lerp(a,b,t){return a+(b-a)*t}
+
+// ---------- 状态 ----------
+const MAX_IMGS=12;
+let images=[];          // [{img:HTMLImageElement, file:File|null}]
+let currentTpl=0;       // 模板索引
+let canvasRatio=[1,1];  // [w,h] 逻辑比例
+let gap=8;              // 画布逻辑像素
+let outerMargin=12;
+let cornerRadius=4;
+let bgColor='#ffffff';
+let borderEnabled=false;
+let borderColor='#ffffff';
+let borderWidth=4;
+
+// ---------- 布局模板 ----------
+// 每个模板: { name, min(最少图), max(最多图), cells:[{x,y,w,h}], spans:[] }
+// 单元格坐标基于 100x100 单位画布（宽高各 100），间距/边距另算。
+// spans 是可选的，用于"主图加大图"等不规则布局（span 表示该单元格占几格）。
+const TPL=[
+  // 双图
+  {name:'左右双图',min:2,max:2,cells:[{x:0,y:0,w:50,h:100},{x:50,y:0,w:50,h:100}]},
+  {name:'上下双图',min:2,max:2,cells:[{x:0,y:0,w:100,h:50},{x:0,y:50,w:100,h:50}]},
+  // 三图
+  {name:'一大两小',min:3,max:3,cells:[{x:0,y:0,w:100,h:60},{x:0,y:60,w:50,h:40},{x:50,y:60,w:50,h:40}]},
+  {name:'三横排',min:3,max:3,cells:[{x:0,y:0,w:33.34,h:100},{x:33.34,y:0,w:33.33,h:100},{x:66.67,y:0,w:33.33,h:100}]},
+  {name:'三纵排',min:3,max:3,cells:[{x:0,y:0,w:100,h:33.34},{x:0,y:33.34,w:100,h:33.33},{x:0,y:66.67,w:100,h:33.33}]},
+  // 四图
+  {name:'2×2 网格',min:4,max:4,cells:[{x:0,y:0,w:50,h:50},{x:50,y:0,w:50,h:50},{x:0,y:50,w:50,h:50},{x:50,y:50,w:50,h:50}]},
+  {name:'左主右二',min:4,max:4,cells:[{x:0,y:0,w:60,h:100},{x:60,y:0,w:40,h:50},{x:60,y:50,w:40,h:50}]},
+  {name:'上二下一',min:4,max:4,cells:[{x:0,y:0,w:50,h:50},{x:50,y:0,w:50,h:50},{x:0,y:50,w:100,h:50}]},
+  // 五图
+  {name:'主图加四小',min:5,max:5,cells:[{x:0,y:0,w:100,h:55},{x:0,y:55,w:25,h:45},{x:25,y:55,w:25,h:45},{x:50,y:55,w:25,h:45},{x:75,y:55,w:25,h:45}]},
+  {name:'五格阶梯',min:5,max:5,cells:[{x:0,y:0,w:50,h:40},{x:50,y:0,w:50,h:60},{x:0,y:40,w:40,h:60},{x:40,y:60,w:30,h:40},{x:70,y:60,w:30,h:40}]},
+  // 六图
+  {name:'3×2 网格',min:6,max:6,cells:[{x:0,y:0,w:33.34,h:50},{x:33.34,y:0,w:33.33,h:50},{x:66.67,y:0,w:33.33,h:50},{x:0,y:50,w:33.34,h:50},{x:33.34,y:50,w:33.33,h:50},{x:66.67,y:50,w:33.33,h:50}]},
+  {name:'2×3 网格',min:6,max:6,cells:[{x:0,y:0,w:50,h:33.34},{x:50,y:0,w:50,h:33.34},{x:0,y:33.34,w:50,h:33.33},{x:50,y:33.34,w:50,h:33.33},{x:0,y:66.67,w:50,h:33.33},{x:50,y:66.67,w:50,h:33.33}]},
+  {name:'主图三辅',min:6,max:6,cells:[{x:0,y:0,w:60,h:60},{x:60,y:0,w:40,h:30},{x:60,y:30,w:40,h:30},{x:0,y:60,w:40,h:40},{x:40,y:60,w:60,h:40}]},
+  // 七图
+  {name:'四+三 分层',min:7,max:7,cells:[{x:0,y:0,w:50,h:50},{x:50,y:0,w:50,h:50},{x:0,y:50,w:33.34,h:50},{x:33.34,y:50,w:33.33,h:50},{x:66.67,y:50,w:33.33,h:50},{x:0,y:50,w:0,h:0},{x:0,y:50,w:0,h:0}]},
+  // 八图
+  {name:'4×2 网格',min:8,max:8,cells:[{x:0,y:0,w:25,h:50},{x:25,y:0,w:25,h:50},{x:50,y:0,w:25,h:50},{x:75,y:0,w:25,h:50},{x:0,y:50,w:25,h:50},{x:25,y:50,w:25,h:50},{x:50,y:50,w:25,h:50},{x:75,y:50,w:25,h:50}]},
+  {name:'大主图七辅',min:8,max:8,cells:[{x:0,y:0,w:55,h:65},{x:55,y:0,w:45,h:32.5},{x:55,y:32.5,w:45,h:32.5},{x:0,y:65,w:27.5,h:35},{x:27.5,y:65,w:27.5,h:35},{x:55,y:65,w:22.5,h:35},{x:77.5,y:65,w:22.5,h:35}]},
+  // 九图
+  {name:'3×3 九宫格',min:9,max:9,cells:[{x:0,y:0,w:33.34,h:33.34},{x:33.34,y:0,w:33.33,h:33.34},{x:66.67,y:0,w:33.33,h:33.34},{x:0,y:33.34,w:33.34,h:33.33},{x:33.34,y:33.34,w:33.33,h:33.33},{x:66.67,y:33.34,w:33.33,h:33.33},{x:0,y:66.67,w:33.34,h:33.33},{x:33.34,y:66.67,w:33.33,h:33.33},{x:66.67,y:66.67,w:33.33,h:33.33}]},
+  {name:'九宫大主',min:9,max:9,cells:[{x:0,y:0,w:50,h:60},{x:50,y:0,w:50,h:30},{x:50,y:30,w:50,h:30},{x:0,y:60,w:33.34,h:40},{x:33.34,y:60,w:33.33,h:40},{x:66.67,y:60,w:33.33,h:40},{x:0,y:80,w:0,h:0},{x:33.34,y:80,w:0,h:0},{x:66.67,y:80,w:0,h:0}]},
+];
+// 修正 7/8 图模板：有些模板有占位 0 格，去掉它们
+TPL.forEach(function(t){
+  t.cells=t.cells.filter(function(c){return c.w>0&&c.h>0});
+  t.min=Math.min(t.min,t.cells.length);
+  t.max=t.cells.length; // 每格一张，固定数量
+});
+// 重新定义 7 图和 8 图（上面有些占位格被去掉）
+// 7 图：4+3
+TPL[12].cells=[{x:0,y:0,w:50,h:50},{x:50,y:0,w:50,h:50},{x:0,y:50,w:33.34,h:50},{x:33.34,y:50,w:33.33,h:50},{x:66.67,y:50,w:33.33,h:50}];
+TPL[12].min=5;TPL[12].max=7;
+// 8 图：大主七辅 → 实际 7 格
+TPL[15].cells=[{x:0,y:0,w:55,h:65},{x:55,y:0,w:45,h:32.5},{x:55,y:32.5,w:45,h:32.5},{x:0,y:65,w:27.5,h:35},{x:27.5,y:65,w:27.5,h:35},{x:55,y:65,w:22.5,h:35},{x:77.5,y:65,w:22.5,h:35}];
+TPL[15].min=7;TPL[15].max=8;
+// 9 图：九宫大主 → 实际 6 格
+TPL[17].cells=[{x:0,y:0,w:50,h:60},{x:50,y:0,w:50,h:30},{x:50,y:30,w:50,h:30},{x:0,y:60,w:33.34,h:40},{x:33.34,y:60,w:33.33,h:40},{x:66.67,y:60,w:33.33,h:40}];
+TPL[17].min=6;TPL[17].max=9;
+
+// 通用网格生成器：当图片数量超出固定模板时使用
+function makeGrid(cols,rows,n){
+  const cells=[];
+  const cw=100/cols,ch=100/rows;
+  for(let i=0;i<Math.min(n,cols*rows);i++){
+    const col=i%cols,row=Math.floor(i/cols);
+    cells.push({x:col*cw,y:row*ch,w:cw,h:ch});
+  }
+  return {name:cols+'×'+rows+' 网格',min:n,max:n,cells:cells};
+}
+function dynamicTemplate(n){
+  if(n<=1)return {name:'单图',min:1,max:1,cells:[{x:0,y:0,w:100,h:100}]};
+  let cols,rows;
+  if(n===2){cols=2;rows=1}
+  else if(n===3){cols=3;rows=1}
+  else if(n===4){cols=2;rows=2}
+  else if(n<=6){cols=3;rows=2}
+  else if(n<=9){cols=3;rows=3}
+  else{cols=4;rows=Math.ceil(n/4)}
+  return makeGrid(cols,rows,n);
+}
+// 获取当前模板的单元格（根据图片数量自适应）
+function getCells(){
+  const tpl=TPL[currentTpl]||dynamicTemplate(images.length);
+  const cells=tpl.cells.slice(0,images.length);
+  return {tpl:tpl,cells:cells};
+}
+
+// ---------- 图片上传 ----------
+$id('fileInput').addEventListener('change',function(e){
+  addFiles(e.target.files);
+  e.target.value='';
+});
+$id('uploadZone').addEventListener('click',function(){$id('fileInput').click()});
+function addFiles(files){
+  const list=Array.from(files).filter(function(f){return f&&f.type&&/^image\/(jpeg|png|webp)/i.test(f.type)});
+  if(!list.length){toast('请选择有效的图片文件');return}
+  let remain=MAX_IMGS-images.length;
+  if(remain<=0){toast('最多 '+MAX_IMGS+' 张图片');return}
+  const take=list.slice(0,remain);
+  if(take.length<list.length)toast('已截取前 '+take.length+' 张（上限 '+MAX_IMGS+'）');
+  let done=0;
+  take.forEach(function(file){
+    const img=new Image();
+    img.onload=function(){
+      images.push({img:img,file:file});
+      if(++done===take.length){refreshImages();selectBestTpl()}
+    };
+    img.onerror=function(){toast('图片读取失败：'+file.name);if(++done===take.length){refreshImages()}};
+    img.src=URL.createObjectURL(file);
+  });
+}
+function refreshImages(){
+  // 缩略图列表
+  const list=$id('imgList');list.innerHTML='';
+  images.forEach(function(item,i){
+    const d=document.createElement('div');d.className='img-item';
+    const im=document.createElement('img');im.src=item.img.src;im.alt='图'+(i+1);
+    const num=document.createElement('span');num.className='num';num.textContent=i+1;
+    const del=document.createElement('span');del.className='del';del.textContent='×';
+    del.onclick=function(){removeImage(i)};
+    const ord=document.createElement('span');ord.className='ord';
+    if(i>0){const b1=document.createElement('button');b1.textContent='↑';b1.title='前移';b1.onclick=function(){moveImage(i,-1)};ord.appendChild(b1)}
+    if(i<images.length-1){const b2=document.createElement('button');b2.textContent='↓';b2.title='后移';b2.onclick=function(){moveImage(i,1)};ord.appendChild(b2)}
+    d.appendChild(im);d.appendChild(num);d.appendChild(del);
+    if(ord.childNodes.length)d.appendChild(ord);
+    list.appendChild(d);
+  });
+  $id('imgCount').textContent=images.length+'/'+MAX_IMGS;
+  $id('exportBtn').disabled=images.length===0;
+  updateTplAvail();
+}
+function removeImage(i){
+  URL.revokeObjectURL(images[i].img.src);
+  images.splice(i,1);
+  refreshImages();selectBestTpl();
+}
+function moveImage(i,dir){
+  const j=i+dir;
+  if(j<0||j>=images.length)return;
+  const t=images[i];images[i]=images[j];images[j]=t;
+  refreshImages();render();
+}
+function selectBestTpl(){
+  const n=images.length;
+  // 找最适合的模板
+  let best=-1;
+  for(let k=0;k<TPL.length;k++){
+    if(n>=TPL[k].min&&n<=TPL[k].max){best=k;break}
+  }
+  if(best>=0){currentTpl=best}
+  else{currentTpl=TPL.length} // 使用动态网格
+  renderTplCards();render();
+}
+function updateTplAvail(){
+  const n=images.length;
+  document.querySelectorAll('.tpl-item').forEach(function(el,i){
+    const tpl=TPL[i];
+    if(!tpl)return; // 跳过动态网格卡片(idx=999)
+    el.classList.toggle('disabled',n<tpl.min||n>tpl.max);
+    const need=el.querySelector('.need');
+    if(need)need.textContent=n<tpl.min?'需'+tpl.min+'张':(n>tpl.max?'超'+tpl.max+'张':tpl.min+'-'+tpl.max+'张');
+  });
+}
+
+// ---------- 模板卡片 ----------
+function renderTplCards(){
+  const sc=$id('tplScroll');sc.innerHTML='';
+  const items=[];
+  TPL.forEach(function(t,i){items.push({tpl:t,real:true,idx:i})});
+  // 动态网格卡片
+  const dyn=dynamicTemplate(Math.max(images.length,2));
+  items.push({tpl:dyn,real:false,idx:999});
+  items.forEach(function(it){
+    const d=document.createElement('div');
+    d.className='tpl-item'+(it.real?(currentTpl===it.idx?' active':''):(currentTpl===999?' active':''));
+    // 绘制缩略图
+    const cv=document.createElement('canvas');cv.width=120;cv.height=148;
+    drawTplThumb(cv,it.tpl,it.real?it.idx:999);
+    const tag=document.createElement('div');tag.className='tag';tag.textContent=it.tpl.name;
+    const need=document.createElement('div');need.className='need';
+    const n=images.length;
+    need.textContent=n<it.tpl.min?'需'+it.tpl.min+'张':(n>it.tpl.max?'超'+it.tpl.max+'张':it.tpl.min+'-'+it.tpl.max+'张');
+    d.appendChild(cv);d.appendChild(need);d.appendChild(tag);
+    d.onclick=function(){
+      const n=images.length;
+      if(n<it.tpl.min){toast('该模板至少需要 '+it.tpl.min+' 张图片');return}
+      if(n>it.tpl.max){toast('该模板最多支持 '+it.tpl.max+' 张图片');return}
+      currentTpl=it.idx;renderTplCards();render();
+    };
+    sc.appendChild(d);
+  });
+}
+function drawTplThumb(cv,tpl,idx){
+  const g=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  const m=6; // 缩略图内边距
+  const gap=3;
+  const area=W-m*2,hArea=H-m*2;
+  g.fillStyle='#f0ede6';g.fillRect(0,0,W,H);
+  // 单元格
+  const colors=['#8fa8c4','#a8bf9e','#c9a88a','#b9c9dd','#d4b8a0','#9aab8c','#c6d8e8','#7d94b1'];
+  tpl.cells.forEach(function(c,i){
+    const x=m+c.w/100*area,y=m+c.h/100*hArea,w=c.w/100*area,h=c.h/100*hArea;
+    const r=2;
+    g.fillStyle=colors[i%colors.length];
+    g.beginPath();
+    // 简化圆角矩形
+    g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();g.fill();
+  });
+  // 标记当前
+  if(idx===currentTpl){g.strokeStyle='#c9a37c';g.lineWidth=2;g.strokeRect(0.5,0.5,W-1,H-1)}
+}
+
+// ---------- 画布渲染（核心） ----------
+const canvas=$id('collageCanvas');
+const ctx=canvas.getContext('2d');
+let dpr=window.devicePixelRatio||1;
+
+function computeCanvasSize(){
+  const ratioW=canvasRatio[0],ratioH=canvasRatio[1];
+  // 预览：限制显示尺寸
+  const zone=$id('canvasZone')||canvas.parentElement.parentElement;
+  const maxW=Math.min(zone.clientWidth-40,800);
+  const maxH=Math.min(zone.clientHeight-40,600);
+  let pw=maxW,ph=pw*ratioH/ratioW;
+  if(ph>maxH){ph=maxH;pw=ph*ratioW/ratioH}
+  dpr=window.devicePixelRatio||1;
+  canvas.width=Math.round(pw*dpr);
+  canvas.height=Math.round(ph*dpr);
+  canvas.style.width=pw+'px';
+  canvas.style.height=ph+'px';
+  return {W:canvas.width,H:canvas.height};
+}
+
+// ---------- 布局/渲染辅助 ----------
+// 模板名是否属于不规则布局（单元格宽高中至少一个不是整除 100/n）
+function isIrregularTpl(name){
+  // 网格类：名称含 "×" 且不含 "主/大/阶梯/分层/九宫"
+  if(/^[\d]+×[\d]+/.test(name))return false;
+  // 这些模板名包含不规则信息
+  return /双图|主|大|阶梯|分层|九宫/.test(name);
+}
+// 给定 cellsCount，按模板名反推列数（用于均匀网格分支）
+function inferCols(tplName, n){
+  const m=/(\d+)×(\d+)/.exec(tplName);
+  if(m)return parseInt(m[1]);
+  if(n===1)return 1;
+  if(n===2)return 2;
+  if(n===3)return 3;
+  if(n===4)return 2;
+  if(n<=6)return 3;
+  if(n<=9)return 3;
+  return 4;
+}
+// 核心渲染：预览与导出共用
+function drawCollage(g,W,H,cells,tpl){
+  const mRatio=outerMargin/100;
+  const gRatio=gap/100;
+  const n=cells.length;
+  const innerX=W*mRatio,innerY=H*mRatio;
+  const innerW=W*(1-2*mRatio),innerH=H*(1-2*mRatio);
+  const rMax=Math.max(0,cornerRadius*(H/1000));
+  const bw=borderEnabled?Math.max(0,borderWidth*(H/1000)):0;
+  const irreg=isIrregularTpl(tpl.name);
+  let colW,rowH,totalGapX,totalGapY,gridCols,rows;
+  if(!irreg){
+    gridCols=inferCols(tpl.name,n);
+    rows=Math.ceil(n/gridCols);
+    totalGapX=gRatio*innerW*Math.max(0,gridCols-1);
+    totalGapY=gRatio*innerH*Math.max(0,rows-1);
+    colW=(innerW-totalGapX)/gridCols;
+    rowH=(innerH-totalGapY)/rows;
+  }
+  cells.forEach(function(c,i){
+    const im=images[i].img;
+    if(!im||!im.width)return;
+    let cx,cy,cw,ch;
+    if(irreg){
+      cx=innerX+c.x/100*innerW;
+      cy=innerY+c.y/100*innerH;
+      cw=c.w/100*innerW;
+      ch=c.h/100*innerH;
+    }else{
+      const col=i%gridCols,row=Math.floor(i/gridCols);
+      cx=innerX+col*(colW+totalGapX/Math.max(1,gridCols-1));
+      cy=innerY+row*(rowH+totalGapY/Math.max(1,rows-1));
+      cw=colW;ch=rowH;
+    }
+    // 画圆角裁切
+    g.save();
+    g.beginPath();roundRect(g,cx,cy,cw,ch,rMax);g.clip();
+    // cover
+    const sc=Math.max(cw/im.width,ch/im.height);
+    g.drawImage(im,cx+(cw-im.width*sc)/2,cy+(ch-im.height*sc)/2,im.width*sc,im.height*sc);
+    g.restore();
+    // 边框
+    if(bw>0){g.strokeStyle=borderColor;g.lineWidth=bw;g.beginPath();roundRect(g,cx,cy,cw,ch,rMax);g.stroke()}
+  });
+}
+
+function render(){
+  const size=computeCanvasSize();
+  const W=size.W,H=size.H;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle=bgColor;ctx.fillRect(0,0,W,H);
+  if(images.length===0){
+    ctx.fillStyle='rgba(120,120,120,.35)';
+    ctx.font=Math.round(W*0.025)+'px -apple-system,sans-serif';
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText('请先上传图片',W/2,H/2);
+    return;
+  }
+  const {tpl,cells}=getCells();
+  drawCollage(ctx,W,H,cells,tpl);
+}
+
+function renderTo(g,W,H){
+  g.clearRect(0,0,W,H);
+  g.fillStyle=bgColor;g.fillRect(0,0,W,H);
+  if(images.length===0)return;
+  const {tpl,cells}=getCells();
+  drawCollage(g,W,H,cells,tpl);
+}
+function roundRect(g,x,y,w,h,r){
+  r=Math.min(r,w/2,h/2);
+  g.moveTo(x+r,y);
+  g.arcTo(x+w,y,x+w,y+h,r);
+  g.arcTo(x+w,y+h,x,y+h,r);
+  g.arcTo(x,y+h,x,y,r);
+  g.arcTo(x,y,x+w,y,r);
+  g.closePath();
+}
+
+// ---------- 事件绑定 ----------
+function onRatioChange(){
+  const v=$id('ratioSelect').value;
+  $id('customRatioRow').style.display=v==='custom'?'flex':'none';
+  if(v==='custom'){onCustomRatio()}
+  else{
+    const parts=v.split(':');
+    canvasRatio=[parseInt(parts[0]),parseInt(parts[1])];
+    render();
+  }
+}
+function onCustomRatio(){
+  const w=parseInt($id('customW').value)||4;
+  const h=parseInt($id('customH').value)||3;
+  canvasRatio=[Math.max(1,Math.min(20,w)),Math.max(1,Math.min(20,h))];
+  $id('ratioSelect').value='custom';
+  render();
+}
+function onGapChange(el){gap=parseInt(el.value);gapVal=$id('gapVal');gapVal.textContent=gap;render()}
+function onMarginChange(el){outerMargin=parseInt(el.value);$id('marginVal').textContent=outerMargin;render()}
+function onRadiusChange(el){cornerRadius=parseInt(el.value);$id('radiusVal').textContent=cornerRadius;render()}
+function onBgPreset(el){
+  if(el.checked){
+    bgColor=el.value;
+    document.querySelectorAll('.swatch').forEach(function(s){s.classList.remove('active')});
+    el.parentElement.classList.add('active');
+    $id('bgCustom').value=el.value;
+    render();
+  }
+}
+function onBgCustom(el){
+  bgColor=el.value;
+  document.querySelectorAll('.swatch').forEach(function(s){s.classList.remove('active')});
+  el.parentElement.classList.add('active');
+  document.querySelectorAll('input[name=bgPreset]').forEach(function(r){r.checked=false});
+  render();
+}
+function onBorderChk(el){
+  borderEnabled=el.checked;
+  $id('borderOpts').style.display=borderEnabled?'flex':'none';
+  $id('borderStatus').textContent=borderEnabled?'开启':'关闭';
+  render();
+}
+function onBorderColor(el){borderColor=el.value;$id('borderColorSwatch').style.background=borderColor;render()}
+function onExportSizeChange(){updateExportHint()}
+function updateExportHint(){
+  const s=parseInt($id('exportSize').value);
+  const rw=canvasRatio[0],rh=canvasRatio[1];
+  let w,h;
+  if(rw>=rh){w=s;h=Math.round(s*rh/rw)}
+  else{h=s;w=Math.round(s*rw/rh)}
+  $id('exportHint').textContent='导出尺寸：'+w+'×'+h+'px（长边 '+s+'px）';
+}
+
+// ---------- 导出 ----------
+function exportPNG(){
+  if(images.length===0){toast('请先添加图片');return}
+  const s=parseInt($id('exportSize').value)||2048;
+  const rw=canvasRatio[0],rh=canvasRatio[1];
+  let ew,eh;
+  if(rw>=rh){ew=s;eh=Math.round(s*rh/rw)}
+  else{eh=s;ew=Math.round(s*rw/rh)}
+  // 创建全分辨率画布
+  const ec=document.createElement('canvas');
+  ec.width=ew;ec.height=eh;
+  const eg=ec.getContext('2d');
+  // 临时切换
+  const oldCanvas=canvas,oldCtx=ctx;
+  const savedDpr=dpr;
+  // 用全分辨率渲染
+  renderTo(eg,ew,eh);
+  // 转 blob
+  ec.toBlob(function(blob){
+    if(!blob){toast('导出失败，请重试');return}
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.download='collage-'+ew+'x'+eh+'.png';
+    a.href=url;
+    document.body.appendChild(a);a.click();
+    setTimeout(function(){a.remove();URL.revokeObjectURL(url)},8000);
+    toast('已导出 '+ew+'×'+eh+' PNG');
+  },'image/png');
+}
+// ---------- 重置 ----------
+function resetAll(){
+  gap=8;outerMargin=12;cornerRadius=4;bgColor='#ffffff';
+  borderEnabled=false;borderColor='#ffffff';borderWidth=4;
+  canvasRatio=[1,1];
+  $id('gapSlider').value=8;$id('gapVal').textContent='8';
+  $id('marginSlider').value=12;$id('marginVal').textContent='12';
+  $id('radiusSlider').value=4;$id('radiusVal').textContent='4';
+  $id('ratioSelect').value='1:1';$id('customRatioRow').style.display='none';
+  $id('borderChk').checked=false;$id('borderOpts').style.display='none';$id('borderStatus').textContent='关闭';
+  const defaultRadio=document.querySelector('input[name=bgPreset][value="#ffffff"]');
+  if(defaultRadio){defaultRadio.checked=true;document.querySelectorAll('.swatch').forEach(function(s){s.classList.remove('active')});defaultRadio.parentElement.classList.add('active')}
+  updateExportHint();render();
+}
+
+// ---------- 初始化 ----------
+function init(){
+  renderTplCards();
+  refreshImages();
+  updateExportHint();
+  render();
+  window.addEventListener('resize',function(){clearTimeout(window._rtm);window._rtm=setTimeout(render,150)});
+}
+init();
+</script>
+</body>
+</html>
