@@ -9,7 +9,7 @@
      比对下面的版本号，不一致就弹「有新版本」提示（点一下带参数跳转，必定回源）。
      每次发版请把 PS_BUILD 改成新的 git 短 hash（git rev-parse --short HEAD）。 ===== -->
 <script>
-window.PS_BUILD="2501bf2";
+window.PS_BUILD="ab63600";
 (function(){
   var TIP_ID="psVerTip",TIP_KEY="psVerTipShown";
   function showTip(v){
@@ -55,6 +55,8 @@ window.PS_BUILD="2501bf2";
 </script>
 <!-- 字体全部本地内置（真·离线），见 fonts.css + fonts/ 目录；均为 OFL 可商用授权 -->
 <link href="fonts.css" rel="stylesheet">
+<!-- Sortable.js 用于拼图缩略图拖动排序 -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -243,62 +245,50 @@ input[type=file]{font-size:11px}
 .mn-line{height:6px;border-radius:3px;background:#b8a184}
 .mn-line.short{width:55%}
 /* 缩略 mock：锁屏 */
-.mock-lock{width:112px;height:200px;border-radius:22px;background:linear-gradient(160deg,#3a5a8a,#16233a);display:flex;flex-direction:column;align-items:center;padding:18px 10px;color:#fff;box-shadow:0 10px 26px rgba(0,0,0,.55);position:relative}
-.mock-lock::before{content:"";position:absolute;top:7px;left:50%;transform:translateX(-50%);width:34px;height:4px;border-radius:2px;background:rgba(255,255,255,.28)}
-.ml-time{font-size:32px;font-weight:300;letter-spacing:1px;line-height:1;margin-top:6px}
-.ml-date{font-size:8px;opacity:.85;margin-top:6px;letter-spacing:.5px}
-.ml-btns{margin-top:auto;width:100%;display:flex;justify-content:space-between;padding:0 6px}
-.ml-btns span{width:22px;height:22px;border-radius:50%;background:rgba(255,255,255,.22)}
+.mock-lock{width:112px;height:200px;border-radius:22px;background:linear-gradient(160deg,#3a5a8a,#16233a);box-shadow:0 10px 26px rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;position:relative}
 /* 缩略 mock：字稿风 */
-.mock-ms{width:132px;height:186px;border-radius:12px;background:linear-gradient(160deg,#f5ead4,#e0c99a);position:relative;padding:14px;box-shadow:0 10px 26px rgba(0,0,0,.45);overflow:hidden}
-.mm-bar{position:absolute;top:0;left:0;right:0;height:28px;background:rgba(120,90,50,.16);display:flex;align-items:center;padding:0 10px}
-.mm-bar::before{content:"";width:14px;height:14px;border-radius:50%;background:#c9a37c}
-.mm-script{font-family:'Great Vibes',cursive;font-size:22px;color:#c08a4a;text-align:right;margin-top:20px;line-height:1}
-.mm-title{font-family:'KaiTi','Kaiti SC','STKaiti',serif;font-size:15px;color:#b8894a;line-height:1.55;margin-top:16px;font-weight:700}
-.mm-author{position:absolute;left:14px;bottom:12px;font-family:'KaiTi','Kaiti SC','STKaiti',serif;font-size:13px;color:#a8793f}
-.mock-polaroid{width:132px;height:186px;border-radius:10px;background:linear-gradient(160deg,#f5ecd8,#e8dcc0);position:relative;box-shadow:0 10px 26px rgba(0,0,0,.35);overflow:hidden}
-.mp-date-top{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 0;color:#5a4a32;font-size:11px;font-weight:600;letter-spacing:.5px}
-.mp-date-top::before{content:"";flex:1;height:.5px;background:rgba(90,74,50,.35);margin:0 6px}
-.mp-frame{position:absolute;left:12px;right:12px;top:32px;background:#fff;padding:8px 8px 22px;border-radius:2px;box-shadow:0 4px 10px rgba(0,0,0,.12)}
-.mp-frame-img{width:100%;aspect-ratio:1/1;border-radius:2px;background:linear-gradient(135deg,#e2cd92,#b8a06c)}
-.mp-frame-text{text-align:center;font-family:'KaiTi','Kaiti SC',serif;font-size:10px;color:#4a3a22;margin-top:7px}
-.mp-deco{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Great Vibes',cursive;font-size:58px;color:rgba(120,95,60,.12);pointer-events:none}
-.mock-dual{width:100%;height:100%;display:flex;gap:6px;padding:8px;align-items:stretch;background:linear-gradient(160deg,#eceef0,#dfe2e6);border-radius:10px;box-sizing:border-box}
-.mock-dual .md-wp{flex:1;background:rgba(255,255,255,.45);border-radius:6px;position:relative;overflow:hidden}
-.mock-dual .md-time{position:absolute;top:14px;left:50%;transform:translateX(-50%);font-size:22px;font-weight:700;color:#2b2b2b;letter-spacing:2px}
-.mock-dual .md-date{position:absolute;top:46px;left:50%;transform:translateX(-50%);font-size:8px;color:#5a5a5a}
-.mock-dual .md-wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:28px;color:rgba(138,143,150,.25);font-weight:600}
-.mock-dual .md-foot{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:8px;color:#2b2b2b;font-weight:600}
-.mock-dual .md-sq{width:44%;display:flex;flex-direction:column;border-radius:6px;overflow:hidden;background:rgba(255,255,255,.55);position:relative}
-.mock-dual .md-sq-body{flex:1;background:linear-gradient(135deg,#e4e6ea,#ced2d8)}
-.mock-dual .md-sq-bar{height:34%;background:#fff;padding:5px 6px;display:flex;flex-direction:column;gap:3px;box-sizing:border-box}
-.mock-dual .md-sq-bar span{height:4px;background:#333;border-radius:2px}
-.mock-dual .md-sq-bar span:nth-child(1){width:70%;background:#9aa0a6}
-.mock-dual .md-sq-bar span:nth-child(2){width:86%;background:#444}
-.mock-dual .md-sq-bar span:nth-child(3){width:74%;background:#444}
-.mock-profile{width:112px;height:190px;border-radius:14px;background:linear-gradient(180deg,#bfe0ea 0%,#dceef0 42%,#e8d3a8 78%,#dcc293 100%);position:relative;box-shadow:0 10px 26px rgba(0,0,0,.3);overflow:hidden}
-.mock-profile .mpf-status{position:absolute;top:10px;left:0;right:0;display:flex;justify-content:space-between;padding:0 12px;font-size:9px;font-weight:700;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.25);z-index:2}
-.mock-profile .mpf-bg{position:absolute;inset:0}
-.mock-profile .mpf-card{position:absolute;left:0;right:0;bottom:0;height:44%;background:#fff;border-radius:16px 16px 0 0;padding:26px 12px 10px}
-.mock-profile .mpf-ava{position:absolute;top:-26px;left:14px;width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#cfd5dc,#9aa3ad);border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.18);box-sizing:border-box}
-.mock-profile .mpf-lines{display:flex;flex-direction:column;gap:5px;margin-left:64px}
-.mock-profile .mpf-lines i{display:block;height:7px;width:90%;border-radius:4px;background:#2b2b2b}
-.mock-profile .mpf-lines i.short{width:46%;background:#9aa3ad}
-.mock-profile .mpf-stats{display:flex;gap:14px;margin-top:14px;padding-left:4px}
-.mock-profile .mpf-stats b{font-size:13px;color:#1a1a1a;font-weight:700}
-.tpl-thumb .mock-normal,.tpl-thumb .mock-lock,.tpl-thumb .mock-ms,.tpl-thumb .mock-polaroid,.tpl-thumb .mock-dual,.tpl-thumb .mock-profile,.tpl-thumb .mock-frame{transform:scale(var(--mk,1));transform-origin:center;transition:transform .25s ease}
-/* 缩略 mock：相框风 */
-.mock-frame{width:150px;height:150px;border-radius:10px;position:relative;overflow:hidden;box-shadow:0 10px 26px rgba(0,0,0,.3);background:linear-gradient(150deg,#e9e3d8,#c8d5e2)}
-.mock-frame .mkf-bg{position:absolute;inset:-16px;background:linear-gradient(150deg,#f0e8da 0%,#cfd9e4 48%,#8fa3bb 100%);filter:blur(10px)}
-.mock-frame .mkf-veil{position:absolute;inset:0;background:rgba(255,255,255,.26)}
-.mock-frame .mkf-art{position:absolute;left:29px;top:24px;width:92px;height:94px;border-radius:6px;background:linear-gradient(145deg,#9fb6cf 0%,#6f8aa8 55%,#4d6480 100%)}
-.mock-frame .mkf-c{position:absolute;width:14px;height:14px;border:0 solid #fff;border-radius:3px}
-.mock-frame .mkf-c.tl{left:29px;top:24px;border-left-width:2.6px;border-top-width:2.6px}
-.mock-frame .mkf-c.tr{right:29px;top:24px;border-right-width:2.6px;border-top-width:2.6px}
-.mock-frame .mkf-c.bl{left:29px;bottom:32px;border-left-width:2.6px;border-bottom-width:2.6px}
-.mock-frame .mkf-c.br{right:29px;bottom:32px;border-right-width:2.6px;border-bottom-width:2.6px}
-.mock-frame .mkf-pill{position:absolute;left:50%;top:21px;transform:translateX(-50%);width:21px;height:4px;border-radius:2px;background:rgba(255,255,255,.62)}
-.mock-frame .mkf-bar{position:absolute;left:50%;bottom:11px;transform:translateX(-50%);width:38px;height:4px;border-radius:2px;background:rgba(255,255,255,.55)}
+.mock-ms{width:132px;height:186px;border-radius:12px;background:linear-gradient(160deg,#f5ead4,#e0c99a);box-shadow:0 10px 26px rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;overflow:hidden}
+/* 缩略 mock：拍立得 */
+.mock-polaroid{width:132px;height:186px;border-radius:10px;background:linear-gradient(160deg,#f5ecd8,#e8dcc0);box-shadow:0 10px 26px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;overflow:hidden}
+/* 缩略 mock：双模板 */
+.mock-dual{width:100%;height:100%;border-radius:10px;background:linear-gradient(160deg,#eceef0,#dfe2e6);display:flex;align-items:center;justify-content:center;padding:8px;box-sizing:border-box}
+/* 缩略 mock：个人主页 */
+.mock-profile{width:112px;height:190px;border-radius:14px;background:linear-gradient(180deg,#bfe0ea 0%,#dceef0 42%,#e8d3a8 78%,#dcc293 100%);box-shadow:0 10px 26px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.tpl-thumb .mock-normal,.tpl-thumb .mock-lock,.tpl-thumb .mock-ms,.tpl-thumb .mock-polaroid,.tpl-thumb .mock-dual,.tpl-thumb .mock-profile,.tpl-thumb .mock-frame,.tpl-thumb .mock-axis{transform:scale(var(--mk,1));transform-origin:center;transition:transform .25s ease}
+/* 缩略 mock：相框风（纯 SVG 图标） */
+.mock-frame{width:140px;height:140px;border-radius:10px;box-shadow:0 10px 26px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,#e9e3d8,#c8d5e2)}
+/* 缩略 mock：作品展示轴 */
+.mock-axis{width:196px;height:88px;position:relative;background:#fff;border-radius:8px;box-shadow:0 10px 26px rgba(0,0,0,.22);overflow:hidden;display:flex;align-items:center;justify-content:center}
+/* 缩略 mock：自由拼图 */
+.mock-collage{width:132px;height:132px;border-radius:10px;box-shadow:0 10px 26px rgba(0,0,0,.28);display:flex;align-items:center;justify-content:center;background:#f8f6f2}
+/* 自由拼图工作区（内联面板） */
+.cg-upload-zone{display:block;border:1.5px dashed #3a3a48;border-radius:10px;padding:18px 10px;text-align:center;color:#8b8b95;font-size:12px;background:#14141a;transition:border-color .2s,color .2s;-webkit-tap-highlight-color:transparent}
+.cg-upload-zone:hover{border-color:var(--accent);color:var(--accent)}
+.cg-img-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(52px,1fr));gap:6px;margin-top:8px}
+.cg-img-item{position:relative;aspect-ratio:1;border-radius:7px;overflow:hidden;border:1.5px solid #2a2a35;background:#0f0f14;cursor:grab;touch-action:manipulation}
+.cg-img-item:active{cursor:grabbing}
+.cg-img-item img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.cg-img-item .num{position:absolute;left:2px;top:2px;background:rgba(0,0,0,.62);color:#fff;font-size:9px;line-height:1;padding:2px 4px;border-radius:4px}
+.cg-img-item .del{position:absolute;right:2px;top:2px;width:16px;height:16px;border-radius:50%;background:rgba(220,60,60,.9);color:#fff;font-size:12px;line-height:16px;text-align:center;cursor:pointer}
+.cg-sortable-ghost{opacity:.35;border-color:var(--accent)!important;border-style:dashed!important}
+.cg-img-item.selected{border-color:#4a9eff!important;box-shadow:0 0 0 2px rgba(74,158,255,.35)}
+.cg-tpl-scroll{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:8px;max-height:320px;overflow-y:auto;padding:2px}
+.cg-tpl-item{border:1.5px solid #2a2a35;border-radius:8px;padding:4px;cursor:pointer;background:#14141a;transition:border-color .18s,transform .18s}
+.cg-tpl-item:hover{border-color:#4a4a5a;transform:translateY(-1px)}
+.cg-tpl-item.active{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.cg-tpl-item canvas{width:100%;height:auto;border-radius:5px;display:block}
+.cg-tpl-item .tag{font-size:9px;color:#8b8b95;text-align:center;margin-top:3px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* 拼图模式切换（网格 / 拼接 / 自由） */
+.cg-mode-tabs{display:flex;gap:6px;margin:8px 0 2px}
+.cg-mode{flex:1;padding:7px 0;border-radius:8px;border:1.5px solid #2a2a35;background:#14141a;color:#9aa0aa;font-size:12px;cursor:pointer;transition:all .18s}
+.cg-mode:hover{border-color:#4a4a5a;color:#cfd4dc}
+.cg-mode.active{border-color:var(--accent);color:#1a1a1a;background:var(--accent);font-weight:600}
+/* 背景库 */
+.cg-bg-presets{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:6px}
+.cg-bg-sw{aspect-ratio:1;border-radius:6px;border:1.5px solid #2a2a35;cursor:pointer;transition:transform .15s,border-color .15s}
+.cg-bg-sw:hover{transform:scale(1.06);border-color:#6a6a7a}
+.cg-bg-sw.active{border-color:var(--accent);box-shadow:0 0 0 2px rgba(201,163,124,.3)}
+#c.cg-canvas{touch-action:none;cursor:crosshair}
 /* 模板卡片响应式：必须置于基础样式之后，否则同优先级会被覆盖 */
 @media(max-width:768px){
   .tpl-grid{gap:14px}
@@ -448,9 +438,16 @@ input[type=file]{font-size:11px}
         <div class="tpl-card" data-tpl="lock" onclick="selectTemplate('lock')">
           <div class="tpl-thumb">
             <div class="mock-lock">
-              <div class="ml-time">9:41</div>
-              <div class="ml-date">10月6日 星期一</div>
-              <div class="ml-btns"><span></span><span></span></div>
+              <svg viewBox="0 0 112 200" width="112" height="200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="4" y="4" width="104" height="192" rx="18" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+                <rect x="39" y="12" width="34" height="4" rx="2" fill="rgba(255,255,255,.25)"/>
+                <circle cx="56" cy="82" r="30" stroke="rgba(255,255,255,.75)" stroke-width="2.4"/>
+                <line x1="56" y1="66" x2="56" y2="83" stroke="rgba(255,255,255,.75)" stroke-width="2.4" stroke-linecap="round"/>
+                <line x1="69" y1="89" x2="57" y2="81" stroke="rgba(255,255,255,.75)" stroke-width="2.4" stroke-linecap="round"/>
+                <circle cx="22" cy="164" r="11" fill="rgba(255,255,255,.2)"/>
+                <circle cx="90" cy="164" r="11" fill="rgba(255,255,255,.2)"/>
+                <rect x="30" y="188" width="52" height="4" rx="2" fill="rgba(255,255,255,.3)"/>
+              </svg>
             </div>
           </div>
           <h3>锁屏排版预览</h3>
@@ -460,10 +457,17 @@ input[type=file]{font-size:11px}
         <div class="tpl-card" data-tpl="manuscript" onclick="selectTemplate('manuscript')">
           <div class="tpl-thumb">
             <div class="mock-ms">
-              <div class="mm-bar"></div>
-              <div class="mm-script">Preview</div>
-              <div class="mm-title">我很爱我<br>普通的生活</div>
-              <div class="mm-author">裴砚</div>
+              <svg viewBox="0 0 132 186" width="132" height="186" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="2" width="128" height="182" rx="10" fill="url(#msGrad)"/>
+                <defs><linearGradient id="msGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f5ead4"/><stop offset="100%" stop-color="#e0c99a"/></linearGradient></defs>
+                <rect x="0" y="0" width="132" height="28" fill="rgba(120,90,50,.12)"/>
+                <circle cx="14" cy="14" r="7" fill="#c9a37c" opacity=".7"/>
+                <line x1="14" y1="60" x2="118" y2="60" stroke="rgba(192,138,74,.5)" stroke-width="1.5"/>
+                <line x1="14" y1="80" x2="90" y2="80" stroke="rgba(184,137,74,.6)" stroke-width="2"/>
+                <line x1="14" y1="92" x2="100" y2="92" stroke="rgba(184,137,74,.5)" stroke-width="2"/>
+                <line x1="14" y1="104" x2="70" y2="104" stroke="rgba(184,137,74,.4)" stroke-width="2"/>
+                <circle cx="14" cy="170" r="5" fill="rgba(168,121,63,.5)"/>
+              </svg>
             </div>
           </div>
           <h3>字稿风预览</h3>
@@ -473,12 +477,14 @@ input[type=file]{font-size:11px}
         <div class="tpl-card" data-tpl="polaroid" onclick="selectTemplate('polaroid')">
           <div class="tpl-thumb">
             <div class="mock-polaroid">
-              <div class="mp-deco">memories</div>
-              <div class="mp-date-top"><span>2026</span><span>10/7</span></div>
-              <div class="mp-frame">
-                <div class="mp-frame-img"></div>
-                <div class="mp-frame-text">—— 手写文字 ——</div>
-              </div>
+              <svg viewBox="0 0 132 186" width="132" height="186" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="2" width="128" height="182" rx="8" fill="#f5ecd8"/>
+                <line x1="12" y1="18" x2="120" y2="18" stroke="rgba(90,74,50,.3)" stroke-width=".5"/>
+                <rect x="12" y="24" width="108" height="110" rx="2" fill="#fff" stroke="rgba(0,0,0,.06)" stroke-width="1"/>
+                <rect x="18" y="30" width="96" height="96" rx="2" fill="url(#ppGrad)"/>
+                <defs><linearGradient id="ppGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e2cd92"/><stop offset="100%" stop-color="#b8a06c"/></linearGradient></defs>
+                <line x1="30" y1="148" x2="102" y2="148" stroke="rgba(74,58,34,.3)" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
             </div>
           </div>
           <h3>拍立得预览</h3>
@@ -488,13 +494,18 @@ input[type=file]{font-size:11px}
         <div class="tpl-card" data-tpl="profile" onclick="selectTemplate('profile')">
           <div class="tpl-thumb">
             <div class="mock-profile">
-              <div class="mpf-status"><span>18:57</span><span>5G</span></div>
-              <div class="mpf-bg"></div>
-              <div class="mpf-card">
-                <div class="mpf-ava"></div>
-                <div class="mpf-lines"><i></i><i class="short"></i></div>
-                <div class="mpf-stats"><b>18</b><b>128</b><b>375</b></div>
-              </div>
+              <svg viewBox="0 0 112 190" width="112" height="190" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="2" width="108" height="186" rx="12" fill="url(#prGrad)"/>
+                <defs><linearGradient id="prGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#bfe0ea"/><stop offset="50%" stop-color="#dceef0"/><stop offset="100%" stop-color="#dcc293"/></linearGradient></defs>
+                <rect x="0" y="0" width="112" height="30" fill="rgba(255,255,255,.15)"/>
+                <circle cx="24" cy="68" r="22" fill="url(#avaGrad)" stroke="#fff" stroke-width="2.5"/>
+                <defs><linearGradient id="avaGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#cfd5dc"/><stop offset="100%" stop-color="#9aa3ad"/></linearGradient></defs>
+                <rect x="56" y="52" width="46" height="6" rx="3" fill="#2b2b2b" opacity=".6"/>
+                <rect x="56" y="64" width="26" height="6" rx="3" fill="#9aa3ad" opacity=".6"/>
+                <rect x="16" y="90" width="12" height="14" rx="2" fill="#1a1a1a" opacity=".7"/>
+                <rect x="36" y="90" width="16" height="14" rx="2" fill="#1a1a1a" opacity=".5"/>
+                <rect x="60" y="90" width="12" height="14" rx="2" fill="#1a1a1a" opacity=".4"/>
+              </svg>
             </div>
           </div>
           <h3>个人主页模板</h3>
@@ -504,36 +515,118 @@ input[type=file]{font-size:11px}
         <div class="tpl-card" data-tpl="frame" onclick="selectTemplate('frame')">
           <div class="tpl-thumb">
             <div class="mock-frame">
-              <div class="mkf-bg"></div>
-              <div class="mkf-veil"></div>
-              <div class="mkf-art"></div>
-              <div class="mkf-c tl"></div>
-              <div class="mkf-c tr"></div>
-              <div class="mkf-c bl"></div>
-              <div class="mkf-c br"></div>
-              <div class="mkf-pill"></div>
-              <div class="mkf-bar"></div>
+              <svg viewBox="0 0 140 140" width="140" height="140" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="20" y="20" width="100" height="100" rx="4" stroke="#fff" stroke-width="2.4" opacity=".85"/>
+                <rect x="28" y="28" width="84" height="84" rx="3" fill="rgba(160,185,210,.55)" stroke="rgba(255,255,255,.45)" stroke-width="1"/>
+                <line x1="20" y1="38" x2="20" y2="20" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+                <line x1="20" y1="20" x2="38" y2="20" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+                <line x1="120" y1="38" x2="120" y2="20" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+                <line x1="120" y1="20" x2="102" y2="20" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+                <line x1="20" y1="102" x2="20" y2="120" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+                <line x1="20" y1="120" x2="38" y2="120" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+                <line x1="120" y1="102" x2="120" y2="120" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+                <line x1="120" y1="120" x2="102" y2="120" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+                <rect x="52" y="110" width="36" height="4" rx="2" fill="rgba(255,255,255,.5)"/>
+                <rect x="62" y="24" width="16" height="4" rx="2" fill="rgba(255,255,255,.5)"/>
+              </svg>
             </div>
           </div>
           <h3>相框风预览</h3>
           <p>同一张作品图放大模糊铺满背景，中央清晰展示原图；四角白色 L 形角标 + 顶部小条 + 底部指示条，画框缩放、圆角、角标长度与粗细、模糊与薄纱全部可调。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('frame')">进入制作 →</button>
         </div>
+        <div class="tpl-card" data-tpl="axis" onclick="selectTemplate('axis')">
+          <div class="tpl-thumb">
+            <div class="mock-axis">
+              <svg viewBox="0 0 196 88" width="196" height="88" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="9" y="29" width="34" height="36" rx="3" fill="url(#axGrad1)" opacity=".72"/>
+                <rect x="41" y="17" width="44" height="52" rx="3" fill="url(#axGrad2)" opacity=".86"/>
+                <rect x="80" y="8" width="54" height="68" rx="3" fill="url(#axGrad3)" opacity="1"/>
+                <rect x="130" y="18" width="42" height="50" rx="3" fill="url(#axGrad4)" opacity=".86"/>
+                <rect x="168" y="31" width="30" height="32" rx="3" fill="url(#axGrad5)" opacity=".7"/>
+                <defs>
+                  <linearGradient id="axGrad1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c6d8e8"/><stop offset="100%" stop-color="#8aa4bf"/></linearGradient>
+                  <linearGradient id="axGrad2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c6d8e8"/><stop offset="100%" stop-color="#8aa4bf"/></linearGradient>
+                  <linearGradient id="axGrad3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#dfe7cf"/><stop offset="100%" stop-color="#9aab8c"/></linearGradient>
+                  <linearGradient id="axGrad4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#b9c9dd"/><stop offset="100%" stop-color="#7d94b1"/></linearGradient>
+                  <linearGradient id="axGrad5" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c6d8e8"/><stop offset="100%" stop-color="#8aa4bf"/></linearGradient>
+                </defs>
+              </svg>
+            </div>
+          </div>
+          <h3>作品展示轴</h3>
+          <p>一次上传多张作品，横向铺成一条展轴：中间最大、两侧递减，垂直错落叠压，白底柔和投影，长横幅画布适合系列作品陈列。</p>
+          <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('axis')">进入制作 →</button>
+        </div>
+        <div class="tpl-card" data-tpl="collage" onclick="selectTemplate('collage')">
+          <div class="tpl-thumb">
+            <div class="mock-collage">
+              <svg viewBox="0 0 132 132" width="132" height="132" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="1" y="1" width="130" height="130" rx="6" fill="#f8f6f2"/>
+                <g>
+                  <rect x="7" y="7" width="56" height="38" rx="3" fill="url(#cgr1)"/>
+                  <rect x="69" y="7" width="56" height="38" rx="3" fill="url(#cgr2)"/>
+                  <rect x="7" y="51" width="56" height="38" rx="3" fill="url(#cgr3)"/>
+                  <rect x="69" y="51" width="56" height="38" rx="3" fill="url(#cgr4)"/>
+                  <rect x="7" y="95" width="56" height="30" rx="3" fill="url(#cgr1)" opacity=".65"/>
+                  <rect x="69" y="95" width="56" height="30" rx="3" fill="url(#cgr4)" opacity=".65"/>
+                </g>
+                <defs>
+                  <linearGradient id="cgr1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c6d8e8"/><stop offset="100%" stop-color="#8aa4bf"/></linearGradient>
+                  <linearGradient id="cgr2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#dfe7cf"/><stop offset="100%" stop-color="#9aab8c"/></linearGradient>
+                  <linearGradient id="cgr3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#b9c9dd"/><stop offset="100%" stop-color="#7d94b1"/></linearGradient>
+                  <linearGradient id="cgr4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e8d5c0"/><stop offset="100%" stop-color="#c9a88a"/></linearGradient>
+                </defs>
+              </svg>
+            </div>
+          </div>
+          <h3>自由拼图</h3>
+          <p>多张图片任意排列成网格拼图，自由设置行列数、间距、圆角、边框，支持等宽/等高等比铺满，图片清晰不模糊。</p>
+          <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('collage')">进入制作 →</button>
+        </div>
+        <div class="tpl-card" data-tpl="magazine" onclick="selectTemplate('magazine')">
+          <div class="tpl-thumb">
+            <div class="mock-mag">
+              <svg viewBox="0 0 132 186" width="132" height="186" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="0" y="0" width="132" height="74" fill="url(#mjA)"/>
+                <text x="66" y="36" font-size="7" fill="#f7f2e8" text-anchor="middle" font-family="serif">某某某的款</text>
+                <text x="66" y="47" font-size="6" fill="#efe8dc" text-anchor="middle" font-family="serif">文案</text>
+                <rect x="0" y="74" width="132" height="46" fill="#f7f2ea"/>
+                <rect x="12" y="84" width="49" height="27" fill="url(#mjB)"/>
+                <rect x="71" y="84" width="49" height="27" fill="url(#mjC)"/>
+                <g stroke="#b9b9b9" stroke-width="1.1">
+                  <rect x="61" y="85" width="10" height="4.4" rx="2.2"/>
+                  <rect x="61" y="90" width="10" height="4.4" rx="2.2"/>
+                  <rect x="61" y="95" width="10" height="4.4" rx="2.2"/>
+                  <rect x="61" y="100" width="10" height="4.4" rx="2.2"/>
+                  <rect x="61" y="105" width="10" height="4.4" rx="2.2"/>
+                </g>
+                <rect x="0" y="120" width="132" height="66" fill="url(#mjD)"/>
+                <text x="66" y="152" font-size="8" fill="#fbf7f0" text-anchor="middle" font-family="serif">某某某的款</text>
+                <text x="66" y="164" font-size="5" fill="#efe8dc" text-anchor="middle" font-family="serif">文案</text>
+                <defs>
+                  <linearGradient id="mjA" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4a4536"/><stop offset="55%" stop-color="#8a6a3c"/><stop offset="100%" stop-color="#2b3038"/></linearGradient>
+                  <linearGradient id="mjB" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5d6f57"/><stop offset="100%" stop-color="#2f3a34"/></linearGradient>
+                  <linearGradient id="mjC" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c9d2d6"/><stop offset="100%" stop-color="#6e7a80"/></linearGradient>
+                  <linearGradient id="mjD" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2a2b2d"/><stop offset="50%" stop-color="#4d4a44"/><stop offset="100%" stop-color="#1c1d1f"/></linearGradient>
+                </defs>
+              </svg>
+            </div>
+          </div>
+          <h3>杂志手账</h3>
+          <p>秋日摄影长图：顶部诗句封面 + 中部米白双页线圈手账 + 底部英文主题页，独立杂志与摄影手账气质。</p>
+          <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('magazine')">进入制作 →</button>
+        </div>
         <div class="tpl-card" data-tpl="dual" onclick="location.href='dual-studio.html'">
           <div class="tpl-thumb">
             <div class="mock-dual">
-              <div class="md-wp">
-                <div class="md-time">5:20</div>
-                <div class="md-date">5月21日 星期二</div>
-                <div class="md-wm">╭=ω=╭</div>
-                <div class="md-foot">價格：xx 番号：xx</div>
-              </div>
-              <div class="md-sq">
-                <div class="md-sq-body"></div>
-                <div class="md-sq-bar">
-                  <span></span><span></span><span></span>
-                </div>
-              </div>
+              <svg viewBox="0 0 100 100" width="100" height="100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="1" y="1" width="44" height="98" rx="6" fill="rgba(255,255,255,.4)" stroke="rgba(0,0,0,.1)" stroke-width=".5"/>
+                <rect x="47" y="1" width="52" height="98" rx="6" fill="rgba(255,255,255,.55)" stroke="rgba(0,0,0,.1)" stroke-width=".5"/>
+                <rect x="6" y="6" width="34" height="40" rx="3" fill="rgba(228,230,234,.6)"/>
+                <rect x="6" y="50" width="34" height="8" rx="2" fill="rgba(154,160,166,.4)"/>
+                <rect x="54" y="6" width="38" height="88" rx="4" fill="rgba(228,230,234,.5)"/>
+              </svg>
             </div>
           </div>
           <h3>壁纸＋方图双模板</h3>
@@ -550,7 +643,7 @@ input[type=file]{font-size:11px}
           <button class="back-btn" onclick="backToTemplates()">← 返回模板选择</button>
           <span class="tpl-name" id="tplName"></span>
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis">
         <h3 class="tool-h">① 预设存档</h3>
         <p class="preset-tip">仅保存于「<b id="presetTplName">普通作品预览</b>」工作区，与其他模板互不干扰；每个槽位左侧存档、右侧载入。</p>
         <div class="preset-grid" id="presetGrid"></div>
@@ -560,7 +653,7 @@ input[type=file]{font-size:11px}
         <div class="hint">预设只记录参数，自定义纹理图与头像需重新上传。</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis">
         <h3 class="tool-h" style="margin-top:14px">② 分享预设</h3>
         <button class="primary" onclick="sharePreset()" style="margin-bottom:6px">🔗 生成短链接</button>
         <label>导入预设（粘贴链接或短码）</label>
@@ -572,7 +665,7 @@ input[type=file]{font-size:11px}
         <div class="hint" id="shareHint">生成短链接复制给别人，打开即自动应用；也可手动粘贴导入。</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis magazine">
         <h3 class="tool-h">③ 画布尺寸</h3>
         <select id="size">
           <optgroup label="手机锁屏尺寸">
@@ -621,6 +714,16 @@ input[type=file]{font-size:11px}
           <optgroup label="3:4 竖版">
             <option value="1500,2000">3:4 竖 1500×2000</option>
             <option value="1200,1600">3:4 竖 1200×1600</option>
+          </optgroup>
+          <optgroup label="摄影长图">
+            <option value="1080,2520">杂志手账 1080×2520 (约 3:7)</option>
+            <option value="1440,3360">杂志手账 1440×3360 (高清 3:7)</option>
+            <option value="1080,1920">长图 1080×1920</option>
+          </optgroup>
+          <optgroup label="横幅展示轴">
+            <option value="3000,1300">横幅 3000×1300 (约 2.3:1)</option>
+            <option value="2400,1200">横幅 2400×1200 (2:1)</option>
+            <option value="3600,1500">横幅 3600×1500 (2.4:1)</option>
           </optgroup>
           <optgroup label="大尺寸">
             <option value="4000,4000">正方形 4000×4000 (高清)</option>
@@ -724,13 +827,288 @@ input[type=file]{font-size:11px}
         <input type="color" id="fmArmColor" value="#ffffff" onchange="requestDraw()">
         <div class="hint">长度/粗细均按画框短边百分比计算，设为 0 可隐藏角标。</div>
         <div class="po-group">背景</div>
-        <label>背景模糊: <span id="fmBlurVal">40</span></label>
-        <input type="range" id="fmBlur" min="0" max="100" value="40" oninput="document.getElementById('fmBlurVal').textContent=this.value;requestDraw()">
-        <label>白色薄纱: <span id="fmVeilVal">24</span>%</label>
-        <input type="range" id="fmVeil" min="0" max="80" value="24" oninput="document.getElementById('fmVeilVal').textContent=this.value;requestDraw()">
+        <label>背景模糊: <span id="fmBlurVal">60</span></label>
+        <input type="range" id="fmBlur" min="0" max="100" value="60" oninput="document.getElementById('fmBlurVal').textContent=this.value;requestDraw()">
+        <label>白色薄纱: <span id="fmVeilVal">10</span>%</label>
+        <input type="range" id="fmVeil" min="0" max="80" value="10" oninput="document.getElementById('fmVeilVal').textContent=this.value;requestDraw()">
         <div class="checkbox-row"><input type="checkbox" id="fmPill" checked onchange="requestDraw()"><span>顶部小条（Dynamic Island）</span></div>
         <div class="checkbox-row"><input type="checkbox" id="fmBar" checked onchange="requestDraw()"><span>底部指示条（Home Bar）</span></div>
         <div class="hint">背景为同一张作品图放大模糊 + 白色薄纱；未上传作品图时使用浅蓝灰渐变兜底。</div>
+        </div>
+        <div class="tpl-sec" data-tpl="axis">
+        <h3 class="tool-h" style="margin-top:14px">⑦ 作品展示轴（Axis）</h3>
+        <div class="po-group">多图上传</div>
+        <input type="file" id="axUpload" accept="image/*" multiple>
+        <div class="hint" id="axCount">一次可选多张，按选择顺序从左到右铺开。</div>
+        <button class="warn small" onclick="axClear()" style="margin-top:6px">× 清空全部图片</button>
+        <label>图片区高度: <span id="axBaseHVal">62</span>%</label>
+        <input type="range" id="axBaseH" min="25" max="90" value="62" oninput="document.getElementById('axBaseHVal').textContent=this.value;requestDraw()">
+        <label>两侧递减: <span id="axFalloffVal">18</span>%</label>
+        <input type="range" id="axFalloff" min="0" max="45" value="18" oninput="document.getElementById('axFalloffVal').textContent=this.value;requestDraw()">
+        <label>重叠程度: <span id="axOverlapVal">8</span>%</label>
+        <input type="range" id="axOverlap" min="0" max="35" value="8" oninput="document.getElementById('axOverlapVal').textContent=this.value;requestDraw()">
+        <label>垂直错落: <span id="axStaggerVal">7</span>%</label>
+        <input type="range" id="axStagger" min="0" max="25" value="7" oninput="document.getElementById('axStaggerVal').textContent=this.value;requestDraw()">
+        <label>投影强度: <span id="axShadowVal">45</span>%</label>
+        <input type="range" id="axShadow" min="0" max="100" value="45" oninput="document.getElementById('axShadowVal').textContent=this.value;requestDraw()">
+        <label>垂直对齐</label>
+        <select id="axAlign" onchange="requestDraw()">
+          <option value="stagger" selected>错落（参考图效果）</option>
+          <option value="center">居中对齐</option>
+          <option value="bottom">底边对齐</option>
+          <option value="top">顶边对齐</option>
+        </select>
+        <label>图片圆角: <span id="axRadiusVal">0</span>%</label>
+        <input type="range" id="axRadius" min="0" max="8" value="0" oninput="document.getElementById('axRadiusVal').textContent=this.value;requestDraw()">
+        <div class="po-group">背景</div>
+        <label>背景样式</label>
+        <select id="axBgType" onchange="axBgModeChanged();requestDraw()">
+          <option value="solid" selected>纯色</option>
+          <option value="gradient">渐变</option>
+        </select>
+        <label>背景主色</label>
+        <input type="color" id="axBg" value="#ffffff" onchange="requestDraw()">
+        <div id="axBg2Row" style="display:none">
+          <label>背景副色</label>
+          <input type="color" id="axBg2" value="#eef2f6" onchange="requestDraw()">
+          <label>渐变方向</label>
+          <select id="axBgDir" onchange="requestDraw()">
+            <option value="v">上→下</option>
+            <option value="h" selected>左→右</option>
+            <option value="d">左上→右下</option>
+            <option value="r">径向</option>
+          </select>
+        </div>
+        <button onclick="axExtractColors()" style="margin-top:4px">✦ 从图片提取主色渐变</button>
+        <div class="hint">中间一张最大、向两侧递减；按顺序叠压，中心图显示在最上层。</div>
+        </div>
+        <div class="tpl-sec" data-tpl="magazine">
+        <h3 class="tool-h" style="margin-top:14px">杂志手账（Editorial Journal）</h3>
+        <div class="hint">三段式竖版长图：顶部大图 → 中部线圈手账 → 底部大图。只支持 2 张大图；纸张支持取色、渐变与纹理。</div>
+        <div class="po-group">图片（2 张大图）</div>
+        <div id="mjSlots"></div>
+        <div class="hint" id="mjMsg" style="display:none"></div>
+        <div class="po-group">版式</div>
+        <label>顶部封面高度: <span id="mjTopVal">38</span>%</label>
+        <input type="range" id="mjTop" min="25" max="55" value="38" oninput="document.getElementById('mjTopVal').textContent=this.value;requestDraw()">
+        <label>中部手账高度: <span id="mjMidVal">25</span>%</label>
+        <input type="range" id="mjMid" min="12" max="40" value="25" oninput="document.getElementById('mjMidVal').textContent=this.value;requestDraw()">
+        <label>图片比例</label>
+        <select id="mjRatio" onchange="requestDraw()">
+          <option value="auto" selected>自动识别</option>
+          <option value="wall">壁纸 9:16</option>
+          <option value="sq">方图 1:1</option>
+        </select>
+        <div class="hint">顶部大图 → 中部手账 → 底部大图；切换比例实时预览，已上传的图片与文字保持不变。最多 2 张大图（第 1 张在上，第 2 张在下），手账为固定双页。</div>
+        <div class="po-group">中部纸张（取色 / 渐变 / 纹理）</div>
+        <label>纸张样式</label>
+        <select id="mjPaperType" onchange="mjPaperTypeChanged()">
+          <option value="solid" selected>纯色</option>
+          <option value="gradient">渐变</option>
+        </select>
+        <label>纸张颜色</label>
+        <input type="color" id="mjPaper" value="#f7f2ea" onchange="requestDraw()">
+        <div id="mjPaper2Row" style="display:none">
+          <label>渐变第二色</label>
+          <input type="color" id="mjPaper2" value="#eee3d2" onchange="requestDraw()">
+          <label>渐变方向</label>
+          <select id="mjPaperDir" onchange="requestDraw()">
+            <option value="v" selected>上 → 下</option>
+            <option value="h">左 → 右</option>
+          </select>
+        </div>
+        <button onclick="mjPickPaper()">✦ 从图片吸取纸张颜色（自动开渐变）</button>
+        <label>纸张纹理</label>
+        <select id="mjTexSource" onchange="mjTexSourceChanged()">
+          <option value="none" selected>无纹理</option>
+          <option value="preset">内置预设素材</option>
+          <option value="upload">上传自定义纹理</option>
+        </select>
+        <div id="mjTexPresetRow" style="display:none">
+          <label>预设纹理</label>
+          <select id="mjTexPreset" onchange="mjTexPresetChanged()">
+            <option value="kraft" selected>牛皮纸（暖棕）</option>
+            <option value="xuan">米色宣纸</option>
+            <option value="card">白色卡纸</option>
+            <option value="vintage">复古纸（斑点）</option>
+          </select>
+        </div>
+        <div id="mjTexUploadRow" style="display:none">
+          <input type="file" id="mjTexUpload" accept="image/*" onchange="mjTexUpload(this)">
+        </div>
+        <label>纹理透明度: <span id="mjTexOpVal">35</span>%</label>
+        <input type="range" id="mjTexOpacity" min="0" max="100" value="35" oninput="document.getElementById('mjTexOpVal').textContent=this.value;requestDraw()">
+        <div class="hint">纹理只铺在中部纸张区域，不会盖住上下照片。</div>
+        <div class="po-group">文字</div>
+        <label>顶部文案（回车换行，每行一句）</label>
+        <textarea id="mjPoem" rows="4" oninput="requestDraw()">Style 1 picture
+苹果的第一万六千个故事
+The 16,000th story of Apple</textarea>
+        <label>底部标题</label>
+        <input type="text" id="mjTitle" oninput="requestDraw()" value="Style 2 picture">
+        <label>底部副标题（回车换行）</label>
+        <textarea id="mjSub" rows="2" oninput="requestDraw()">爱生活这件事 永远来得及
+It's always not too late to love life</textarea>
+        <button onclick="mjResetText()" style="margin-top:4px">↺ 恢复默认文案</button>
+        <div class="po-group">文字样式</div>
+        <label>中文字体（顶部诗句）</label>
+        <select id="mjFontCn" onchange="fontChanged(this)">
+          <option value="'Songti SC','STSong','SimSun',serif" selected>宋体（系统默认）</option>
+          <option value="'PingFang SC','Noto Serif SC',serif">苹方 / 思源宋</option>
+          <option value="'Noto Serif SC',serif">思源宋体</option>
+          <option value="'ZCOOL XiaoWei',serif">站酷小薇（宋体）</option>
+          <option value="'KaiTi','Kaiti SC','STKaiti',serif">楷体</option>
+          <option value="'Ma Shan Zheng',cursive">马善政毛笔楷书</option>
+          <optgroup label="英文 · 衬线">
+          <option value="'Playfair Display',serif">Playfair Display 衬线</option>
+          <option value="'Cormorant Garamond',serif">Cormorant Garamond 衬线</option>
+          </optgroup>
+        </select>
+        <label>英文字体（底部标题 / 副标题）</label>
+        <select id="mjFontEn" onchange="fontChanged(this)">
+          <option value="'Times New Roman','Georgia','Songti SC',serif" selected>Times New Roman 衬线（默认）</option>
+          <option value="'Playfair Display',serif">Playfair Display 衬线</option>
+          <option value="'Cormorant Garamond',serif">Cormorant Garamond 衬线</option>
+          <option value="'EB Garamond',serif">EB Garamond 衬线</option>
+          <option value="'Lora',serif">Lora 衬线</option>
+          <option value="'Songti SC','STSong',serif">宋体</option>
+        </select>
+        <label>诗句字号: <span id="mjSizeCnVal">4.8</span>%</label>
+        <input type="range" id="mjSizeCn" min="2" max="9" step="0.1" value="4.8" oninput="document.getElementById('mjSizeCnVal').textContent=this.value;requestDraw()">
+        <label>标题字号: <span id="mjSizeTitleVal">6.2</span>%</label>
+        <input type="range" id="mjSizeTitle" min="3" max="12" step="0.1" value="6.2" oninput="document.getElementById('mjSizeTitleVal').textContent=this.value;requestDraw()">
+        <label>副标题字号: <span id="mjSizeSubVal">2.5</span>%</label>
+        <input type="range" id="mjSizeSub" min="1" max="5" step="0.1" value="2.5" oninput="document.getElementById('mjSizeSubVal').textContent=this.value;requestDraw()">
+        <label>文字颜色</label>
+        <input type="color" id="mjColor" value="#fbf7f0" onchange="requestDraw()">
+        <label>顶部文字位置: <span id="mjYTopVal">52</span>%</label>
+        <input type="range" id="mjYTop" min="15" max="85" value="52" oninput="document.getElementById('mjYTopVal').textContent=this.value;requestDraw()">
+        <label>底部文字位置: <span id="mjYBotVal">47</span>%</label>
+        <input type="range" id="mjYBot" min="15" max="85" value="47" oninput="document.getElementById('mjYBotVal').textContent=this.value;requestDraw()">
+        <label>文字对齐</label>
+        <select id="mjAlign" onchange="requestDraw()">
+          <option value="left">左对齐</option>
+          <option value="center" selected>居中</option>
+          <option value="right">右对齐</option>
+        </select>
+        <div class="hint">字号按画布宽度百分比计算，画布变大时文字等比放大。</div>
+        </div>
+        <div class="tpl-sec" data-tpl="collage">
+        <h3 class="tool-h" style="margin-top:14px">⑧ 自由拼图（Collage）</h3>
+        <div class="cg-mode-tabs">
+          <button class="cg-mode active" data-mode="grid" onclick="cgSetMode('grid')">网格模板</button>
+          <button class="cg-mode" data-mode="strip" onclick="cgSetMode('strip')">拼接长图</button>
+          <button class="cg-mode" data-mode="free" onclick="cgSetMode('free')">自由拼图</button>
+        </div>
+        <div class="hint" id="cgModeHint">网格：按模板均匀排列，画布内拖动可微调位置。</div>
+        <div class="po-group">多图上传（最多 30 张）</div>
+        <label class="cg-upload-zone" style="cursor:pointer">
+          <input type="file" id="cgUpload" accept="image/jpeg,image/png,image/webp" multiple style="display:none">
+          ＋ 点击上传多张图片（JPG/PNG/WebP）
+        </label>
+        <div class="hint" id="cgCount">任意图片数量均可套用任意模板，拖动缩略图可调整顺序。</div>
+        <div class="cg-img-list" id="cgImgList"></div>
+        <label class="btn small" style="width:100%;margin-top:6px;cursor:pointer;text-align:center">
+          <input type="file" id="cgUpload2" accept="image/jpeg,image/png,image/webp" multiple style="display:none">
+          ＋ 继续添加图片
+        </label>
+        <button class="warn small" onclick="cgClear()" style="margin-top:6px">× 清空全部图片</button>
+        <div class="po-group">拼图模板（任意数量通用）</div>
+        <div class="cg-tpl-scroll" id="cgTplScroll"></div>
+        <div class="po-group">画布比例</div>
+        <select id="cgRatio" onchange="cgRatioChanged()">
+          <option value="1080,1080">1:1 正方形 1080</option>
+          <option value="1500,1500">1:1 正方形 1500</option>
+          <option value="1200,1600">3:4 竖版</option>
+          <option value="1600,1200">4:3 横版</option>
+          <option value="1080,1920">9:16 手机竖屏</option>
+          <option value="1920,1080">16:9 横版</option>
+          <option value="2048,2048">1:1 高清 2048</option>
+        </select>
+        <div class="po-group">外观</div>
+        <label>填充方式（默认完整显示，不裁剪）</label>
+        <select id="cgFit" onchange="requestDraw()">
+          <option value="contain" selected>完整显示（contain，不裁剪）</option>
+          <option value="cover">铺满裁切（cover）</option>
+        </select>
+        <label>图片间距: <span id="cgGapVal">8</span></label>
+        <input type="range" id="cgGap" min="0" max="40" value="8" oninput="document.getElementById('cgGapVal').textContent=this.value;requestDraw()">
+        <label>外边距: <span id="cgMarginVal">12</span></label>
+        <input type="range" id="cgMargin" min="0" max="60" value="12" oninput="document.getElementById('cgMarginVal').textContent=this.value;requestDraw()">
+        <label>图片圆角: <span id="cgRadiusVal">4</span></label>
+        <input type="range" id="cgRadius" min="0" max="40" value="4" oninput="document.getElementById('cgRadiusVal').textContent=this.value;requestDraw()">
+        <div class="po-group">背景</div>
+        <label>背景样式</label>
+        <select id="cgBgType" onchange="cgBgModeChanged();requestDraw()">
+          <option value="solid">纯色</option>
+          <option value="gradient">渐变</option>
+          <option value="image">照片</option>
+        </select>
+        <label>背景主色</label>
+        <input type="color" id="cgBg" value="#ffffff" onchange="requestDraw()">
+        <div id="cgBg2Row" style="display:none">
+          <label>背景副色</label>
+          <input type="color" id="cgBg2" value="#f0f4f8" onchange="requestDraw()">
+          <label>渐变方向</label>
+          <select id="cgBgDir" onchange="requestDraw()">
+            <option value="v">上→下</option>
+            <option value="h" selected>左→右</option>
+            <option value="d">左上→右下</option>
+            <option value="r">径向</option>
+          </select>
+        </div>
+        <button class="btn small" onclick="cgPickColorsFromImage()" style="margin-top:6px;width:100%">🎨 从图片智能取色（与字稿风一致）</button>
+        <div class="po-group">背景库</div>
+        <div class="cg-bg-presets" id="cgBgPresets"></div>
+        <label class="btn small" style="width:100%;margin-top:6px;cursor:pointer;text-align:center;display:block">
+          <input type="file" id="cgBgUpload" accept="image/*" style="display:none">
+          🖼 导入照片作背景
+        </label>
+        <button class="ghost small" onclick="cgClearBgImage()" style="width:100%;margin-top:6px">× 清除背景照片</button>
+        <label style="margin-top:8px">背景照片模糊: <span id="cgBgBlurVal">0</span></label>
+        <input type="range" id="cgBgBlur" min="0" max="40" value="0" disabled>
+        <div id="cgBgBlurTip" style="font-size:11px;color:#8a8a95;margin-top:4px">先「导入照片作背景」，即可调节模糊强度。</div>
+        
+        <!-- 单图属性面板 -->
+        <div id="cgItemPanel" style="display:none;margin-top:12px;border-top:1px solid #2a2a35;padding-top:12px">
+          <h4 id="cgItemTitle" style="margin:0 0 8px 0;font-size:13px;color:#c9a37c">第 1 张图片设置</h4>
+          <div class="po-group">形状裁剪（保持比例）</div>
+          <select id="cgShape" style="width:100%;margin-bottom:6px">
+            <option value="rect">矩形（默认）</option>
+            <option value="stamp">邮票齿孔</option>
+            <option value="circle">圆形</option>
+            <option value="rounded">圆角矩形</option>
+            <option value="arch">拱门</option>
+            <option value="hexagon">六边形</option>
+            <option value="star">五角星</option>
+            <option value="heart">心形</option>
+            <option value="triangle">三角形</option>
+            <option value="diamond">菱形</option>
+            <option value="parallelogram">平行四边形</option>
+            <option value="film">胶片</option>
+          </select>
+          <button class="ghost small" onclick="cgApplyShapeToAll()" style="width:100%;margin-bottom:8px">应用到全部图片</button>
+          
+          <div class="po-group">变换调整</div>
+          <label>缩放：<span id="cgScaleVal">100%</span></label>
+          <input type="range" id="cgScale" min="0.3" max="2" step="0.05" value="1" style="width:100%">
+          <label>旋转：<span id="cgRotateVal">0°</span></label>
+          <input type="range" id="cgRotate" min="-180" max="180" value="0" style="width:100%">
+          <label>水平偏移：<span id="cgPosXVal">0</span></label>
+          <input type="range" id="cgPosX" min="-0.5" max="0.5" step="0.01" value="0" style="width:100%">
+          <label>垂直偏移：<span id="cgPosYVal">0</span></label>
+          <input type="range" id="cgPosY" min="-0.5" max="0.5" step="0.01" value="0" style="width:100%">
+          <button class="warn small" onclick="cgResetSelectedTransform()" style="width:100%;margin-top:6px">重置变换</button>
+          
+          <div class="po-group">边框</div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="cgBorderColorOn"><span>启用边框色</span>
+          </div>
+          <label>边框颜色</label>
+          <input type="color" id="cgBorderColor" value="#ffffff" style="width:100%">
+        </div>
+        
+        <div class="hint">任意模板适配任意图片数量；默认「完整显示」保留每张图的原始比例，绝不裁剪。点击缩略图可选中单张图，在下方单独调整形状/缩放/旋转/位置。导出走右上「导出 PNG」。</div>
         </div>
         <div class="tpl-sec" data-tpl="polaroid">
         <h3 class="tool-h" style="margin-top:14px">⑦ 拍立得风格（Polaroid）</h3>
@@ -1572,7 +1950,7 @@ love
         <div class="hint">💡 头像 / 昵称 / 统计 / 正文 / 音乐栏都可以直接在画布上拖拽移动</div>
         </div>
 
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis">
         <h3 class="tool-h" style="margin-top:14px">⑬ 全屏水印</h3>
         <div class="checkbox-row"><input type="checkbox" id="wmEnable" onchange="requestDraw()"><span>启用全屏水印</span></div>
         <input type="file" id="wmUpload" accept="image/*">
@@ -1623,7 +2001,7 @@ love
         <div class="hint" id="pickerHint" style="display:none;color:#f4c842">吸管模式已开启：点击右侧画布任意位置吸取颜色</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis">
         <h3 class="tool-h">⑮ 导出</h3>
         <button class="primary" onclick="exportPNG()">导出 PNG</button>
         <div class="hint" style="margin-top:10px">提示：预设只保存参数，自定义纹理图和头像需重新上传。</div>
@@ -1830,6 +2208,8 @@ let wmClip=null;
 
 // R9 性能优化：预览/导出解耦
 const PREVIEW_MAX=1000;
+// 单画布最大边长（拼接长图按内容撑高时的安全上限）
+const CG_MAX_DIM=12000;
 let previewScale=1;
 let exportCanvas=null;
 let exportCtx=null;
@@ -2079,9 +2459,37 @@ function ensureExportCanvas(w,h){
 }
 
 // ============ 画布尺寸 ============
+// 当前画布的有效像素尺寸：拼接长图模式下高度由图片内容决定
+function cgEffectiveSize(){
+  const sel=document.getElementById("size");
+  const s=sel?sel.value.split(","):["1500","1500"];
+  let w=parseInt(s[0])||1500, h=parseInt(s[1])||1500;
+  if(typeof currentTemplate==="undefined"||currentTemplate!=="collage")return [w,h];
+  if(cgMode!=="strip"||!cgImages.length)return [w,h];
+  const bodyW=Math.max(0.1,1-2*cgMargin/100);
+  const calc=function(W){
+    const innerW=W*bodyW;
+    const gapPx=cgGap*(W/1000);
+    let total=0;
+    cgImages.forEach(function(it){
+      const im=it.img;
+      const ar=(im&&im.width)?im.height/im.width:1;
+      total+=innerW*ar+gapPx;
+    });
+    return total/bodyW;
+  };
+  let H=calc(w);
+  // 超出浏览器单画布上限时整体等比缩小宽度，保证比例不变形
+  if(H>CG_MAX_DIM){
+    w=Math.max(1,Math.round(w*CG_MAX_DIM/H));
+    H=calc(w);
+  }
+  return [Math.round(w),Math.round(H)];
+}
+
 function resizeCanvas(){
-  const s=document.getElementById("size").value.split(",");
-  const w=parseInt(s[0]),h=parseInt(s[1]);
+  const sz=cgEffectiveSize();
+  const w=sz[0],h=sz[1];
   previewScale=Math.min(1,PREVIEW_MAX/Math.max(w,h));
   c.width=Math.round(w*previewScale);
   c.height=Math.round(h*previewScale);
@@ -2340,9 +2748,18 @@ function ptPath(x,y,w,h,r){
 // ============ 相框风预览（Frame） ============
 function fmV(id){const el=document.getElementById(id);return el?el.value:"";}
 function fmN(id,d){const v=parseInt(fmV(id),10);return isNaN(v)?d:v;}
-// 跨浏览器背景模糊：支持 ctx.filter 时用高斯模糊，否则用离屏降采样近似（Safari 不支持 ctx.filter）
+// 跨浏览器背景模糊：像素级检测 ctx.filter 是否真的渲染高斯模糊
 const FM_FILTER_OK=(function(){
-  try{const t=document.createElement("canvas").getContext("2d");t.filter="blur(2px)";return t.filter!=="none"&&!!t.filter;}catch(e){return false;}
+  try{
+    const c=document.createElement("canvas");c.width=200;c.height=200;
+    const t=c.getContext("2d");
+    t.fillStyle="#000";t.fillRect(0,0,100,200);
+    t.fillStyle="#fff";t.fillRect(100,0,100,200);
+    t.filter="blur(6px)";t.drawImage(c,0,0);
+    const p=t.getImageData(100,100,1,1).data;
+    // 真实高斯模糊下分界处会出现灰阶；未真正渲染时像素仍是纯黑或纯白
+    return p[0]>10&&p[0]<245&&p[1]>10&&p[1]<245&&p[2]>10&&p[2]<245;
+  }catch(e){return false;}
 })();
 function fmDrawBlurred(img,dx,dy,dw,dh,blurPx){
   if(blurPx<0.5){ctx.drawImage(img,dx,dy,dw,dh);return;}
@@ -2377,7 +2794,7 @@ function drawFrame(){
   const art=(layers.length&&layers[0].img)?layers[0].img:null;
 
   // 1) 背景：作品图放大模糊铺满，无图时浅蓝灰渐变兜底
-  const blurPct=Math.max(0,Math.min(100,fmN("fmBlur",40)));
+  const blurPct=Math.max(0,Math.min(100,fmN("fmBlur",60)));
   const blurPx=blurPct/100*Math.min(W,H)*0.11;
   if(art&&art.width&&art.height){
     const grow=1.12+blurPx/Math.min(W,H)*1.6;
@@ -2391,7 +2808,7 @@ function drawFrame(){
   }
 
   // 2) 白色薄纱
-  const veil=Math.max(0,Math.min(80,fmN("fmVeil",24)))/100;
+  const veil=Math.max(0,Math.min(80,fmN("fmVeil",10)))/100;
   if(veil>0){ctx.fillStyle="rgba(255,255,255,"+veil+")";ctx.fillRect(0,0,W,H);}
 
   // 3) 中央画框：固定正方形，作品图铺满（cover）
@@ -2427,6 +2844,8 @@ function drawFrame(){
     ctx.beginPath();ptPath(ax,ay,aw,ah,rad);ctx.fill();
     ctx.restore();
   }
+  // 确保 ctx.filter 已清除，防止影响后续绘制
+  ctx.filter="none";
 
   // 4) 细白描边
   ctx.save();
@@ -2505,6 +2924,1186 @@ document.getElementById("fmArtUpload").onchange=e=>{
   e.target.value="";
 };
 function fmRemoveArt(){removeArt();}
+
+// ============ 作品展示轴（Axis） ============
+function axImgs(){
+  return layers.map(function(L){return L&&L.img;}).filter(function(im){return im&&im.width&&im.height;});
+}
+function axSyncCount(){
+  const el=document.getElementById("axCount");
+  if(!el)return;
+  const n=axImgs().length;
+  el.textContent=n?("已载入 "+n+" 张图片，按上传顺序从左到右排布。"):"一次可选多张，按选择顺序从左到右铺开。";
+}
+function axClear(){
+  layers.length=0;
+  axSyncCount();
+  requestDraw();
+}
+function axLoadFiles(files){
+  const list=Array.from(files).filter(function(f){return f&&f.type&&f.type.indexOf("image/")===0;});
+  if(!list.length)return;
+  const hint=document.getElementById("axCount");
+  if(hint)hint.textContent="正在载入 "+list.length+" 张图片…";
+  const loaded=new Array(list.length);
+  let done=0;
+  const finish=function(){
+    layers.length=0;
+    loaded.forEach(function(im){
+      if(im)layers.push({img:im,x:0.5,y:0.5,w:1,h:1,fitMode:"cover"});
+    });
+    axSyncCount();
+    requestDraw();
+  };
+  list.forEach(function(f,i){
+    const img=new Image();
+    img.onload=function(){loaded[i]=img;if(++done===list.length)finish();};
+    img.onerror=function(){if(++done===list.length)finish();};
+    img.src=URL.createObjectURL(f);
+  });
+}
+document.getElementById("axUpload").onchange=e=>{
+  axLoadFiles(e.target.files);
+  e.target.value="";
+};
+
+// ========== 自由拼图（Collage）完整引擎 ==========
+let cgImages=[];      // [{img:Image|null, url:string, loaded:boolean, x:number,y:number,scale:number,rotation:number,borderShape:string,borderColor:string}]
+let cgFillMode='contain';   // 'cover' 铺满裁切 | 'contain' 完整显示留白
+let cgGap=8, cgMargin=12, cgRadius=4;
+let cgRatio=[1500,1500];
+let cgBgType='solid', cgBg='#ffffff', cgBg2='#f0f4f8', cgBgDir='h';
+let currentCgTpl=0;
+let cgSelectedIdx=-1;  // 当前选中的图片索引
+let cgIsDragging=false;
+let cgDragStart={x:0,y:0};
+let cgMode='grid';           // 'grid' 网格模板 | 'strip' 拼接长图 | 'free' 自由拼图
+let cgBgImg=null,cgBgImgURL=null;   // 背景照片
+let cgBgBlur=0;                      // 背景照片高斯模糊强度（0-40）
+let cgHit=[];                // 上一帧各图片在画布上的几何（命中检测用，仅预览时记录）
+let cgDrag=null;             // 画布内拖拽/缩放/旋转状态
+let cgPinch=null;            // 双指缩放/旋转状态
+let cgExporting=false;       // 导出中（此时不画选中框/手柄）
+
+// 布局生成器：每个模板 = 一个按图片数量生成单元格的函数
+function gUniform(cols){
+  return function(n){
+    const rows=Math.ceil(n/cols),cw=100/cols,ch=100/rows,cells=[];
+    for(let i=0;i<n;i++){
+      const col=i%cols,row=Math.floor(i/cols);
+      const inRow=Math.min(cols,n-row*cols);
+      const w=100/inRow;
+      cells.push({x:(i-row*cols)*w,y:row*ch,w:w,h:ch});
+    }
+    return cells;
+  };
+}
+function gHero(heroWRatio,heroHRatio,restCols){
+  return function(n){
+    if(n<=1)return [{x:0,y:0,w:100,h:100}];
+    const cells=[{x:0,y:0,w:100*heroWRatio,h:100*heroHRatio}];
+    const rest=n-1;
+    const heroW=100*heroWRatio,heroH=100*heroHRatio;
+    const areaX=heroW,areaY=0,areaW=100-heroW,areaH=100;
+    const cols=restCols||Math.ceil(Math.sqrt(rest));
+    const rows=Math.ceil(rest/cols);
+    const cw=areaW/cols,ch=areaH/rows;
+    for(let i=0;i<rest;i++){
+      const col=i%cols,row=Math.floor(i/cols);
+      const inRow=Math.min(cols,rest-row*cols);
+      const w=areaW/inRow;
+      cells.push({x:areaX+(i-row*cols)*w,y:areaY+row*ch,w:w,h:ch});
+    }
+    return cells;
+  };
+}
+function gLeftMain(){
+  return function(n){
+    if(n<=1)return [{x:0,y:0,w:100,h:100}];
+    const leftW=58,rightW=42;
+    const rest=n-1,rows=rest;
+    const ch=100/rows;
+    const cells=[{x:0,y:0,w:leftW,h:100}];
+    for(let i=0;i<rest;i++)cells.push({x:leftW,y:i*ch,w:rightW,h:ch});
+    return cells;
+  };
+}
+function gTopMain(){
+  return function(n){
+    if(n<=1)return [{x:0,y:0,w:100,h:100}];
+    const topH=60,botH=40;
+    const rest=n-1,cols=rest;
+    const cw=100/cols;
+    const cells=[{x:0,y:0,w:100,h:topH}];
+    for(let i=0;i<rest;i++)cells.push({x:i*cw,y:topH,w:cw,h:botH});
+    return cells;
+  };
+}
+function gStagger(){
+  return function(n){
+    if(n<=1)return [{x:0,y:0,w:100,h:100}];
+    const cells=[];
+    const rows=2;
+    const perRow=Math.ceil(n/rows);
+    const rowH=100/rows;
+    for(let i=0;i<n;i++){
+      const row=Math.floor(i/perRow);
+      const idxInRow=i%perRow;
+      const cntInRow=Math.min(perRow,n-row*perRow);
+      const wideFirst=(row%2===0);
+      const widths=[];
+      for(let k=0;k<cntInRow;k++){
+        widths.push(wideFirst?(k===0?62:38/(cntInRow-1||1)):(k===cntInRow-1?62:38/(cntInRow-1||1)));
+      }
+      let x=0;
+      for(let k=0;k<idxInRow;k++)x+=widths[k];
+      cells.push({x:x,y:row*rowH,w:widths[idxInRow],h:rowH});
+    }
+    return cells;
+  };
+}
+function gOneBigTwo(){
+  return function(n){
+    if(n<=1)return [{x:0,y:0,w:100,h:100}];
+    if(n===2)return [{x:0,y:0,w:100,h:60},{x:0,y:60,w:100,h:40}];
+    const cells=[{x:0,y:0,w:100,h:58}];
+    const rest=n-1,cols=2,rows=Math.ceil(rest/cols);
+    const cw=100/cols,ch=42/rows;
+    for(let i=0;i<rest;i++){
+      const col=i%cols,row=Math.floor(i/cols);
+      cells.push({x:col*cw,y:58+row*ch,w:cw,h:ch});
+    }
+    return cells;
+  };
+}
+function gNine(){return gUniform(3)}
+
+const CG_TPL=[
+  {name:'左右双图', gen:gUniform(2)},
+  {name:'上下双图', gen:gUniform(1)},
+  {name:'三横排',   gen:gUniform(3)},
+  {name:'三纵排',   gen:gUniform(1)},
+  {name:'一大两小', gen:gOneBigTwo()},
+  {name:'2×2 网格', gen:gUniform(2)},
+  {name:'左主右二', gen:gLeftMain()},
+  {name:'上二下一', gen:gTopMain()},
+  {name:'主图加四小',gen:gHero(1,0.55,4)},
+  {name:'五格阶梯', gen:gStagger()},
+  {name:'3×2 网格', gen:gUniform(3)},
+  {name:'2×3 网格', gen:gUniform(2)},
+  {name:'主图三辅', gen:gHero(0.6,0.6,2)},
+  {name:'四 + 三 分层',gen:gHero(1,0.5,3)},
+  {name:'4×2 网格', gen:gUniform(4)},
+  {name:'大主图七辅',gen:gHero(0.55,0.68,2)},
+  {name:'3×3 九宫格',gen:gNine()},
+  {name:'九宫大主', gen:gHero(0.5,0.6,3)},
+];
+
+const CG_MODE_HINTS={
+  grid:'网格：按模板均匀排列，画布内拖动可微调位置。',
+  strip:'拼接：按每张图原始比例纵向拼成长图，不裁剪。',
+  free:'自由：任意拖动、四角缩放、旋转手柄旋转，可互相重叠。'
+};
+
+function cgSetMode(m){
+  cgMode=m;
+  document.querySelectorAll('.cg-mode').forEach(function(b){
+    b.classList.toggle('active',b.getAttribute('data-mode')===m);
+  });
+  const hint=document.getElementById('cgModeHint');
+  if(hint)hint.textContent=CG_MODE_HINTS[m]||'';
+  const box=document.getElementById('cgTplScroll');
+  if(box){
+    const show=(m==='grid');
+    box.style.display=show?'':'none';
+    const t=box.previousElementSibling;
+    if(t&&t.classList&&t.classList.contains('po-group'))t.style.display=show?'':'none';
+  }
+  if(m==='free')cgInitFreeLayout();
+  cgSelectedIdx=-1;
+  // 模式间状态隔离：每张图的形状/描边按模式独立记忆，切换模式互不影响
+  cgImages.forEach(function(it){
+    if(!it.shapeByMode)it.shapeByMode={grid:'rect',strip:'rect',free:'rect'};
+    if(!it.colorByMode)it.colorByMode={grid:'',strip:'',free:''};
+    it.borderShape=it.shapeByMode[m]||'rect';
+    it.borderColor=it.colorByMode[m]||'';
+  });
+  renderCgImgList();syncCgItemPanel();
+  // 拼接模式切换时重算画布高度（resizeCanvas 内部会 requestDraw）
+  if(m==='strip'||(typeof currentTemplate!=='undefined'&&currentTemplate==='collage'))resizeCanvas();
+  else requestDraw();
+}
+
+// 自由模式：首次进入时给每张图一个不重叠的初始位置（画布归一化坐标）
+function cgInitFreeLayout(){
+  const n=cgImages.length;
+  if(!n)return;
+  const cols=Math.ceil(Math.sqrt(n)),rows=Math.ceil(n/cols);
+  const cw=0.86/cols,chh=0.86/rows;
+  cgImages.forEach(function(it,i){
+    if(it.fx!=null&&it.fy!=null)return;
+    const col=i%cols,row=Math.floor(i/cols);
+    it.fx=0.07+cw*(col+0.5);
+    it.fy=0.07+chh*(row+0.5);
+    it.fw=Math.min(0.9,cw*0.92);
+  });
+}
+
+// 拼接长图：逐行按原图宽高比拼成一条，画布高度已由 cgEffectiveSize() 按内容算出
+function cgStripCells(){
+  const n=cgImages.length;
+  if(!n)return [];
+  const W=c.width||1,H=c.height||1;
+  const mRatio=cgMargin/100;
+  const innerW=W*(1-2*mRatio),innerH=H*(1-2*mRatio);
+  const gapPx=cgGap*(W/1000);
+  const ars=cgImages.map(function(it){
+    const im=it.img;
+    return (im&&im.width)?im.height/im.width:1;
+  });
+  let y=0;
+  return ars.map(function(ar){
+    // 单元格高度 = 图片实际高 + 间距，drawCgCollage 里再各减去 gapPx
+    const hpx=innerW*ar+gapPx;
+    const cell={x:0,y:y/innerH*100,w:100,h:hpx/innerH*100};
+    y+=hpx;
+    return cell;
+  });
+}
+
+function getCgCells(){
+  const n=cgImages.length;
+  if(n===0)return [];
+  if(cgMode==='free')return [];
+  if(cgMode==='strip')return cgStripCells();
+  const tpl=CG_TPL[currentCgTpl];
+  if(!tpl)return [];
+  return tpl.gen(n);
+}
+
+// 形状路径：返回一个 Path2D，用于裁剪图片（保持图片比例不变）
+function cgShapePath(shape,x,y,w,h,rad){
+  const p=new Path2D();
+  const r=Math.max(0,Math.min(rad!=null?rad:Math.min(w,h)*0.06,Math.min(w,h)/2));
+  if(shape==='stamp'){
+    // 邮票齿孔：沿四条边打半圆缺口
+    const teeth=Math.max(6,Math.round(Math.min(w,h)/22));
+    const stepW=w/teeth, stepH=h/teeth;
+    // 顺时针描边，齿孔用 arc 反向挖
+    p.moveTo(x,y);
+    // 上边
+    for(let i=0;i<teeth;i++){
+      const sx=x+i*stepW+stepW/2;
+      p.lineTo(sx-stepW*0.22,y);
+      p.arc(sx,y,stepW*0.28,Math.PI,0,true);
+      p.lineTo(sx+stepW*0.28,y);
+    }
+    p.lineTo(x+w,y);
+    // 右边
+    for(let i=0;i<teeth;i++){
+      const sy=y+i*stepH+stepH/2;
+      p.lineTo(x+w,sy-stepH*0.22);
+      p.arc(x+w,sy,stepH*0.28,-Math.PI/2,Math.PI/2,true);
+      p.lineTo(x+w,sy+stepH*0.28);
+    }
+    p.lineTo(x+w,y+h);
+    // 下边
+    for(let i=teeth-1;i>=0;i--){
+      const sx=x+i*stepW+stepW/2;
+      p.lineTo(sx+stepW*0.22,y+h);
+      p.arc(sx,y+h,stepW*0.28,0,Math.PI,true);
+      p.lineTo(sx-stepW*0.28,y+h);
+    }
+    p.lineTo(x,y+h);
+    // 左边
+    for(let i=teeth-1;i>=0;i--){
+      const sy=y+i*stepH+stepH/2;
+      p.lineTo(x,sy+stepH*0.22);
+      p.arc(x,sy,stepH*0.28,Math.PI/2,-Math.PI/2,true);
+      p.lineTo(x,sy-stepH*0.28);
+    }
+    p.closePath();
+  }else if(shape==='circle'){
+    p.ellipse(x+w/2,y+h/2,w/2,h/2,0,0,Math.PI*2);
+  }else if(shape==='rounded'){
+    const rr=Math.max(0,Math.min(r,Math.min(w,h)/2));
+    p.moveTo(x+rr,y);p.lineTo(x+w-rr,y);
+    p.quadraticCurveTo(x+w,y,x+w,y+rr);
+    p.lineTo(x+w,y+h-rr);
+    p.quadraticCurveTo(x+w,y+h,x+w-rr,y+h);
+    p.lineTo(x+rr,y+h);
+    p.quadraticCurveTo(x,y+h,x,y+h-rr);
+    p.lineTo(x,y+rr);
+    p.quadraticCurveTo(x,y,x+rr,y);
+    p.closePath();
+  }else if(shape==='arch'){
+    // 拱门：上方半圆 + 下方矩形
+    const ar=w/2;
+    p.moveTo(x,y+h);
+    p.lineTo(x,y+ar);
+    p.arc(x+ar,y+ar,ar,Math.PI,0,false);
+    p.lineTo(x+w,y+h);
+    p.closePath();
+  }else if(shape==='hexagon'){
+    const cx=x+w/2, cy=y+h/2;
+    const rx=w/2, ry=h/2;
+    p.moveTo(cx,cy-ry);
+    p.lineTo(cx+rx,cy-ry*0.5);
+    p.lineTo(cx+rx,cy+ry*0.5);
+    p.lineTo(cx,cy+ry);
+    p.lineTo(cx-rx,cy+ry*0.5);
+    p.lineTo(cx-rx,cy-ry*0.5);
+    p.closePath();
+  }else if(shape==='star'){
+    const cx=x+w/2, cy=y+h/2;
+    const R=Math.min(w,h)/2, r=R*0.45;
+    for(let i=0;i<10;i++){
+      const ang=-Math.PI/2+i*Math.PI/5;
+      const rad=(i%2===0)?R:r;
+      const px=cx+Math.cos(ang)*rad*(w/h>1?1:1);
+      const py=cy+Math.sin(ang)*rad;
+      if(i===0)p.moveTo(px,py);else p.lineTo(px,py);
+    }
+    p.closePath();
+  }else if(shape==='heart'){
+    const cx=x+w/2, cy=y+h*0.36;
+    const s=Math.min(w,h);
+    p.moveTo(cx,y+h*0.95);
+    p.bezierCurveTo(x-w*0.05,y+h*0.55,x+w*0.02,cy-s*0.42,cx,cy-s*0.08);
+    p.bezierCurveTo(x+w*0.98,cy-s*0.42,x+w*1.05,y+h*0.55,cx,y+h*0.95);
+    p.closePath();
+  }else if(shape==='triangle'){
+    p.moveTo(x+w/2,y);
+    p.lineTo(x+w,y+h);
+    p.lineTo(x,y+h);
+    p.closePath();
+  }else if(shape==='diamond'){
+    p.moveTo(x+w/2,y);
+    p.lineTo(x+w,y+h/2);
+    p.lineTo(x+w/2,y+h);
+    p.lineTo(x,y+h/2);
+    p.closePath();
+  }else if(shape==='parallelogram'){
+    const off=w*0.18;
+    p.moveTo(x+off,y);
+    p.lineTo(x+w,y);
+    p.lineTo(x+w-off,y+h);
+    p.lineTo(x,y+h);
+    p.closePath();
+  }else if(shape==='film'){
+    // 胶片：左右两侧打方孔
+    const holes=Math.max(4,Math.round(h/26));
+    const hs=h/holes;
+    const hw=Math.min(w*0.09,hs*0.6);
+    p.rect(x,y,w,h);
+    for(let i=0;i<holes;i++){
+      const hy=y+i*hs+hs/2;
+      p.moveTo(x+hw*0.3,hy-hs*0.22);
+      p.rect(x+hw*0.3,hy-hs*0.22,hw*0.4,hs*0.44);
+      p.moveTo(x+w-hw*0.7,hy-hs*0.22);
+      p.rect(x+w-hw*0.7,hy-hs*0.22,hw*0.4,hs*0.44);
+    }
+  }else{
+    // rect 默认：r>0 时按圆角矩形绘制，让全局圆角滑块对每张图生效
+    if(r>0.01){
+      p.moveTo(x+r,y);p.lineTo(x+w-r,y);
+      p.quadraticCurveTo(x+w,y,x+w,y+r);
+      p.lineTo(x+w,y+h-r);
+      p.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+      p.lineTo(x+r,y+h);
+      p.quadraticCurveTo(x,y+h,x,y+h-r);
+      p.lineTo(x,y+r);
+      p.quadraticCurveTo(x,y,x+r,y);
+      p.closePath();
+    }else{
+      p.rect(x,y,w,h);
+    }
+  }
+  return p;
+}
+
+// 单个图块的几何：中心点 + 尺寸 + 旋转（供绘制与命中检测共用）
+function cgItemGeom(item,cx,cy,cw,ch){
+  const scale=item.scale||1;
+  const rot=item.rotation||0;
+  const hw=cw/2*scale, hh=ch/2*scale;
+  const panX=(item.x||0)*cw, panY=(item.y||0)*ch;
+  return {cx:cx+panX, cy:cy+panY, bw:cw, bh:ch, hw:hw, hh:hh, rot:rot, scale:scale};
+}
+
+// 四角 + 旋转手柄的绝对坐标
+function cgHandlePoints(h,W){
+  const a=h.rot*Math.PI/180, cos=Math.cos(a), sin=Math.sin(a);
+  const rp=function(x,y){return {x:h.cx+x*cos-y*sin, y:h.cy+x*sin+y*cos}};
+  return {
+    tl:rp(-h.hw,-h.hh), tr:rp(h.hw,-h.hh),
+    bl:rp(-h.hw, h.hh), br:rp(h.hw, h.hh),
+    rt:rp(0,-h.hh-Math.max(26,W*0.045))
+  };
+}
+
+function drawCgItem(g,item,im,geom,isPreview,W){
+  const shape=item.borderShape||'rect';
+  g.save();
+  g.translate(geom.cx,geom.cy);
+  g.rotate(geom.rot*Math.PI/180);
+  g.scale(geom.scale,geom.scale);
+  // 以原点为中心的局部坐标系
+  const bx=-geom.bw/2, by=-geom.bh/2;
+  // 图片在本图块内的实际绘制区域
+  let dx,dy,dw,dh;
+  if(cgFillMode==='contain'){
+    const sc=Math.min(geom.bw/im.width, geom.bh/im.height);
+    dw=im.width*sc; dh=im.height*sc;
+    dx=bx+(geom.bw-dw)/2; dy=by+(geom.bh-dh)/2;
+  }else{
+    const sc=Math.max(geom.bw/im.width, geom.bh/im.height);
+    dw=im.width*sc; dh=im.height*sc;
+    dx=bx+(geom.bw-dw)/2; dy=by+(geom.bh-dh)/2;
+  }
+  // 形状盒：完整显示时贴合图片实际尺寸，铺满裁切时贴合单元格
+  const sb=(cgFillMode==='contain')?{x:dx,y:dy,w:dw,h:dh}:{x:bx,y:by,w:geom.bw,h:geom.bh};
+  // 圆角按形状盒短边百分比换算，保证滑块 0→40 有明显视觉变化
+  const rad=Math.max(0,Math.min(sb.w,sb.h)*cgRadius/100);
+  const path=cgShapePath(shape,sb.x,sb.y,sb.w,sb.h,rad);
+  g.save();
+  g.clip(path);
+  g.drawImage(im,dx,dy,dw,dh);
+  g.restore();
+  if(item.borderColor){
+    g.strokeStyle=item.borderColor;
+    g.lineWidth=Math.max(1.5,W/600)/geom.scale;
+    g.stroke(path);
+  }
+  g.restore();
+}
+
+function cgDrawSelection(g,geom,W){
+  const lw=Math.max(1.5,W/700);
+  g.save();
+  g.translate(geom.cx,geom.cy);
+  g.rotate(geom.rot*Math.PI/180);
+  g.setLineDash([Math.max(4,W/300),Math.max(3,W/400)]);
+  g.strokeStyle='#4a9eff';
+  g.lineWidth=lw/geom.scale;
+  g.strokeRect(-geom.hw/geom.scale,-geom.hh/geom.scale,
+               geom.hw*2/geom.scale,geom.hh*2/geom.scale);
+  g.setLineDash([]);
+  // 旋转手柄
+  const hs=Math.max(8,W*0.016)/geom.scale;
+  const off=Math.max(26,W*0.045);
+  g.beginPath();
+  g.moveTo(0,-geom.hh/geom.scale);
+  g.lineTo(0,(-geom.hh-off)/geom.scale);
+  g.stroke();
+  g.beginPath();
+  g.fillStyle='#4a9eff';
+  g.arc(0,(-geom.hh-off)/geom.scale,hs*0.55,0,Math.PI*2);
+  g.fill();
+  // 四角缩放手柄
+  const corners=[[-geom.hw,-geom.hh],[geom.hw,-geom.hh],[-geom.hw,geom.hh],[geom.hw,geom.hh]];
+  g.fillStyle='#ffffff';
+  corners.forEach(function(p){
+    g.beginPath();
+    g.rect(p[0]/geom.scale-hs/2,p[1]/geom.scale-hs/2,hs,hs);
+    g.fill();
+    g.stroke();
+  });
+  g.restore();
+}
+
+function drawCgCollage(g,W,H){
+  cgHit.length=0;
+  const isPreview=!cgExporting;
+  const mRatio=cgMargin/100;
+  const innerX=W*mRatio,innerY=H*mRatio;
+  const innerW=W*(1-2*mRatio),innerH=H*(1-2*mRatio);
+  const gapPx=cgGap*(Math.min(W,H)/1000);
+  const half=gapPx/2;
+
+  // 自由模式：不按单元格，各自独立摆放
+  if(cgMode==='free'){
+    cgImages.forEach(function(item,i){
+      const im=item&&item.img;
+      if(!im||!im.width)return;
+      if(item.fx==null||item.fy==null||item.fw==null)return;
+      const cw=item.fw*W;
+      const ch=cw*im.height/im.width;
+      const geom=cgItemGeom(item,item.fx*W,item.fy*H,cw,ch);
+      geom.realW=cw;geom.realH=ch;
+      item.__selected=(i===cgSelectedIdx);
+      cgHit.push({i:i,cx:geom.cx,cy:geom.cy,hw:geom.hw,hh:geom.hh,rot:geom.rot,
+                  cw:cw,ch:ch,realH:ch,free:true});
+      drawCgItem(g,item,im,geom,isPreview,W);
+    });
+    // 绘制顺序按索引，选中框可能被后画的图盖住，补画一次
+    if(isPreview&&cgSelectedIdx>=0){
+      const sel=cgHit.filter(function(h){return h.i===cgSelectedIdx})[0];
+      if(sel){
+        const geom={cx:sel.cx,cy:sel.cy,bw:sel.cw,bh:sel.ch,hw:sel.hw,hh:sel.hh,rot:sel.rot,scale:sel.hw*2/sel.cw};
+        cgDrawSelection(g,geom,W);
+      }
+    }
+    return;
+  }
+
+  const cells=getCgCells();
+  if(!cells.length)return;
+  cells.forEach(function(cell,i){
+    const item=cgImages[i];
+    const im=item&&item.img;
+    if(!im||!im.width)return;
+    let cx=innerX+cell.x/100*innerW;
+    let cy=innerY+cell.y/100*innerH;
+    let cw=cell.w/100*innerW;
+    let ch=cell.h/100*innerH;
+    cx+=half;cy+=half;cw-=gapPx;ch-=gapPx;
+    if(cw<=0||ch<=0)return;
+    const geom=cgItemGeom(item,cx+cw/2,cy+ch/2,cw,ch);
+    item.__selected=(i===cgSelectedIdx);
+    cgHit.push({i:i,cx:geom.cx,cy:geom.cy,hw:geom.hw,hh:geom.hh,rot:geom.rot,
+                cw:cw,ch:ch,cellX:cx,cellY:cy});
+    drawCgItem(g,item,im,geom,isPreview,W);
+  });
+  if(isPreview&&cgSelectedIdx>=0){
+    const sel=cgHit.filter(function(h){return h.i===cgSelectedIdx})[0];
+    if(sel){
+      const geom={cx:sel.cx,cy:sel.cy,bw:sel.cw,bh:sel.ch,hw:sel.hw,hh:sel.hh,rot:sel.rot,
+                  scale:Math.max(0.01,sel.hw*2/sel.cw)};
+      cgDrawSelection(g,geom,W);
+    }
+  }
+}
+
+// 画背景照片：按画布宽度铺满，纵向平铺（长图下不会被拉伸成一整块大色块）
+// 模糊用原生 canvas filter；不支持时自动改用「降采样再放大」的等效模糊
+const CG_CAN_FILTER=(function(){
+  try{
+    const t=document.createElement('canvas').getContext('2d');
+    t.filter='blur(2px)';
+    return typeof t.filter==='string'&&t.filter.indexOf('blur')===0;
+  }catch(e){return false}
+})();
+function cgDrawBgPhoto(g,img,W,H,blurPx){
+  const bl=Math.max(0,blurPx||0);
+  const sc=W/img.width;              // 只按宽度缩放，保持原图细节密度
+  const dw=W, dh=img.height*sc;
+  g.save();
+  if(bl>=0.6&&CG_CAN_FILTER)g.filter='blur('+bl.toFixed(2)+'px)';
+  if(dh>=H){
+    // 图片本身够高：居中裁切
+    g.drawImage(img,0,(H-dh)/2,dw,dh);
+  }else{
+    // 纵向平铺：用 pattern 一次性铺满，避免逐块绘制产生接缝
+    let pat=null;
+    try{
+      pat=g.createPattern(img,'repeat');
+      if(pat&&pat.setTransform){
+        const m=new DOMMatrix();
+        m.a=sc;m.d=sc;
+        pat.setTransform(m);
+      }else{pat=null;}
+    }catch(e){pat=null;}
+    if(pat){
+      g.fillStyle=pat;
+      g.fillRect(0,0,W,H);
+    }else{
+      for(let y=0;y<H;y+=dh)g.drawImage(img,0,y,dw,dh);
+    }
+  }
+  g.restore();
+}
+
+function drawCollageFull(){
+  const W=c.width,H=c.height;
+  // 背景：照片 > 渐变 > 纯色
+  if(cgBgImg&&cgBgImg.width){
+    // 模糊半径按画布宽度换算，预览与导出视觉强度一致
+    const bl=cgBgBlur*(W/1000);
+    // 模糊会让边缘晕成透明，先铺一层底色
+    if(bl>0){
+      ctx.save();
+      ctx.fillStyle=cgBg||"#ffffff";
+      ctx.fillRect(0,0,W,H);
+      ctx.restore();
+    }
+    cgDrawBgPhoto(ctx,cgBgImg,W,H,bl);
+  }else if(cgBgType==="gradient"){
+    const c1=cgBg||"#ffffff", c2=cgBg2||"#f0f4f8", dir=cgBgDir||"h";
+    let grad;
+    if(dir==="v")grad=ctx.createLinearGradient(0,0,0,H);
+    else if(dir==="h")grad=ctx.createLinearGradient(0,0,W,0);
+    else if(dir==="d")grad=ctx.createLinearGradient(0,0,W,H);
+    else grad=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.1,W/2,H/2,Math.max(W,H)*0.7);
+    grad.addColorStop(0,c1);grad.addColorStop(1,c2);
+    ctx.fillStyle=grad;
+    ctx.fillRect(0,0,W,H);
+  }else{
+    ctx.fillStyle=cgBg||"#ffffff";
+    ctx.fillRect(0,0,W,H);
+  }
+  if(!cgImages.length){
+    const ph=H*0.12;
+    ctx.save();
+    ctx.fillStyle="#eef2f6";
+    ctx.fillRect(W*0.14,H*0.5-ph/2,W*0.72,ph);
+    ctx.fillStyle="#9aa7b6";
+    ctx.font="500 "+Math.max(11,Math.round(H*0.028))+"px 'PingFang SC','Noto Sans SC',sans-serif";
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText("上传多张图片，任选模板自动拼图（默认不裁剪）",W/2,H*0.5);
+    ctx.restore();
+    return;
+  }
+  drawCgCollage(ctx,W,H);
+}
+
+function renderCgTplCards(){
+  const sc=document.getElementById('cgTplScroll');if(!sc)return;
+  sc.innerHTML='';
+  const n=Math.max(cgImages.length,1);
+  CG_TPL.forEach(function(tpl,i){
+    const d=document.createElement('div');
+    d.className='cg-tpl-item'+(currentCgTpl===i?' active':'');
+    const cv=document.createElement('canvas');cv.width=120;cv.height=148;
+    const g=cv.getContext('2d');
+    const W=cv.width,H=cv.height,m=6;
+    const area=W-m*2,hArea=H-m*2;
+    g.fillStyle='#f0ede6';g.fillRect(0,0,W,H);
+    const cells=tpl.gen(n);
+    const colors=['#8fa8c4','#a8bf9e','#c9a88a','#b9c9dd','#d4b8a0','#9aab8c','#c6d8e8','#7d94b1'];
+    cells.forEach(function(c,j){
+      const x=m+c.w/100*area,y=m+c.h/100*hArea,w=c.w/100*area,h=c.h/100*hArea;
+      const r=2;
+      g.fillStyle=colors[j%colors.length];
+      g.beginPath();
+      g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath();g.fill();
+    });
+    if(currentCgTpl===i){g.strokeStyle='#c9a37c';g.lineWidth=2;g.strokeRect(0.5,0.5,W-1,H-1)}
+    const tag=document.createElement('div');tag.className='tag';tag.textContent=tpl.name;
+    d.appendChild(cv);d.appendChild(tag);
+    d.onclick=function(){currentCgTpl=i;renderCgTplCards();requestDraw()};
+    sc.appendChild(d);
+  });
+}
+
+function cgClear(){
+  cgImages=[];
+  document.getElementById('cgImgList').innerHTML='';
+  document.getElementById('cgCount').textContent='任意图片数量均可套用任意模板，拖动缩略图可调整顺序。';
+  renderCgTplCards();
+  // 拼接模式下清空后画布高度需回到基准尺寸
+  if(cgMode==='strip')resizeCanvas();else requestDraw();
+}
+
+function cgUploadHandler(e){
+  const files=Array.from(e.target.files||[]).filter(f=>f&&f.type&&/^image\/(jpeg|png|webp)/i.test(f.type));
+  if(!files.length)return;
+  const remain=30-cgImages.length;
+  const take=files.slice(0,remain);
+  if(take.length<files.length)console.log('已达上限 30 张');
+  take.forEach(file=>{
+    const url=URL.createObjectURL(file);
+    const item={img:null,url:url,loaded:false,x:0,y:0,scale:1,rotation:0,borderShape:'rect',borderColor:''};
+    cgImages.push(item);
+    const img=new Image();
+    img.onload=()=>{item.img=img;item.loaded=true;renderCgImgList();renderCgTplCards();
+      // 拼接模式下加图后画布高度需重算
+      if(cgMode==='strip')resizeCanvas();else requestDraw();
+    };
+    img.onerror=()=>{console.log('图片加载失败:',file.name)};
+    img.src=url;
+  });
+  if(cgMode==='free')cgInitFreeLayout();
+  renderCgImgList();
+  e.target.value='';
+}
+
+function renderCgImgList(){
+  const list=document.getElementById('cgImgList');if(!list)return;
+  list.innerHTML='';
+  cgImages.forEach((item,i)=>{
+    const d=document.createElement('div');
+    d.className='cg-img-item'+(i===cgSelectedIdx?' selected':'');
+    d.setAttribute('draggable','true');
+    const im=document.createElement('img');im.src=item.url;
+    if(!item.loaded)im.style.opacity='0.4';
+    const num=document.createElement('span');num.className='num';num.textContent=i+1;
+    const del=document.createElement('span');del.className='del';del.textContent='×';
+    del.onclick=ev=>{ev.stopPropagation();cgRemoveImage(i)};
+    // 点击缩略图选中该图，用于单独调整
+    d.onclick=()=>{cgSelectedIdx=(cgSelectedIdx===i?-1:i);renderCgImgList();syncCgItemPanel();requestDraw()};
+    d.appendChild(im);d.appendChild(num);d.appendChild(del);
+    list.appendChild(d);
+  });
+  // Sortable 拖动排序
+  if(typeof Sortable!=='undefined'&&list.childNodes.length>0){
+    new Sortable(list,{
+      animation:150,
+      ghostClass:'cg-sortable-ghost',
+      onEnd:evt=>{
+        const oldIdx=evt.oldIndex,newIdx=evt.newIndex;
+        if(oldIdx===newIdx)return;
+        const item=cgImages.splice(oldIdx,1)[0];
+        cgImages.splice(newIdx,0,item);
+        cgSelectedIdx=-1;
+        renderCgImgList();renderCgTplCards();syncCgItemPanel();requestDraw();
+      }
+    });
+  }
+}
+
+// 同步单图属性面板（形状 / 缩放 / 旋转 / 位移 / 边框色）
+function syncCgItemPanel(){
+  const panel=document.getElementById('cgItemPanel');
+  if(!panel)return;
+  const item=cgImages[cgSelectedIdx];
+  if(!item){panel.style.display='none';return}
+  panel.style.display='block';
+  const title=document.getElementById('cgItemTitle');
+  if(title)title.textContent='第 '+(cgSelectedIdx+1)+' 张图片设置';
+  const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v};
+  setV('cgShape',item.borderShape||'rect');
+  setV('cgScale',item.scale||1);
+  setV('cgRotate',item.rotation||0);
+  setV('cgPosX',item.x||0);
+  setV('cgPosY',item.y||0);
+  const sv=document.getElementById('cgScaleVal');if(sv)sv.textContent=Math.round((item.scale||1)*100)+'%';
+  const rv=document.getElementById('cgRotateVal');if(rv)rv.textContent=(item.rotation||0)+'°';
+  const bc=document.getElementById('cgBorderColor');if(bc)bc.value=item.borderColor||'#ffffff';
+  const bce=document.getElementById('cgBorderColorOn');if(bce)bce.checked=!!item.borderColor;
+}
+
+function cgApplyToSelected(key,val){
+  const item=cgImages[cgSelectedIdx];
+  if(!item)return;
+  item[key]=val;
+  // 形状/描边按当前模式记住，切到别的模式不受影响
+  if(!item.shapeByMode)item.shapeByMode={grid:'rect',strip:'rect',free:'rect'};
+  if(!item.colorByMode)item.colorByMode={grid:'',strip:'',free:''};
+  if(key==='borderShape')item.shapeByMode[cgMode]=val;
+  if(key==='borderColor')item.colorByMode[cgMode]=val;
+  requestDraw();
+}
+
+// 从图片智能取色（与其它模板一致的取色逻辑）
+function cgPickColorsFromImage(){
+  const item=cgImages[cgSelectedIdx]||cgImages[0];
+  if(!item||!item.img){alert('请先上传图片');return}
+  const im=item.img;
+  const tmp=document.createElement('canvas');
+  const TW=64,TH=Math.max(1,Math.round(64*im.height/im.width));
+  tmp.width=TW;tmp.height=TH;
+  const tg=tmp.getContext('2d');
+  tg.drawImage(im,0,0,TW,TH);
+  let data;
+  try{data=tg.getImageData(0,0,TW,TH).data}catch(err){alert('取色失败（跨域图片）');return}
+  // 简易中位切分量化：统计主要颜色
+  const buckets={};
+  for(let i=0;i<data.length;i+=4){
+    const a=data[i+3];if(a<128)continue;
+    const r=data[i],g2=data[i+1],b=data[i+2];
+    const key=((r>>4)<<8)|((g2>>4)<<4)|(b>>4);
+    if(!buckets[key])buckets[key]={r:0,g:0,b:0,n:0};
+    const bk=buckets[key];bk.r+=r;bk.g+=g2;bk.b+=b;bk.n++;
+  }
+  const arr=Object.values(buckets).sort((a,b)=>b.n-a.n);
+  const toHex=(r,g2,b)=>'#'+[r,g2,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+  const c1=arr[0]?toHex(arr[0].r/arr[0].n,arr[0].g/arr[0].n,arr[0].b/arr[0].n):'#ffffff';
+  const c2=arr[1]?toHex(arr[1].r/arr[1].n,arr[1].g/arr[1].n,arr[1].b/arr[1].n):c1;
+  cgBg=c1;cgBg2=c2;
+  const bgEl=document.getElementById('cgBg');if(bgEl)bgEl.value=c1;
+  const bg2El=document.getElementById('cgBg2');if(bg2El)bg2El.value=c2;
+  // 自动切换到渐变，方便直接看到效果
+  const btEl=document.getElementById('cgBgType');
+  if(btEl&&btEl.value!=='gradient'){btEl.value='gradient';cgBgType='gradient';document.getElementById('cgBg2Row').style.display='block'}
+  requestDraw();
+}
+
+function cgResetSelectedTransform(){
+  const item=cgImages[cgSelectedIdx];
+  if(!item)return;
+  item.x=0;item.y=0;item.scale=1;item.rotation=0;
+  syncCgItemPanel();requestDraw();
+}
+
+function cgApplyShapeToAll(){
+  const item=cgImages[cgSelectedIdx];
+  if(!item)return;
+  const shape=item.borderShape||'rect';
+  const color=item.borderColor||'';
+  cgImages.forEach(it=>{
+    it.borderShape=shape;it.borderColor=color;
+    if(!it.shapeByMode)it.shapeByMode={grid:'rect',strip:'rect',free:'rect'};
+    if(!it.colorByMode)it.colorByMode={grid:'',strip:'',free:''};
+    it.shapeByMode[cgMode]=shape;
+    it.colorByMode[cgMode]=color;
+  });
+  renderCgImgList();requestDraw();
+}
+
+function cgRemoveImage(i){
+  const item=cgImages[i];
+  if(item&&item.url)URL.revokeObjectURL(item.url);
+  cgImages.splice(i,1);
+  if(cgSelectedIdx===i)cgSelectedIdx=-1;
+  else if(cgSelectedIdx>i)cgSelectedIdx--;
+  cgDrag=null;cgPinch=null;
+  renderCgImgList();renderCgTplCards();syncCgItemPanel();
+  // 拼接模式下删图后画布高度需重算
+  if(cgMode==='strip')resizeCanvas();else requestDraw();
+}
+
+function cgRatioChanged(){
+  const val=document.getElementById('cgRatio').value.split(',');
+  cgRatio=[parseInt(val[0]),parseInt(val[1])];
+  // 同步到主画布尺寸
+  if(currentTemplate==="collage"){
+    const sizeEl=document.getElementById('size');
+    if(sizeEl)sizeEl.value=cgRatio.join(',');
+    resizeCanvas();
+  }
+  requestDraw();
+}
+
+function cgBgModeChanged(){
+  cgBgType=document.getElementById('cgBgType').value;
+  document.getElementById('cgBg2Row').style.display=(cgBgType==='gradient')?'block':'none';
+  syncCgBgBlurUI();
+  requestDraw();
+}
+
+// 模糊滑块仅在「照片」背景且已导入照片时可用
+function syncCgBgBlurUI(){
+  const el=document.getElementById('cgBgBlur');
+  const tip=document.getElementById('cgBgBlurTip');
+  if(!el)return;
+  const usable=(cgBgType==='image'&&cgBgImg&&cgBgImg.width);
+  el.disabled=!usable;
+  el.style.opacity=usable?'1':'0.45';
+  if(tip){
+    if(usable){tip.textContent='拖动调节背景照片的高斯模糊强度。';}
+    else if(cgBgType==='image'){tip.textContent='已选择「照片」背景，请点上方「导入照片作背景」。';}
+    else{tip.textContent='先「导入照片作背景」，即可调节模糊强度。';}
+  }
+}
+
+// ===== 背景库：预设色板 + 导入照片 =====
+const CG_BG_PRESETS=[
+  ['#ffffff','#f0f4f8'],['#f7f3ec','#e8dfd2'],['#fdf2f2','#f6d9d9'],
+  ['#eef6f0','#d6e8db'],['#eef3fb','#d4e2f5'],['#1c1c22','#2c2c36'],
+  ['#2b2118','#4a3a2a'],['#c9a37c','#e6d3bd'],['#8fa8c4','#c6d8e8'],
+  ['#a8bf9e','#d8e4d2']
+];
+function renderCgBgPresets(){
+  const box=document.getElementById('cgBgPresets');if(!box)return;
+  box.innerHTML='';
+  CG_BG_PRESETS.forEach(function(pr){
+    const d=document.createElement('div');
+    d.className='cg-bg-sw'+(cgBg===pr[0]&&cgBgType==='gradient'?' active':'');
+    d.style.background='linear-gradient(135deg,'+pr[0]+','+pr[1]+')';
+    d.title=pr[0]+' → '+pr[1];
+    d.onclick=function(){
+      cgBg=pr[0];cgBg2=pr[1];cgBgType='gradient';
+      cgBgImg=null;cgBgImgURL=null;
+      const t=document.getElementById('cgBgType');if(t)t.value='gradient';
+      const b1=document.getElementById('cgBg');if(b1)b1.value=pr[0];
+      const b2=document.getElementById('cgBg2');if(b2)b2.value=pr[1];
+      const row=document.getElementById('cgBg2Row');if(row)row.style.display='block';
+      renderCgBgPresets();requestDraw();
+    };
+    box.appendChild(d);
+  });
+}
+function cgClearBgImage(){
+  if(cgBgImgURL)URL.revokeObjectURL(cgBgImgURL);
+  cgBgImg=null;cgBgImgURL=null;
+  cgBgBlur=0;
+  const bl=document.getElementById('cgBgBlur');if(bl)bl.value=0;
+  const blv=document.getElementById('cgBgBlurVal');if(blv)blv.textContent='0';
+  // 背景照片没了，样式回落纯色，避免 UI 与实际不一致
+  if(cgBgType==='image'){
+    cgBgType='solid';
+    const t=document.getElementById('cgBgType');if(t)t.value='solid';
+    const row=document.getElementById('cgBg2Row');if(row)row.style.display='none';
+  }
+  syncCgBgBlurUI();
+  requestDraw();
+}
+(function bindCgBgBlur(){
+  const el=document.getElementById('cgBgBlur');if(!el)return;
+  el.addEventListener('input',function(e){
+    cgBgBlur=parseInt(e.target.value,10)||0;
+    const v=document.getElementById('cgBgBlurVal');if(v)v.textContent=cgBgBlur;
+    requestDraw();
+  });
+})();
+(function bindCgBgUpload(){
+  const el=document.getElementById('cgBgUpload');if(!el)return;
+  el.addEventListener('change',function(e){
+    const f=(e.target.files||[])[0];
+    if(!f)return;
+    if(cgBgImgURL)URL.revokeObjectURL(cgBgImgURL);
+    cgBgImgURL=URL.createObjectURL(f);
+    const img=new Image();
+    img.onload=function(){
+      cgBgImg=img;
+      // 导入成功即切到「照片」背景，避免样式停留在纯色导致看起来没生效
+      cgBgType='image';
+      const t=document.getElementById('cgBgType');if(t)t.value='image';
+      const row=document.getElementById('cgBg2Row');if(row)row.style.display='none';
+      syncCgBgBlurUI();
+      requestDraw();
+    };
+    img.src=cgBgImgURL;
+    e.target.value='';
+  });
+})();
+renderCgBgPresets();
+syncCgBgBlurUI();
+
+// 绑定上传事件
+document.getElementById('cgUpload').addEventListener('change',cgUploadHandler);
+document.getElementById('cgUpload2').addEventListener('change',cgUploadHandler);
+// 绑定滑块
+['cgGap','cgMargin','cgRadius'].forEach(id=>{
+  const el=document.getElementById(id);if(!el)return;
+  el.addEventListener('input',e=>{
+    const v=parseInt(e.target.value,10);
+    if(id==='cgGap')cgGap=v;
+    else if(id==='cgMargin')cgMargin=v;
+    else cgRadius=v;
+    const valEl=document.getElementById(id+'Val');
+    if(valEl)valEl.textContent=v;
+    // 拼接模式下改边距/间距需重算画布高度
+    if(cgMode==='strip'&&currentTemplate==='collage')resizeCanvas();
+    else requestDraw();
+  });
+});
+// 绑定填充方式
+document.getElementById('cgFit').addEventListener('change',e=>{
+  cgFillMode=e.target.value;
+  requestDraw();
+});
+// 绑定背景
+document.getElementById('cgBg').addEventListener('input',e=>{cgBg=e.target.value;requestDraw()});
+document.getElementById('cgBg2').addEventListener('input',e=>{cgBg2=e.target.value;requestDraw()});
+document.getElementById('cgBgDir').addEventListener('input',e=>{cgBgDir=e.target.value;requestDraw()});
+
+// ===== 单图属性面板事件绑定 =====
+(function bindCgItemPanel(){
+  const shapeEl=document.getElementById('cgShape');
+  if(shapeEl)shapeEl.addEventListener('change',e=>cgApplyToSelected('borderShape',e.target.value));
+  const scaleEl=document.getElementById('cgScale');
+  if(scaleEl)scaleEl.addEventListener('input',e=>{
+    const v=parseFloat(e.target.value);
+    const sv=document.getElementById('cgScaleVal');if(sv)sv.textContent=Math.round(v*100)+'%';
+    cgApplyToSelected('scale',v);
+  });
+  const rotEl=document.getElementById('cgRotate');
+  if(rotEl)rotEl.addEventListener('input',e=>{
+    const v=parseInt(e.target.value,10);
+    const rv=document.getElementById('cgRotateVal');if(rv)rv.textContent=v+'°';
+    cgApplyToSelected('rotation',v);
+  });
+  const posXEl=document.getElementById('cgPosX');
+  if(posXEl)posXEl.addEventListener('input',e=>cgApplyToSelected('x',parseFloat(e.target.value)));
+  const posYEl=document.getElementById('cgPosY');
+  if(posYEl)posYEl.addEventListener('input',e=>cgApplyToSelected('y',parseFloat(e.target.value)));
+  const bcOn=document.getElementById('cgBorderColorOn');
+  if(bcOn)bcOn.addEventListener('change',e=>{
+    const item=cgImages[cgSelectedIdx];if(!item)return;
+    item.borderColor=e.target.checked?(document.getElementById('cgBorderColor').value||'#ffffff'):'';
+    requestDraw();
+  });
+  const bcEl=document.getElementById('cgBorderColor');
+  if(bcEl)bcEl.addEventListener('input',e=>{
+    const item=cgImages[cgSelectedIdx];if(!item)return;
+    const on=document.getElementById('cgBorderColorOn');
+    if(on&&on.checked)item.borderColor=e.target.value;
+    requestDraw();
+  });
+})();
+
+// 初始化拼图模板卡片
+renderCgTplCards();
+
+function axBgModeChanged(){
+  const t=fmV("axBgType")||"solid";
+  const row=document.getElementById("axBg2Row");
+  if(row)row.style.display=t==="gradient"?"":"none";
+}
+// 从已载入的多张图片里取色：每张各取一个代表色，主色用中心图，副色用整条展轴的均值
+function axExtractColors(){
+  const imgs=axImgs();
+  if(!imgs.length){alert("请先上传作品图");return;}
+  const sw=40,sh=40;
+  const off=document.createElement("canvas");
+  off.width=sw;off.height=sh;
+  const o=off.getContext("2d");
+  const pick=function(im){
+    o.clearRect(0,0,sw,sh);
+    o.drawImage(im,0,0,sw,sh);
+    const d=o.getImageData(0,0,sw,sh).data;
+    const buckets={};
+    for(let i=0;i<d.length;i+=4){
+      if(d[i+3]<128)continue;
+      const r=Math.floor(d[i]/16)*16,g=Math.floor(d[i+1]/16)*16,b=Math.floor(d[i+2]/16)*16;
+      const k=r+"_"+g+"_"+b;
+      if(!buckets[k])buckets[k]={count:0,r:r,g:g,b:b};
+      buckets[k].count++;
+    }
+    const arr=Object.values(buckets).sort(function(a,b){return b.count-a.count;});
+    if(!arr.length)return null;
+    const isVivid=function(x){
+      const mx=Math.max(x.r,x.g,x.b),mn=Math.min(x.r,x.g,x.b);
+      return (mx-mn)>20&&mx<245&&mn>15;
+    };
+    const vivid=arr.filter(isVivid);
+    const best=vivid[0]||arr[0];
+    return {r:best.r+8,g:best.g+8,b:best.b+8};
+  };
+  const cols=imgs.map(pick).filter(Boolean);
+  if(!cols.length){alert("无法提取颜色");return;}
+  const mid=cols[Math.floor((cols.length-1)/2)];
+  const avg=cols.reduce(function(a,x){return {r:a.r+x.r/cols.length,g:a.g+x.g/cols.length,b:a.b+x.b/cols.length};},{r:0,g:0,b:0});
+  const toHex=function(v){return ("0"+Math.max(0,Math.min(255,Math.round(v))).toString(16)).slice(-2);};
+  const hex=function(x){return "#"+toHex(x.r)+toHex(x.g)+toHex(x.b);};
+  const lighten=function(x,d){return {r:x.r+d,g:x.g+d,b:x.b+d};};
+  const darken=function(x,d){return {r:x.r-d,g:x.g-d,b:x.b-d};};
+  const c1=hex(lighten(mid,42));
+  const c2=hex(darken(avg,18));
+  document.getElementById("axBgType").value="gradient";
+  document.getElementById("axBg").value=c1;
+  document.getElementById("axBg2").value=c2;
+  axBgModeChanged();
+  requestDraw();
+}
+
+function drawAxis(){
+  const W=c.width,H=c.height;
+  // 背景：纯色 / 渐变（与其它工作区保持一致的配色习惯）
+  if((fmV("axBgType")||"solid")==="gradient"){
+    const c1=fmV("axBg")||"#ffffff";
+    const c2=fmV("axBg2")||"#eef2f6";
+    const dir=fmV("axBgDir")||"h";
+    let grad;
+    if(dir==="v")grad=ctx.createLinearGradient(0,0,0,H);
+    else if(dir==="h")grad=ctx.createLinearGradient(0,0,W,0);
+    else if(dir==="d")grad=ctx.createLinearGradient(0,0,W,H);
+    else grad=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.1,W/2,H/2,Math.max(W,H)*0.7);
+    grad.addColorStop(0,c1);grad.addColorStop(1,c2);
+    ctx.fillStyle=grad;
+  }else{
+    ctx.fillStyle=fmV("axBg")||"#ffffff";
+  }
+  ctx.fillRect(0,0,W,H);
+
+  const imgs=axImgs();
+  if(!imgs.length){
+    const ph=H*0.12;
+    ctx.save();
+    ctx.fillStyle="#eef2f6";
+    ctx.fillRect(W*0.14,H*0.5-ph/2,W*0.72,ph);
+    ctx.fillStyle="#9aa7b6";
+    ctx.font="500 "+Math.max(11,Math.round(H*0.03))+"px 'PingFang SC','Noto Sans SC',sans-serif";
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText("一次上传多张作品图，自动排成展示轴",W/2,H*0.5);
+    ctx.restore();
+    wmClip={ox:0,oy:0,rot:0,x:W*0.14,y:H*0.5-ph/2,w:W*0.72,h:ph,r:0};
+    return;
+  }
+
+  const n=imgs.length;
+  const mid=(n-1)/2;
+  const baseH=Math.max(25,Math.min(90,fmN("axBaseH",62)))/100*H;
+  const falloff=Math.max(0,Math.min(45,fmN("axFalloff",18)))/100;
+  const stagger=Math.max(0,Math.min(25,fmN("axStagger",7)))/100*H;
+  const overlap=Math.max(0,Math.min(35,fmN("axOverlap",8)))/100;
+  const shadowPct=Math.max(0,Math.min(100,fmN("axShadow",45)))/100;
+  const radPct=Math.max(0,Math.min(8,fmN("axRadius",0)))/100;
+
+  // 1) 逐张尺寸：中间最大，两侧按到中心的距离线性递减
+  const dims=imgs.map(function(im,i){
+    const d=mid>0?Math.abs(i-mid)/mid:0;
+    const th=baseH*(1-falloff*d);
+    return {im:im,w:th*(im.width/im.height),h:th,d:d};
+  });
+
+  // 2) 总宽（相邻图片按重叠比例压边）
+  let total=0;
+  for(let i=0;i<n;i++){
+    total+=dims[i].w;
+    if(i<n-1)total-=Math.min(dims[i].w,dims[i+1].w)*overlap;
+  }
+  const maxW=W*0.94;
+  if(total>maxW){
+    const k=maxW/total;
+    dims.forEach(function(o){o.w*=k;o.h*=k;});
+    total=maxW;
+  }else if(total<maxW*0.6){
+    let k=(maxW*0.6)/total;
+    const maxH=Math.max.apply(null,dims.map(function(o){return o.h;}));
+    k=Math.min(k,(H*0.86)/maxH);
+    if(k>1){
+      dims.forEach(function(o){o.w*=k;o.h*=k;});
+      total*=k;
+    }
+  }
+
+  // 3) 定位：水平居中；垂直按所选对齐方式（默认错落：中心图最正，外侧偏移更大）
+  const align=fmV("axAlign")||"stagger";
+  const midIdx=(n%2===1)?Math.floor(n/2):-1;
+  const maxH=Math.max.apply(null,dims.map(function(o){return o.h;}));
+  const topLine=H*0.5-maxH/2;
+  let x=(W-total)/2;
+  dims.forEach(function(o,i){
+    o.x=x;
+    if(align==="center"){
+      o.y=H*0.5-o.h/2;
+    }else if(align==="top"){
+      o.y=topLine;
+    }else if(align==="bottom"){
+      o.y=topLine+maxH-o.h;
+    }else{
+      const dir=(i%2===0)?-1:1;
+      const amp=(i===midIdx)?0:stagger*(0.25+o.d*0.75);
+      o.y=H*0.5-o.h/2+dir*amp;
+    }
+    x+=o.w-(i<n-1?Math.min(o.w,dims[i+1].w)*overlap:0);
+  });
+
+  // 4) 从外向内绘制，让中间那张压在最上层
+  const order=dims.map(function(o,i){return i;}).sort(function(a,b){
+    return Math.abs(b-mid)-Math.abs(a-mid);
+  });
+  order.forEach(function(i){
+    const o=dims[i];
+    const rad=Math.min(o.w,o.h)*radPct;
+    if(shadowPct>0){
+      ctx.save();
+      ctx.shadowColor="rgba(28,40,58,"+(0.05+shadowPct*0.22).toFixed(3)+")";
+      ctx.shadowBlur=Math.max(4,Math.min(o.w,o.h)*(0.03+shadowPct*0.12));
+      ctx.shadowOffsetY=Math.max(1,Math.min(o.w,o.h)*0.014);
+      ctx.fillStyle="#ffffff";
+      ctx.beginPath();ptPath(o.x,o.y,o.w,o.h,rad);ctx.fill();
+      ctx.restore();
+    }
+    ctx.save();
+    ctx.beginPath();ptPath(o.x,o.y,o.w,o.h,rad);ctx.clip();
+    const sc=Math.max(o.w/o.im.width,o.h/o.im.height);
+    const dw=o.im.width*sc,dh=o.im.height*sc;
+    ctx.drawImage(o.im,o.x+(o.w-dw)/2,o.y+(o.h-dh)/2,dw,dh);
+    ctx.restore();
+  });
+
+  // 5) 水印区域：整条展轴的外接矩形
+  let bx=1e9,by=1e9,bx2=-1e9,by2=-1e9;
+  dims.forEach(function(o){
+    bx=Math.min(bx,o.x);by=Math.min(by,o.y);
+    bx2=Math.max(bx2,o.x+o.w);by2=Math.max(by2,o.y+o.h);
+  });
+  wmClip={ox:0,oy:0,rot:0,x:bx,y:by,w:bx2-bx,h:by2-by,r:0};
+}
 
 // ============ 背景绘制 ============
 function drawBackground(){
@@ -3555,6 +5154,412 @@ function drawProfile(){
   wmClip={ox:0,oy:0,rot:0,x:0,y:0,w:W,h:H,r:0};
 }
 
+// ============ 杂志手账模板（Editorial Journal） ============
+// 三段式纵向长图：顶部诗句封面 → 中部米白双页线圈手账 → 底部英文主题页
+const MJ_DEF={
+  poem:"Style 1 picture\n苹果的第一万六千个故事\nThe 16,000th story of Apple",
+  title:"Style 2 picture",
+  sub:"爱生活这件事 永远来得及\nIt's always not too late to love life"
+};
+// 图片列表：不进 layers，与其它模板完全隔离；张数决定排版（见 mjPlan）
+const MJ_MAX=2;                                     // 只支持 2 张大图（第 1 张在顶部，第 2 张在底部）
+const mjImgs=[];                                // 大图列表（固定最多 2 张，第 1 张顶部、第 2 张底部）
+const mjOff=[];                                 // 与 mjImgs 平行的取景中心百分比，[50,50] = 居中裁切
+// 中部纸张纹理（独立于普通模板的全局纹理，互不干扰）
+let mjPresetTex=null,mjPresetTexType="",mjTexImg=null;
+const MJ_FALLBACK=[
+  ["#5f5440","#2b3138"],   // 顶：秋叶褐 → 灰蓝
+  ["#6a7a66","#32403a"],   // 手账左页：水面绿
+  ["#c9d2d6","#6e7a80"],   // 手账右页：雨天灰
+  ["#24252a","#4a4640"]    // 底：暗水
+];
+const MJ_PAGE3_FB=["#e4d7bd","#b79b6a"];       // 手账三页并排时的第三页兜底色（暖沙）
+
+function mjN(id,def){const el=document.getElementById(id);if(!el)return def;const v=parseFloat(el.value);return isNaN(v)?def:v;}
+function mjV(id,def){const el=document.getElementById(id);if(!el)return def;return el.value;}
+
+// 面板内提示（不弹窗、不阻塞交互）
+function mjMsg(t){
+  const el=document.getElementById("mjMsg");
+  if(!el)return;
+  el.textContent=t||"";
+  el.style.display=t?"":"none";
+}
+// 多选导入：全部解码完成后按文件顺序一次性追加，保证顺序稳定；总数封顶 MJ_MAX 张
+function mjUploadMulti(input){
+  const all=Array.prototype.slice.call(input.files||[]);
+  if(!all.length)return;
+  const room=Math.max(0,MJ_MAX-mjImgs.length);
+  const files=all.slice(0,room);
+  const dropped=all.length-files.length;
+  if(!files.length){
+    input.value="";
+    mjMsg("最多 "+MJ_MAX+" 张图片，已达上限；可先删除再导入。");
+    return;
+  }
+  const out=new Array(files.length);
+  let settled=0;
+  const settle=function(){
+    settled++;
+    if(settled<files.length)return;
+    let added=false;
+    for(let k=0;k<out.length;k++){
+      if(out[k]){mjImgs.push(out[k]);mjOff.push([50,50]);added=true;}
+    }
+    input.value="";
+    if(!added)return;
+    mjBuildSlots();
+    if(dropped>0)mjMsg("最多 "+MJ_MAX+" 张，已自动忽略多出的 "+dropped+" 张。");
+    requestDraw();
+  };
+  files.forEach(function(f,k){
+    const img=new Image();
+    img.onload=function(){out[k]=img;settle();};
+    img.onerror=settle;
+    img.src=URL.createObjectURL(f);
+  });
+}
+function mjRemove(i){
+  if(i<0||i>=mjImgs.length)return;
+  mjImgs.splice(i,1);
+  mjOff.splice(i,1);
+  mjMsg("");
+  mjBuildSlots();
+  requestDraw();
+}
+// 替换第 i 张图（取景恢复居中，其余图片与文字不受影响）
+function mjReplace(i,input){
+  const f=input.files&&input.files[0];
+  if(!f||i<0||i>=mjImgs.length){input.value="";return;}
+  const img=new Image();
+  img.onload=function(){
+    mjImgs[i]=img;
+    mjOff[i]=[50,50];
+    mjBuildSlots();
+    requestDraw();
+  };
+  img.onerror=function(){mjMsg("图片加载失败，请换一张试试");};
+  img.src=URL.createObjectURL(f);
+  input.value="";
+}
+// 布局方向切换能力已按需求移除：杂志手账仅保留上下布局
+function mjSetOff(i,axis,v){
+  mjOff[i][axis==="x"?0:1]=parseFloat(v);
+  const lab=document.getElementById("mjOff"+i+axis.toUpperCase()+"Val");
+  if(lab)lab.textContent=v;
+  requestDraw();
+}
+function mjResetSlot(i){
+  mjOff[i][0]=50;mjOff[i][1]=50;
+  ["X","Y"].forEach(function(a){
+    const s=document.getElementById("mjOff"+i+a);if(s)s.value=50;
+    const l=document.getElementById("mjOff"+i+a+"Val");if(l)l.textContent="50";
+  });
+  requestDraw();
+}
+function mjResetText(){
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  set("mjPoem",MJ_DEF.poem);
+  set("mjTitle",MJ_DEF.title);
+  set("mjSub",MJ_DEF.sub);
+  requestDraw();
+}
+// 图片控件由脚本生成：顶部是多选导入框，下方按当前张数列出每张图的
+// 角色标签 + 替换/删除 + 取景控件
+function mjBuildSlots(){
+  const box=document.getElementById("mjSlots");
+  if(!box)return;
+  const plan=mjPlan();
+  const roleOf=function(i){
+    if(i===plan.A)return "大图 · 顶部";
+    if(plan.B!=null&&i===plan.B)return "大图 · 底部";
+    return "大图";
+  };
+  let h='<input type="file" id="mjUpMulti" accept="image/*" multiple onchange="mjUploadMulti(this)" style="width:100%">';
+  h+='<div class="hint">只支持最多 '+MJ_MAX+' 张大图：第 1 张放顶部，第 2 张放底部，手账页面为固定双页。可多次追加导入、替换或删除。</div>';
+  for(let i=0;i<mjImgs.length;i++){
+    h+='<div class="po-group" style="margin-top:'+(i?12:0)+'px">图片'+(i+1)+" · "+roleOf(i)+"</div>";
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
+    h+='<input type="file" accept="image/*" id="mjRep'+i+'" onchange="mjReplace('+i+',this)" style="display:none">';
+    h+='<button onclick="document.getElementById(\'mjRep'+i+'\').click()">⇄ 替换</button>';
+    h+='<button class="warn small" onclick="mjRemove('+i+')">× 删除</button>';
+    h+='</div>';
+    h+='<label>水平取景: <span id="mjOff'+i+'XVal">'+mjOff[i][0]+'</span>%</label>';
+    h+='<input type="range" id="mjOff'+i+'X" min="0" max="100" value="'+mjOff[i][0]+'" oninput="mjSetOff('+i+',\'x\',this.value)">';
+    h+='<label>垂直取景: <span id="mjOff'+i+'YVal">'+mjOff[i][1]+'</span>%</label>';
+    h+='<input type="range" id="mjOff'+i+'Y" min="0" max="100" value="'+mjOff[i][1]+'" oninput="mjSetOff('+i+',\'y\',this.value)">';
+    h+='<button onclick="mjResetSlot('+i+')">恢复默认位置</button>';
+  }
+  box.innerHTML=h;
+}
+
+// 图片比例：壁纸 9:16 / 方图 1:1 / 自动（原图竖长 ≥1.5 视为壁纸，否则方图）
+function mjAR(img){
+  const mode=mjV("mjRatio","auto");
+  if(mode==="wall")return 9/16;
+  if(mode==="sq")return 1;
+  if(!img||!img.width||!img.height)return 1;
+  return (img.height/img.width)>=1.5?9/16:1;
+}
+// cover 裁切：先按目标比例取景（不拉伸变形、不溢出区域），再以 cover 方式铺满整个区域——
+// 照片均匀满铺、无压暗底、无图版边框（与参考效果一致）。
+// 大图与手账页面共用本函数，比例切换在两处同步生效。
+function mjCover(g,img,x,y,w,h,ox,oy,fb){
+  if(!(img&&img.width&&img.height)){
+    const gr=g.createLinearGradient(x,y,x+w,y+h);
+    gr.addColorStop(0,fb[0]);gr.addColorStop(1,fb[1]);
+    g.fillStyle=gr;g.fillRect(x,y,w,h);
+    return;
+  }
+  const t=mjAR(img);
+  // 取景裁切到目标比例（以 ox/oy 为取景中心）
+  let cw=img.width,ch=cw/t;
+  if(ch>img.height){ch=img.height;cw=ch*t;}
+  const sx=(img.width-cw)*ox,sy=(img.height-ch)*oy;
+  // cover 铺满：可能超出区域，必须裁剪到区域内，保证不溢出、不变形
+  const s=Math.max(w/cw,h/ch);
+  g.save();
+  g.beginPath();
+  g.rect(x,y,w,h);
+  g.clip();
+  g.drawImage(img,sx,sy,cw,ch,x+(w-cw*s)*ox,y+(h-ch*s)*oy,cw*s,ch*s);
+  g.restore();
+}
+function mjLines(s){return String(s==null?"":s).split("\n");}
+// 多行文字：行距随字号，整组以 y 为中心，阴影保证在照片上清晰
+function mjText(g,lines,x,y,size,font,color,align,lh,shadow){
+  g.save();
+  g.font=size+"px "+font;
+  g.textAlign=align;
+  g.textBaseline="middle";
+  g.fillStyle=color;
+  if(shadow){
+    g.shadowColor="rgba(0,0,0,.6)";
+    g.shadowBlur=Math.max(2,size*0.42);
+    g.shadowOffsetY=size*0.09;
+  }
+  for(let i=0;i<lines.length;i++){
+    g.fillText(lines[i],x,y+(i-(lines.length-1)/2)*lh);
+  }
+  g.restore();
+}
+// 中部双页之间的金属线圈装订（横跨缝隙、竖向等距排列）
+function mjCoil(g,cx,y0,y1,W){
+  const ringW=W*0.054,ringH=W*0.021;
+  const step=ringH*1.62;
+  const lw=Math.max(1,W*0.0044);
+  const n=Math.max(1,Math.floor((y1-y0)/step));
+  const start=y0+(y1-y0-n*step)/2+step/2;
+  for(let k=0;k<n;k++){
+    const cy=start+k*step;
+    g.save();
+    // 环的落影
+    g.lineWidth=lw;
+    g.strokeStyle="rgba(30,26,20,.32)";
+    g.beginPath();g.ellipse(cx+lw*0.35,cy+lw*0.55,ringW/2,ringH/2,0,0,Math.PI*2);g.stroke();
+    // 金属环本体：线性渐变模拟圆柱反光
+    const mg=g.createLinearGradient(cx-ringW/2,0,cx+ringW/2,0);
+    mg.addColorStop(0,"#7a7a7a");mg.addColorStop(.28,"#e6e6e6");
+    mg.addColorStop(.55,"#9a9a9a");mg.addColorStop(.82,"#dcdcdc");mg.addColorStop(1,"#7f7f7f");
+    g.strokeStyle=mg;
+    g.beginPath();g.ellipse(cx,cy,ringW/2,ringH/2,0,0,Math.PI*2);g.stroke();
+    // 上缘高光
+    g.lineWidth=Math.max(.6,lw*0.32);
+    g.strokeStyle="rgba(255,255,255,.9)";
+    g.beginPath();g.ellipse(cx,cy,ringW/2-lw*0.2,ringH/2-lw*0.2,0,Math.PI*1.06,Math.PI*1.74);g.stroke();
+    g.restore();
+  }
+}
+
+// 布局计划：只支持 2 张大图（第 1 张顶部、第 2 张底部），手账固定原双页效果（兜底色空页面，图片不进手账页面）
+function mjPlan(){
+  const n=mjImgs.length;
+  const plan={n:n,A:null,B:null,pages:2,rows:1,pageImgs:[null,null]};
+  if(n>=1)plan.A=0;
+  if(n>=2)plan.B=1;
+  // 手账固定双页空页面（图片只做顶部/底部大图，不进手账页面）
+  plan.pages=2;
+  plan.rows=1;
+  plan.pageImgs=[null,null];
+  return plan;
+}
+function mjPaperTypeChanged(){
+  const row=document.getElementById("mjPaper2Row");
+  if(row)row.style.display=mjV("mjPaperType","solid")==="gradient"?"":"none";
+  requestDraw();
+}
+// 从已上传的图吸取主色/副色，提亮成纸张色并自动切到渐变
+function mjPickPaper(){
+  const imgs=mjImgs.filter(function(im){return im&&im.width;});
+  if(!imgs.length){alert("请先上传任意一张图片，再吸取颜色");return;}
+  const sw=60,sh=60;
+  const off=document.createElement("canvas");off.width=sw;off.height=sh;
+  const o=off.getContext("2d");
+  const buckets={};
+  imgs.forEach(function(im){
+    try{
+      o.clearRect(0,0,sw,sh);
+      o.drawImage(im,0,0,sw,sh);
+      const d=o.getImageData(0,0,sw,sh).data;
+      for(let i=0;i<d.length;i+=4){
+        if(d[i+3]<128)continue;
+        const r=Math.floor(d[i]/16)*16,g2=Math.floor(d[i+1]/16)*16,b=Math.floor(d[i+2]/16)*16;
+        const k=r+"_"+g2+"_"+b;
+        if(!buckets[k])buckets[k]={count:0,r:r,g:g2,b:b};
+        buckets[k].count++;
+      }
+    }catch(e){}
+  });
+  const arr=Object.values(buckets).sort(function(a,b){return b.count-a.count;});
+  if(!arr.length){alert("取色失败");return;}
+  const isVivid=function(x){const mx=Math.max(x.r,x.g,x.b),mn=Math.min(x.r,x.g,x.b);return (mx-mn)>20&&mx<245&&mn>15;};
+  const vivid=arr.filter(isVivid);
+  const main=vivid[0]||arr[0];
+  const sub=vivid[1]||arr[1]||arr[0];
+  const toHex=function(v){return ("0"+Math.max(0,Math.min(255,Math.round(v))).toString(16)).slice(-2);};
+  const hex=function(x){return "#"+toHex(x.r)+toHex(x.g)+toHex(x.b);};
+  const lift=function(x,d){return {r:Math.min(255,x.r+d),g:Math.min(255,x.g+d),b:Math.min(255,x.b+d)};};
+  const p1=document.getElementById("mjPaper"),p2=document.getElementById("mjPaper2"),pt=document.getElementById("mjPaperType");
+  if(p1)p1.value=hex(lift(main,80));
+  if(p2)p2.value=hex(lift(sub,45));
+  if(pt)pt.value="gradient";
+  mjPaperTypeChanged();
+}
+function mjTexSourceChanged(){
+  const s=mjV("mjTexSource","none");
+  const pr=document.getElementById("mjTexPresetRow"),ur=document.getElementById("mjTexUploadRow");
+  if(pr)pr.style.display=s==="preset"?"":"none";
+  if(ur)ur.style.display=s==="upload"?"":"none";
+  if(s==="preset")mjTexPresetChanged();
+  else requestDraw();
+}
+function mjTexPresetChanged(){
+  const t=mjV("mjTexPreset","kraft");
+  if(!mjPresetTex||mjPresetTexType!==t){
+    mjPresetTex=generatePaperTexture(t);
+    mjPresetTexType=t;
+  }
+  requestDraw();
+}
+function mjTexUpload(input){
+  const f=input.files&&input.files[0];
+  if(!f)return;
+  const img=new Image();
+  img.onload=function(){mjTexImg=img;requestDraw();};
+  img.src=URL.createObjectURL(f);
+  input.value="";
+}
+
+function drawMagazine(){
+  const W=c.width,H=c.height,g=ctx;
+  const pl=mjPlan();
+  const topP=Math.max(25,Math.min(55,mjN("mjTop",38)));
+  const midP=Math.max(12,Math.min(40,mjN("mjMid",25)));
+  const hA=Math.round(H*topP/100);
+  const hB=Math.round(H*midP/100);
+  const hC=H-hA-hB;
+  const paper=mjV("mjPaper","#f7f2ea");
+  const oxi=function(i,a){return (i==null||!mjOff[i])?0.5:mjOff[i][a]/100;};
+  const color=mjV("mjColor","#fbf7f0");
+  const align=mjV("mjAlign","center");
+  const fontCn=mjV("mjFontCn","'Songti SC','STSong','SimSun',serif");
+  const fontEn=mjV("mjFontEn","'Times New Roman','Georgia','Songti SC',serif");
+  const ax=align==="left"?W*0.085:(align==="right"?W*0.915:W/2);
+
+  // ---------- 顶部区域：顶部大图通栏 ----------
+  mjCover(g,pl.A==null?null:mjImgs[pl.A],0,0,W,hA,oxi(pl.A,0),oxi(pl.A,1),MJ_FALLBACK[0]);
+  const va=g.createLinearGradient(0,0,0,hA);
+  va.addColorStop(0,"rgba(0,0,0,.30)");
+  va.addColorStop(.45,"rgba(0,0,0,.14)");
+  va.addColorStop(1,"rgba(0,0,0,.30)");
+  g.fillStyle=va;g.fillRect(0,0,W,hA);
+
+  // ---------- 区域 B：纸张（纯色/渐变 + 纹理）+ 多页照片 + 线圈 ----------
+  if(mjV("mjPaperType","solid")==="gradient"){
+    const p2=mjV("mjPaper2","#eee3d2");
+    const gr=mjV("mjPaperDir","v")==="h"?g.createLinearGradient(0,0,W,0):g.createLinearGradient(0,hA,0,hA+hB);
+    gr.addColorStop(0,paper);gr.addColorStop(1,p2);
+    g.fillStyle=gr;
+  }else{
+    g.fillStyle=paper;
+  }
+  g.fillRect(0,hA,W,hB);
+  // 纹理只铺在纸张区域，不覆盖上下照片
+  const texSrc=mjV("mjTexSource","none");
+  const tex=texSrc==="preset"?mjPresetTex:(texSrc==="upload"?mjTexImg:null);
+  const texOp=Math.max(0,Math.min(100,mjN("mjTexOpacity",35)))/100;
+  if(tex&&tex.width&&tex.height&&texOp>0){
+    g.save();
+    g.beginPath();g.rect(0,hA,W,hB);g.clip();
+    g.globalAlpha=texOp;
+    const r=Math.max(W/tex.width,hB/tex.height);
+    const tw=tex.width*r,th=tex.height*r;
+    g.drawImage(tex,(W-tw)/2,hA+(hB-th)/2,tw,th);
+    g.restore();
+  }
+  // 页面边距：占整幅宽度的 8.5%
+  const padF=0.085;
+  const padX=W*padF,padY=hB*0.115;
+  const gap=Math.max(1,W*0.004);
+  const rows=pl.rows,cells=pl.pages;
+  const rowGap=Math.max(2,W*0.012);
+  const ph=(hB-padY*2-rowGap*(rows-1))/rows;
+  const py=hA+padY;
+  const base=Math.floor(cells/rows),extra=cells%rows;
+  const pfb=[MJ_FALLBACK[1],MJ_FALLBACK[2],MJ_PAGE3_FB];
+  // 每行页数均衡（差 ≤1），行宽始终铺满手账宽度 → 页面数变化时手账整体宽度不变
+  const rowCols=[],rowY=[];
+  let accY=py;
+  for(let r=0;r<rows;r++){
+    rowCols.push(base+(r<extra?1:0));
+    rowY.push(accY);
+    accY+=ph+rowGap;
+  }
+  g.save();
+  g.shadowColor="rgba(72,62,46,.30)";
+  g.shadowBlur=W*0.020;
+  g.shadowOffsetY=W*0.005;
+  let k=0;
+  for(let r=0;r<rows;r++){
+    const cols=rowCols[r];
+    const pw=(W*(1-padF*2)-gap*(cols-1))/cols;
+    for(let c=0;c<cols;c++){
+      const idx=pl.pageImgs[k]==null?null:pl.pageImgs[k];
+      mjCover(g,idx==null?null:mjImgs[idx],padX+c*(pw+gap),rowY[r],pw,ph,oxi(idx,0),oxi(idx,1),pfb[k%3]);
+      k++;
+    }
+  }
+  g.restore();
+  // 每行内相邻两页之间一组金属线圈（双页时正好落在中缝）
+  for(let r=0;r<rows;r++){
+    const cols=rowCols[r];
+    const pw=(W*(1-padF*2)-gap*(cols-1))/cols;
+    for(let c=1;c<cols;c++){
+      mjCoil(g,padX+c*(pw+gap)-gap/2,rowY[r],rowY[r]+ph,W);
+    }
+  }
+
+  // ---------- 底部区域：底部大图通栏 ----------
+  mjCover(g,pl.B==null?null:mjImgs[pl.B],0,hA+hB,W,hC,oxi(pl.B,0),oxi(pl.B,1),MJ_FALLBACK[3]);
+  const vc=g.createLinearGradient(0,hA+hB,0,H);
+  vc.addColorStop(0,"rgba(0,0,0,.16)");
+  vc.addColorStop(.5,"rgba(0,0,0,.34)");
+  vc.addColorStop(1,"rgba(0,0,0,.46)");
+  g.fillStyle=vc;g.fillRect(0,hA+hB,W,hC);
+
+  // ---------- 文字：诗句在顶部图，标题 + 副标题在底部图 ----------
+  const sizeCn=W*mjN("mjSizeCn",4.8)/100;
+  const lhCn=sizeCn*1.95;
+  const topY=hA*mjN("mjYTop",52)/100;
+  mjText(g,mjLines(mjV("mjPoem",MJ_DEF.poem)),ax,topY,sizeCn,fontCn,color,align,lhCn,true);
+
+  const sizeT=W*mjN("mjSizeTitle",6.2)/100;
+  const sizeS=W*mjN("mjSizeSub",2.5)/100;
+  const baseY=hA+hB+hC*mjN("mjYBot",47)/100;
+  mjText(g,mjLines(mjV("mjTitle",MJ_DEF.title)),ax,baseY,sizeT,fontEn,color,align,sizeT*1.3,true);
+  mjText(g,mjLines(mjV("mjSub",MJ_DEF.sub)),ax,baseY+sizeT*0.72+sizeS*1.1,sizeS,fontEn,color,align,sizeS*1.85,true);
+}
+
 // ============ 主渲染 ============
 function draw(){
   ctx.clearRect(0,0,c.width,c.height);
@@ -3571,6 +5576,25 @@ function draw(){
   if(typeof currentTemplate!=="undefined"&&currentTemplate==="frame"){
     drawFrame();
     drawWatermark();
+    scheduleAutosave();
+    return;
+  }
+  // 作品展示轴模板：独立渲染管线
+  if(typeof currentTemplate!=="undefined"&&currentTemplate==="axis"){
+    drawAxis();
+    drawWatermark();
+    scheduleAutosave();
+    return;
+  }
+  // 杂志手账模板：独立渲染管线
+  if(typeof currentTemplate!=="undefined"&&currentTemplate==="magazine"){
+    drawMagazine();
+    scheduleAutosave();
+    return;
+  }
+  // 自由拼图模板：独立渲染管线
+  if(typeof currentTemplate!=="undefined"&&currentTemplate==="collage"){
+    drawCollageFull();
     scheduleAutosave();
     return;
   }
@@ -5501,7 +7525,19 @@ function getSettings(){
     fmBlur:document.getElementById("fmBlur").value,
     fmVeil:document.getElementById("fmVeil").value,
     fmPill:chk("fmPill"),
-    fmBar:chk("fmBar")
+    fmBar:chk("fmBar"),
+    // 作品展示轴
+    axBaseH:document.getElementById("axBaseH").value,
+    axFalloff:document.getElementById("axFalloff").value,
+    axOverlap:document.getElementById("axOverlap").value,
+    axStagger:document.getElementById("axStagger").value,
+    axShadow:document.getElementById("axShadow").value,
+    axRadius:document.getElementById("axRadius").value,
+    axAlign:document.getElementById("axAlign").value,
+    axBgType:document.getElementById("axBgType").value,
+    axBg:document.getElementById("axBg").value,
+    axBg2:document.getElementById("axBg2").value,
+    axBgDir:document.getElementById("axBgDir").value
   };
 }
 function applySettings(s){
@@ -5733,7 +7769,7 @@ function applySettings(s){
   fmSet("fmScale",100);fmSet("fmRadius",5);
   fmSet("fmArm",20);fmSet("fmArmW","1.6");
   set("fmArmColor",s.fmArmColor||"#ffffff");
-  fmSet("fmBlur",40);fmSet("fmVeil",24);
+  fmSet("fmBlur",60);fmSet("fmVeil",10);
   chk("fmPill",s.fmPill!==false);
   chk("fmBar",s.fmBar!==false);
   // 同步显示值
@@ -5743,6 +7779,23 @@ function applySettings(s){
   document.getElementById("fmArmWVal").textContent=document.getElementById("fmArmW").value;
   document.getElementById("fmBlurVal").textContent=document.getElementById("fmBlur").value;
   document.getElementById("fmVeilVal").textContent=document.getElementById("fmVeil").value;
+  // 作品展示轴（旧存档没有这些字段时落回默认值）
+  const axSet=(id,d)=>set(id,s[id]!==undefined?s[id]:d);
+  axSet("axBaseH",62);axSet("axFalloff",18);axSet("axOverlap",8);
+  axSet("axStagger",7);axSet("axShadow",45);axSet("axRadius",0);
+  set("axAlign",s.axAlign||"stagger");
+  set("axBgType",s.axBgType||"solid");
+  set("axBg",s.axBg||"#ffffff");
+  set("axBg2",s.axBg2||"#eef2f6");
+  set("axBgDir",s.axBgDir||"h");
+  if(typeof axBgModeChanged==="function")axBgModeChanged();
+  document.getElementById("axBaseHVal").textContent=document.getElementById("axBaseH").value;
+  document.getElementById("axFalloffVal").textContent=document.getElementById("axFalloff").value;
+  document.getElementById("axOverlapVal").textContent=document.getElementById("axOverlap").value;
+  document.getElementById("axStaggerVal").textContent=document.getElementById("axStagger").value;
+  document.getElementById("axShadowVal").textContent=document.getElementById("axShadow").value;
+  document.getElementById("axRadiusVal").textContent=document.getElementById("axRadius").value;
+  if(typeof axSyncCount==="function")axSyncCount();
   document.getElementById("blurVal").textContent=s.bgBlur;
   document.getElementById("scaleVal").textContent=s.artScale;
   document.getElementById("borderVal").textContent=s.artBorder;
@@ -5909,6 +7962,8 @@ function resetAll(){
   document.getElementById("avatarUpload").value="";
   document.getElementById("wmUpload").value="";
   document.getElementById("pfAvatarUpload").value="";
+  document.getElementById("axUpload").value="";
+  if(typeof axSyncCount==="function")axSyncCount();
   requestDraw();
 }
 
@@ -5939,7 +7994,7 @@ function renumberSections(){
 
 // ============ 模板选择首页 / 工作区 ============
 let currentTemplate="normal";
-const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscript:"字稿风预览",polaroid:"拍立得预览",profile:"个人主页",frame:"相框风预览"};
+const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscript:"字稿风预览",polaroid:"拍立得预览",profile:"个人主页",frame:"相框风预览",axis:"作品展示轴",collage:"自由拼图",magazine:"杂志手账"};
 // 每个模板的工作区图片互相独立：切走时存档当前模板的图片，切回时恢复，首次进入未存档则为空
 const tplImages={};
 function selectTemplate(type){
@@ -5963,6 +8018,10 @@ function selectTemplate(type){
   if(nameEl)nameEl.textContent=TPL_NAMES[type]||"";
   applyTemplatePreset(type);
   refreshPresetUI();
+  if(type==="axis"&&typeof axSyncCount==="function")axSyncCount();
+  if(type==="collage"&&typeof renderCgTplCards==="function")renderCgTplCards();
+  c.classList.toggle("cg-canvas",type==="collage");
+  if(type!=="collage"){cgDrag=null;cgPinch=null;c.style.cursor="";}
   const tool=document.getElementById("tool");
   if(tool)tool.scrollIntoView({behavior:"smooth",block:"start"});
 }
@@ -6023,11 +8082,30 @@ function applyTemplatePreset(type){
     chk("pfStatusBar",true);chk("pfTopIcons",true);chk("pfCard",true);chk("pfAvatar",true);
     chk("pfPlus",true);chk("pfOnline",true);chk("pfVip",false);chk("pfStats",true);
     chk("pfPlay",true);chk("pfSign",true);chk("pfSignIcon",true);chk("pfDate",false);chk("pfBody",true);chk("pfMusic",true);
+  }else if(type==="magazine"){
+    chk("msMode",false);
+    chk("lockScreen",false);
+    // 秋日摄影长图：纵向窄比例，顶 / 中 / 底三段
+    set("size","1080,2520");
   }else if(type==="frame"){
     chk("msMode",false);
     chk("lockScreen",false);
     // 相框风：正方形画布，背景由作品图自身模糊铺满，不动共享背景控件
     set("size","1500,1500");
+    set("featherMode","none");
+    set("bgBlur","0");
+  }else if(type==="axis"){
+    chk("msMode",false);
+    chk("lockScreen",false);
+    // 作品展示轴：长横幅画布，白底由模板自身绘制
+    set("size","3000,1300");
+    set("featherMode","none");
+    set("bgBlur","0");
+  }else if(type==="collage"){
+    chk("msMode",false);
+    chk("lockScreen",false);
+    // 自由拼图：画布比例由拼图面板的 cgRatio 决定
+    set("size",cgRatio.join(","));
     set("featherMode","none");
     set("bgBlur","0");
   }else{
@@ -6284,6 +8362,176 @@ function importFromClipboard(){
   }
 })();
 
+// ============ 拼图画布交互：拖动 / 缩放 / 旋转 ============
+function cgPtDist(a,b){const dx=a.x-b.x,dy=a.y-b.y;return Math.sqrt(dx*dx+dy*dy)}
+function cgFindHit(idx){
+  for(let i=0;i<cgHit.length;i++)if(cgHit[i].i===idx)return cgHit[i];
+  return null;
+}
+// 把画布坐标反旋转到图块局部坐标
+function cgToLocal(p,h){
+  const a=h.rot*Math.PI/180, cos=Math.cos(a), sin=Math.sin(a);
+  const dx=p.x-h.cx, dy=p.y-h.cy;
+  return {x:dx*cos+dy*sin, y:-dx*sin+dy*cos};
+}
+function cgHitTest(p){
+  // 先判断已选中图块的旋转手柄与四角缩放手柄
+  if(cgSelectedIdx>=0){
+    const sel=cgFindHit(cgSelectedIdx);
+    if(sel){
+      const gp=cgHandlePoints(sel,c.width);
+      const tol=Math.max(12,c.width*0.024);
+      if(cgPtDist(p,gp.rt)<=tol*1.2)return {mode:'rotate',idx:cgSelectedIdx};
+      const ks=['tl','tr','bl','br'];
+      for(let k=0;k<4;k++){
+        if(cgPtDist(p,gp[ks[k]])<=tol)return {mode:'scale',idx:cgSelectedIdx};
+      }
+    }
+  }
+  // 再从上层往下判断图体
+  for(let i=cgHit.length-1;i>=0;i--){
+    const h=cgHit[i];
+    const l=cgToLocal(p,h);
+    if(Math.abs(l.x)<=h.hw&&Math.abs(l.y)<=h.hh)return {mode:'move',idx:h.i};
+  }
+  return null;
+}
+function cgBeginDrag(p){
+  const hit=cgHitTest(p);
+  if(!hit){
+    if(cgSelectedIdx!==-1){
+      cgSelectedIdx=-1;renderCgImgList();syncCgItemPanel();requestDraw();
+    }
+    cgDrag=null;
+    return false;
+  }
+  const item=cgImages[hit.idx];
+  if(!item)return false;
+  const h=cgFindHit(hit.idx);
+  if(!h)return false;
+  if(cgSelectedIdx!==hit.idx){
+    cgSelectedIdx=hit.idx;renderCgImgList();syncCgItemPanel();
+  }
+  if(hit.mode==='move'){
+    cgDrag={
+      mode:'move',i:hit.idx,px:p.x,py:p.y,
+      x0:(cgMode==='free'?(item.fx||0):(item.x||0)),
+      y0:(cgMode==='free'?(item.fy||0):(item.y||0)),
+      cw:h.cw||1,ch:h.ch||1
+    };
+  }else if(hit.mode==='scale'){
+    cgDrag={mode:'scale',i:hit.idx,d0:Math.max(1,cgPtDist(p,{x:h.cx,y:h.cy})),s0:item.scale||1};
+  }else{
+    cgDrag={mode:'rotate',i:hit.idx,
+            a0:Math.atan2(p.y-h.cy,p.x-h.cx),r0:item.rotation||0};
+  }
+  return true;
+}
+function cgApplyDrag(p){
+  if(!cgDrag)return;
+  const item=cgImages[cgDrag.i];
+  if(!item)return;
+  const h=cgFindHit(cgDrag.i);
+  if(cgDrag.mode==='move'){
+    if(cgMode==='free'){
+      item.fx=Math.max(-0.2,Math.min(1.2,cgDrag.x0+(p.x-cgDrag.px)/c.width));
+      item.fy=Math.max(-0.2,Math.min(1.2,cgDrag.y0+(p.y-cgDrag.py)/c.height));
+    }else{
+      const cw=cgDrag.cw||1,ch=cgDrag.ch||1;
+      item.x=Math.max(-1,Math.min(1,cgDrag.x0+(p.x-cgDrag.px)/cw));
+      item.y=Math.max(-1,Math.min(1,cgDrag.y0+(p.y-cgDrag.py)/ch));
+    }
+  }else if(cgDrag.mode==='scale'){
+    if(!h)return;
+    const d=Math.max(1,cgPtDist(p,{x:h.cx,y:h.cy}));
+    item.scale=Math.max(0.15,Math.min(4,cgDrag.s0*d/cgDrag.d0));
+  }else if(cgDrag.mode==='rotate'){
+    if(!h)return;
+    const a=Math.atan2(p.y-h.cy,p.x-h.cx);
+    let deg=cgDrag.r0+(a-cgDrag.a0)*180/Math.PI;
+    deg=((deg+180)%360+360)%360-180;
+    item.rotation=Math.round(deg);
+  }
+  syncCgItemPanel();requestDraw();
+}
+function cgEndDrag(){cgDrag=null;cgPinch=null;}
+
+c.addEventListener("mousedown",e=>{
+  if(currentTemplate!=="collage"||pickerActive)return;
+  e.stopImmediatePropagation();
+  const p=canvasPos(e);
+  if(cgBeginDrag(p)){e.preventDefault();c.style.cursor="grabbing";}
+});
+c.addEventListener("mousemove",e=>{
+  if(currentTemplate!=="collage"||pickerActive)return;
+  e.stopImmediatePropagation();
+  const p=canvasPos(e);
+  if(cgDrag){cgApplyDrag(p);return}
+  const hit=cgHitTest(p);
+  c.style.cursor=hit?(hit.mode==='move'?'grab':(hit.mode==='rotate'?'crosshair':'nwse-resize')):'';
+});
+c.addEventListener("mouseup",e=>{
+  if(currentTemplate!=="collage")return;
+  e.stopImmediatePropagation();
+  cgEndDrag();c.style.cursor="";
+});
+c.addEventListener("mouseleave",e=>{
+  if(currentTemplate!=="collage")return;
+  cgEndDrag();c.style.cursor="";
+});
+c.addEventListener("touchstart",e=>{
+  if(currentTemplate!=="collage"||pickerActive)return;
+  e.stopImmediatePropagation();
+  const pts=[];
+  for(let i=0;i<e.touches.length;i++)pts.push(canvasPos(e.touches[i]));
+  if(pts.length>=2){
+    cgDrag=null;
+    let idx=cgSelectedIdx;
+    if(idx<0){
+      const hh=cgHitTest({x:(pts[0].x+pts[1].x)/2,y:(pts[0].y+pts[1].y)/2});
+      if(hh)idx=hh.idx;
+    }
+    const item=cgImages[idx];
+    if(item&&cgFindHit(idx)){
+      cgSelectedIdx=idx;
+      cgPinch={
+        i:idx,
+        d0:Math.max(1,cgPtDist(pts[0],pts[1])),
+        s0:item.scale||1,
+        a0:Math.atan2(pts[1].y-pts[0].y,pts[1].x-pts[0].x),
+        r0:item.rotation||0
+      };
+      renderCgImgList();syncCgItemPanel();
+    }
+    e.preventDefault();return;
+  }
+  if(cgBeginDrag(pts[0]))e.preventDefault();
+},{passive:false});
+c.addEventListener("touchmove",e=>{
+  if(currentTemplate!=="collage"||pickerActive)return;
+  e.stopImmediatePropagation();
+  if(cgPinch&&e.touches.length>=2){
+    const a=canvasPos(e.touches[0]),b=canvasPos(e.touches[1]);
+    const item=cgImages[cgPinch.i];
+    if(item){
+      const d=Math.max(1,cgPtDist(a,b));
+      item.scale=Math.max(0.15,Math.min(4,cgPinch.s0*d/cgPinch.d0));
+      let deg=cgPinch.r0+(Math.atan2(b.y-a.y,b.x-a.x)-cgPinch.a0)*180/Math.PI;
+      deg=((deg+180)%360+360)%360-180;
+      item.rotation=Math.round(deg);
+      syncCgItemPanel();requestDraw();
+    }
+    e.preventDefault();return;
+  }
+  if(cgDrag){cgApplyDrag(canvasPos(e.touches[0]));e.preventDefault();}
+},{passive:false});
+c.addEventListener("touchend",e=>{
+  if(currentTemplate!=="collage")return;
+  e.stopImmediatePropagation();
+  if(e.touches.length<2)cgPinch=null;
+  if(e.touches.length===0)cgDrag=null;
+});
+
 // ============ 画布文字拖拽 ============
 function canvasPos(e){
   const rect=c.getBoundingClientRect();
@@ -6398,24 +8646,30 @@ function enablePicker(){
 function exportPNG(){
   // 等字体就绪再绘制，避免导出时数字还是回退字体
   const go=()=>{
-    const s=document.getElementById("size").value.split(",");
-    const ew=parseInt(s[0]),eh=parseInt(s[1]);
+    // 拼接长图模式下高度由图片内容决定，导出尺寸必须与预览一致
+    const sz=cgEffectiveSize();
+    const ew=sz[0],eh=sz[1];
     ensureExportCanvas(ew,eh);
     const origC=c,origCtx=ctx;
     c=exportCanvas;ctx=exportCtx;
     const origScale=previewScale;
     previewScale=1;
+    cgExporting=true;
     c.width=ew;c.height=eh;
     draw();
+    cgExporting=false;
     previewScale=origScale;
     c=origC;ctx=origCtx;
-    exportCanvas.toBlob(blob=>{
+    exportCanvas.toBlob(function(blob){
+      if(!blob){alert("导出失败，请重试或换用其它浏览器");return;}
       const url=URL.createObjectURL(blob);
       const a=document.createElement("a");
       a.download="preview-studio.png";
       a.href=url;
+      a.style.display="none";
+      document.body.appendChild(a);
       a.click();
-      setTimeout(()=>URL.revokeObjectURL(url),1000);
+      setTimeout(function(){a.remove();URL.revokeObjectURL(url);},10000);
     },"image/png");
   };
   const fams=(document.getElementById("clkFont")?parseFamilies(clkFont(clkFontIdIn(clkMode())).css):[]);
@@ -6428,6 +8682,8 @@ function exportPNG(){
 // 自定义字体：先挂载各下拉的导入项并恢复历史导入的字体（含时钟字体卡），
 // 再跑自动保存恢复，保证保存下来的自定义字体值能对上已存在的 option。
 wireFontSelects();
+// 杂志手账：图片上传/替换/排序控件由脚本生成（按当前张数动态生成，避免面板里重复写死）
+mjBuildSlots();
 restoreCustomFonts();
 buildClockFonts();
 restoreAutosave();
@@ -6455,6 +8711,7 @@ buildPresetGrid();
 refreshPresetUI();
 buildClockFonts();
 syncClockPanel();
+cgRatioChanged();
 requestDraw();
 
 // 字体全部本地内置：只预加载当前各下拉框已选中的字体族，其余在切换时按需加载（移动端更稳）

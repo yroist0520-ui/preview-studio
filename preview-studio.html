@@ -584,6 +584,39 @@ input[type=file]{font-size:11px}
           <p>多张图片任意排列成网格拼图，自由设置行列数、间距、圆角、边框，支持等宽/等高等比铺满，图片清晰不模糊。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('collage')">进入制作 →</button>
         </div>
+        <div class="tpl-card" data-tpl="magazine" onclick="selectTemplate('magazine')">
+          <div class="tpl-thumb">
+            <div class="mock-mag">
+              <svg viewBox="0 0 132 186" width="132" height="186" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="0" y="0" width="132" height="74" fill="url(#mjA)"/>
+                <text x="66" y="36" font-size="7" fill="#f7f2e8" text-anchor="middle" font-family="serif">某某某的款</text>
+                <text x="66" y="47" font-size="6" fill="#efe8dc" text-anchor="middle" font-family="serif">文案</text>
+                <rect x="0" y="74" width="132" height="46" fill="#f7f2ea"/>
+                <rect x="12" y="84" width="49" height="27" fill="url(#mjB)"/>
+                <rect x="71" y="84" width="49" height="27" fill="url(#mjC)"/>
+                <g stroke="#b9b9b9" stroke-width="1.1">
+                  <rect x="61" y="85" width="10" height="4.4" rx="2.2"/>
+                  <rect x="61" y="90" width="10" height="4.4" rx="2.2"/>
+                  <rect x="61" y="95" width="10" height="4.4" rx="2.2"/>
+                  <rect x="61" y="100" width="10" height="4.4" rx="2.2"/>
+                  <rect x="61" y="105" width="10" height="4.4" rx="2.2"/>
+                </g>
+                <rect x="0" y="120" width="132" height="66" fill="url(#mjD)"/>
+                <text x="66" y="152" font-size="8" fill="#fbf7f0" text-anchor="middle" font-family="serif">某某某的款</text>
+                <text x="66" y="164" font-size="5" fill="#efe8dc" text-anchor="middle" font-family="serif">文案</text>
+                <defs>
+                  <linearGradient id="mjA" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4a4536"/><stop offset="55%" stop-color="#8a6a3c"/><stop offset="100%" stop-color="#2b3038"/></linearGradient>
+                  <linearGradient id="mjB" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5d6f57"/><stop offset="100%" stop-color="#2f3a34"/></linearGradient>
+                  <linearGradient id="mjC" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#c9d2d6"/><stop offset="100%" stop-color="#6e7a80"/></linearGradient>
+                  <linearGradient id="mjD" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2a2b2d"/><stop offset="50%" stop-color="#4d4a44"/><stop offset="100%" stop-color="#1c1d1f"/></linearGradient>
+                </defs>
+              </svg>
+            </div>
+          </div>
+          <h3>杂志手账</h3>
+          <p>秋日摄影长图：顶部诗句封面 + 中部米白双页线圈手账 + 底部英文主题页，独立杂志与摄影手账气质。</p>
+          <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('magazine')">进入制作 →</button>
+        </div>
         <div class="tpl-card" data-tpl="dual" onclick="location.href='dual-studio.html'">
           <div class="tpl-thumb">
             <div class="mock-dual">
@@ -632,7 +665,7 @@ input[type=file]{font-size:11px}
         <div class="hint" id="shareHint">生成短链接复制给别人，打开即自动应用；也可手动粘贴导入。</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis magazine">
         <h3 class="tool-h">③ 画布尺寸</h3>
         <select id="size">
           <optgroup label="手机锁屏尺寸">
@@ -681,6 +714,11 @@ input[type=file]{font-size:11px}
           <optgroup label="3:4 竖版">
             <option value="1500,2000">3:4 竖 1500×2000</option>
             <option value="1200,1600">3:4 竖 1200×1600</option>
+          </optgroup>
+          <optgroup label="摄影长图">
+            <option value="1080,2520">杂志手账 1080×2520 (约 3:7)</option>
+            <option value="1440,3360">杂志手账 1440×3360 (高清 3:7)</option>
+            <option value="1080,1920">长图 1080×1920</option>
           </optgroup>
           <optgroup label="横幅展示轴">
             <option value="3000,1300">横幅 3000×1300 (约 2.3:1)</option>
@@ -843,6 +881,117 @@ input[type=file]{font-size:11px}
         </div>
         <button onclick="axExtractColors()" style="margin-top:4px">✦ 从图片提取主色渐变</button>
         <div class="hint">中间一张最大、向两侧递减；按顺序叠压，中心图显示在最上层。</div>
+        </div>
+        <div class="tpl-sec" data-tpl="magazine">
+        <h3 class="tool-h" style="margin-top:14px">杂志手账（Editorial Journal）</h3>
+        <div class="hint">三段式竖版长图：顶部大图 → 中部线圈手账 → 底部大图。只支持 2 张大图；纸张支持取色、渐变与纹理。</div>
+        <div class="po-group">图片（2 张大图）</div>
+        <div id="mjSlots"></div>
+        <div class="hint" id="mjMsg" style="display:none"></div>
+        <div class="po-group">版式</div>
+        <label>顶部封面高度: <span id="mjTopVal">38</span>%</label>
+        <input type="range" id="mjTop" min="25" max="55" value="38" oninput="document.getElementById('mjTopVal').textContent=this.value;requestDraw()">
+        <label>中部手账高度: <span id="mjMidVal">25</span>%</label>
+        <input type="range" id="mjMid" min="12" max="40" value="25" oninput="document.getElementById('mjMidVal').textContent=this.value;requestDraw()">
+        <label>图片比例</label>
+        <select id="mjRatio" onchange="requestDraw()">
+          <option value="auto" selected>自动识别</option>
+          <option value="wall">壁纸 9:16</option>
+          <option value="sq">方图 1:1</option>
+        </select>
+        <div class="hint">顶部大图 → 中部手账 → 底部大图；切换比例实时预览，已上传的图片与文字保持不变。最多 2 张大图（第 1 张在上，第 2 张在下），手账为固定双页。</div>
+        <div class="po-group">中部纸张（取色 / 渐变 / 纹理）</div>
+        <label>纸张样式</label>
+        <select id="mjPaperType" onchange="mjPaperTypeChanged()">
+          <option value="solid" selected>纯色</option>
+          <option value="gradient">渐变</option>
+        </select>
+        <label>纸张颜色</label>
+        <input type="color" id="mjPaper" value="#f7f2ea" onchange="requestDraw()">
+        <div id="mjPaper2Row" style="display:none">
+          <label>渐变第二色</label>
+          <input type="color" id="mjPaper2" value="#eee3d2" onchange="requestDraw()">
+          <label>渐变方向</label>
+          <select id="mjPaperDir" onchange="requestDraw()">
+            <option value="v" selected>上 → 下</option>
+            <option value="h">左 → 右</option>
+          </select>
+        </div>
+        <button onclick="mjPickPaper()">✦ 从图片吸取纸张颜色（自动开渐变）</button>
+        <label>纸张纹理</label>
+        <select id="mjTexSource" onchange="mjTexSourceChanged()">
+          <option value="none" selected>无纹理</option>
+          <option value="preset">内置预设素材</option>
+          <option value="upload">上传自定义纹理</option>
+        </select>
+        <div id="mjTexPresetRow" style="display:none">
+          <label>预设纹理</label>
+          <select id="mjTexPreset" onchange="mjTexPresetChanged()">
+            <option value="kraft" selected>牛皮纸（暖棕）</option>
+            <option value="xuan">米色宣纸</option>
+            <option value="card">白色卡纸</option>
+            <option value="vintage">复古纸（斑点）</option>
+          </select>
+        </div>
+        <div id="mjTexUploadRow" style="display:none">
+          <input type="file" id="mjTexUpload" accept="image/*" onchange="mjTexUpload(this)">
+        </div>
+        <label>纹理透明度: <span id="mjTexOpVal">35</span>%</label>
+        <input type="range" id="mjTexOpacity" min="0" max="100" value="35" oninput="document.getElementById('mjTexOpVal').textContent=this.value;requestDraw()">
+        <div class="hint">纹理只铺在中部纸张区域，不会盖住上下照片。</div>
+        <div class="po-group">文字</div>
+        <label>顶部文案（回车换行，每行一句）</label>
+        <textarea id="mjPoem" rows="4" oninput="requestDraw()">Style 1 picture
+苹果的第一万六千个故事
+The 16,000th story of Apple</textarea>
+        <label>底部标题</label>
+        <input type="text" id="mjTitle" oninput="requestDraw()" value="Style 2 picture">
+        <label>底部副标题（回车换行）</label>
+        <textarea id="mjSub" rows="2" oninput="requestDraw()">爱生活这件事 永远来得及
+It's always not too late to love life</textarea>
+        <button onclick="mjResetText()" style="margin-top:4px">↺ 恢复默认文案</button>
+        <div class="po-group">文字样式</div>
+        <label>中文字体（顶部诗句）</label>
+        <select id="mjFontCn" onchange="fontChanged(this)">
+          <option value="'Songti SC','STSong','SimSun',serif" selected>宋体（系统默认）</option>
+          <option value="'PingFang SC','Noto Serif SC',serif">苹方 / 思源宋</option>
+          <option value="'Noto Serif SC',serif">思源宋体</option>
+          <option value="'ZCOOL XiaoWei',serif">站酷小薇（宋体）</option>
+          <option value="'KaiTi','Kaiti SC','STKaiti',serif">楷体</option>
+          <option value="'Ma Shan Zheng',cursive">马善政毛笔楷书</option>
+          <optgroup label="英文 · 衬线">
+          <option value="'Playfair Display',serif">Playfair Display 衬线</option>
+          <option value="'Cormorant Garamond',serif">Cormorant Garamond 衬线</option>
+          </optgroup>
+        </select>
+        <label>英文字体（底部标题 / 副标题）</label>
+        <select id="mjFontEn" onchange="fontChanged(this)">
+          <option value="'Times New Roman','Georgia','Songti SC',serif" selected>Times New Roman 衬线（默认）</option>
+          <option value="'Playfair Display',serif">Playfair Display 衬线</option>
+          <option value="'Cormorant Garamond',serif">Cormorant Garamond 衬线</option>
+          <option value="'EB Garamond',serif">EB Garamond 衬线</option>
+          <option value="'Lora',serif">Lora 衬线</option>
+          <option value="'Songti SC','STSong',serif">宋体</option>
+        </select>
+        <label>诗句字号: <span id="mjSizeCnVal">4.8</span>%</label>
+        <input type="range" id="mjSizeCn" min="2" max="9" step="0.1" value="4.8" oninput="document.getElementById('mjSizeCnVal').textContent=this.value;requestDraw()">
+        <label>标题字号: <span id="mjSizeTitleVal">6.2</span>%</label>
+        <input type="range" id="mjSizeTitle" min="3" max="12" step="0.1" value="6.2" oninput="document.getElementById('mjSizeTitleVal').textContent=this.value;requestDraw()">
+        <label>副标题字号: <span id="mjSizeSubVal">2.5</span>%</label>
+        <input type="range" id="mjSizeSub" min="1" max="5" step="0.1" value="2.5" oninput="document.getElementById('mjSizeSubVal').textContent=this.value;requestDraw()">
+        <label>文字颜色</label>
+        <input type="color" id="mjColor" value="#fbf7f0" onchange="requestDraw()">
+        <label>顶部文字位置: <span id="mjYTopVal">52</span>%</label>
+        <input type="range" id="mjYTop" min="15" max="85" value="52" oninput="document.getElementById('mjYTopVal').textContent=this.value;requestDraw()">
+        <label>底部文字位置: <span id="mjYBotVal">47</span>%</label>
+        <input type="range" id="mjYBot" min="15" max="85" value="47" oninput="document.getElementById('mjYBotVal').textContent=this.value;requestDraw()">
+        <label>文字对齐</label>
+        <select id="mjAlign" onchange="requestDraw()">
+          <option value="left">左对齐</option>
+          <option value="center" selected>居中</option>
+          <option value="right">右对齐</option>
+        </select>
+        <div class="hint">字号按画布宽度百分比计算，画布变大时文字等比放大。</div>
         </div>
         <div class="tpl-sec" data-tpl="collage">
         <h3 class="tool-h" style="margin-top:14px">⑧ 自由拼图（Collage）</h3>
@@ -5005,6 +5154,412 @@ function drawProfile(){
   wmClip={ox:0,oy:0,rot:0,x:0,y:0,w:W,h:H,r:0};
 }
 
+// ============ 杂志手账模板（Editorial Journal） ============
+// 三段式纵向长图：顶部诗句封面 → 中部米白双页线圈手账 → 底部英文主题页
+const MJ_DEF={
+  poem:"Style 1 picture\n苹果的第一万六千个故事\nThe 16,000th story of Apple",
+  title:"Style 2 picture",
+  sub:"爱生活这件事 永远来得及\nIt's always not too late to love life"
+};
+// 图片列表：不进 layers，与其它模板完全隔离；张数决定排版（见 mjPlan）
+const MJ_MAX=2;                                     // 只支持 2 张大图（第 1 张在顶部，第 2 张在底部）
+const mjImgs=[];                                // 大图列表（固定最多 2 张，第 1 张顶部、第 2 张底部）
+const mjOff=[];                                 // 与 mjImgs 平行的取景中心百分比，[50,50] = 居中裁切
+// 中部纸张纹理（独立于普通模板的全局纹理，互不干扰）
+let mjPresetTex=null,mjPresetTexType="",mjTexImg=null;
+const MJ_FALLBACK=[
+  ["#5f5440","#2b3138"],   // 顶：秋叶褐 → 灰蓝
+  ["#6a7a66","#32403a"],   // 手账左页：水面绿
+  ["#c9d2d6","#6e7a80"],   // 手账右页：雨天灰
+  ["#24252a","#4a4640"]    // 底：暗水
+];
+const MJ_PAGE3_FB=["#e4d7bd","#b79b6a"];       // 手账三页并排时的第三页兜底色（暖沙）
+
+function mjN(id,def){const el=document.getElementById(id);if(!el)return def;const v=parseFloat(el.value);return isNaN(v)?def:v;}
+function mjV(id,def){const el=document.getElementById(id);if(!el)return def;return el.value;}
+
+// 面板内提示（不弹窗、不阻塞交互）
+function mjMsg(t){
+  const el=document.getElementById("mjMsg");
+  if(!el)return;
+  el.textContent=t||"";
+  el.style.display=t?"":"none";
+}
+// 多选导入：全部解码完成后按文件顺序一次性追加，保证顺序稳定；总数封顶 MJ_MAX 张
+function mjUploadMulti(input){
+  const all=Array.prototype.slice.call(input.files||[]);
+  if(!all.length)return;
+  const room=Math.max(0,MJ_MAX-mjImgs.length);
+  const files=all.slice(0,room);
+  const dropped=all.length-files.length;
+  if(!files.length){
+    input.value="";
+    mjMsg("最多 "+MJ_MAX+" 张图片，已达上限；可先删除再导入。");
+    return;
+  }
+  const out=new Array(files.length);
+  let settled=0;
+  const settle=function(){
+    settled++;
+    if(settled<files.length)return;
+    let added=false;
+    for(let k=0;k<out.length;k++){
+      if(out[k]){mjImgs.push(out[k]);mjOff.push([50,50]);added=true;}
+    }
+    input.value="";
+    if(!added)return;
+    mjBuildSlots();
+    if(dropped>0)mjMsg("最多 "+MJ_MAX+" 张，已自动忽略多出的 "+dropped+" 张。");
+    requestDraw();
+  };
+  files.forEach(function(f,k){
+    const img=new Image();
+    img.onload=function(){out[k]=img;settle();};
+    img.onerror=settle;
+    img.src=URL.createObjectURL(f);
+  });
+}
+function mjRemove(i){
+  if(i<0||i>=mjImgs.length)return;
+  mjImgs.splice(i,1);
+  mjOff.splice(i,1);
+  mjMsg("");
+  mjBuildSlots();
+  requestDraw();
+}
+// 替换第 i 张图（取景恢复居中，其余图片与文字不受影响）
+function mjReplace(i,input){
+  const f=input.files&&input.files[0];
+  if(!f||i<0||i>=mjImgs.length){input.value="";return;}
+  const img=new Image();
+  img.onload=function(){
+    mjImgs[i]=img;
+    mjOff[i]=[50,50];
+    mjBuildSlots();
+    requestDraw();
+  };
+  img.onerror=function(){mjMsg("图片加载失败，请换一张试试");};
+  img.src=URL.createObjectURL(f);
+  input.value="";
+}
+// 布局方向切换能力已按需求移除：杂志手账仅保留上下布局
+function mjSetOff(i,axis,v){
+  mjOff[i][axis==="x"?0:1]=parseFloat(v);
+  const lab=document.getElementById("mjOff"+i+axis.toUpperCase()+"Val");
+  if(lab)lab.textContent=v;
+  requestDraw();
+}
+function mjResetSlot(i){
+  mjOff[i][0]=50;mjOff[i][1]=50;
+  ["X","Y"].forEach(function(a){
+    const s=document.getElementById("mjOff"+i+a);if(s)s.value=50;
+    const l=document.getElementById("mjOff"+i+a+"Val");if(l)l.textContent="50";
+  });
+  requestDraw();
+}
+function mjResetText(){
+  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  set("mjPoem",MJ_DEF.poem);
+  set("mjTitle",MJ_DEF.title);
+  set("mjSub",MJ_DEF.sub);
+  requestDraw();
+}
+// 图片控件由脚本生成：顶部是多选导入框，下方按当前张数列出每张图的
+// 角色标签 + 替换/删除 + 取景控件
+function mjBuildSlots(){
+  const box=document.getElementById("mjSlots");
+  if(!box)return;
+  const plan=mjPlan();
+  const roleOf=function(i){
+    if(i===plan.A)return "大图 · 顶部";
+    if(plan.B!=null&&i===plan.B)return "大图 · 底部";
+    return "大图";
+  };
+  let h='<input type="file" id="mjUpMulti" accept="image/*" multiple onchange="mjUploadMulti(this)" style="width:100%">';
+  h+='<div class="hint">只支持最多 '+MJ_MAX+' 张大图：第 1 张放顶部，第 2 张放底部，手账页面为固定双页。可多次追加导入、替换或删除。</div>';
+  for(let i=0;i<mjImgs.length;i++){
+    h+='<div class="po-group" style="margin-top:'+(i?12:0)+'px">图片'+(i+1)+" · "+roleOf(i)+"</div>";
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
+    h+='<input type="file" accept="image/*" id="mjRep'+i+'" onchange="mjReplace('+i+',this)" style="display:none">';
+    h+='<button onclick="document.getElementById(\'mjRep'+i+'\').click()">⇄ 替换</button>';
+    h+='<button class="warn small" onclick="mjRemove('+i+')">× 删除</button>';
+    h+='</div>';
+    h+='<label>水平取景: <span id="mjOff'+i+'XVal">'+mjOff[i][0]+'</span>%</label>';
+    h+='<input type="range" id="mjOff'+i+'X" min="0" max="100" value="'+mjOff[i][0]+'" oninput="mjSetOff('+i+',\'x\',this.value)">';
+    h+='<label>垂直取景: <span id="mjOff'+i+'YVal">'+mjOff[i][1]+'</span>%</label>';
+    h+='<input type="range" id="mjOff'+i+'Y" min="0" max="100" value="'+mjOff[i][1]+'" oninput="mjSetOff('+i+',\'y\',this.value)">';
+    h+='<button onclick="mjResetSlot('+i+')">恢复默认位置</button>';
+  }
+  box.innerHTML=h;
+}
+
+// 图片比例：壁纸 9:16 / 方图 1:1 / 自动（原图竖长 ≥1.5 视为壁纸，否则方图）
+function mjAR(img){
+  const mode=mjV("mjRatio","auto");
+  if(mode==="wall")return 9/16;
+  if(mode==="sq")return 1;
+  if(!img||!img.width||!img.height)return 1;
+  return (img.height/img.width)>=1.5?9/16:1;
+}
+// cover 裁切：先按目标比例取景（不拉伸变形、不溢出区域），再以 cover 方式铺满整个区域——
+// 照片均匀满铺、无压暗底、无图版边框（与参考效果一致）。
+// 大图与手账页面共用本函数，比例切换在两处同步生效。
+function mjCover(g,img,x,y,w,h,ox,oy,fb){
+  if(!(img&&img.width&&img.height)){
+    const gr=g.createLinearGradient(x,y,x+w,y+h);
+    gr.addColorStop(0,fb[0]);gr.addColorStop(1,fb[1]);
+    g.fillStyle=gr;g.fillRect(x,y,w,h);
+    return;
+  }
+  const t=mjAR(img);
+  // 取景裁切到目标比例（以 ox/oy 为取景中心）
+  let cw=img.width,ch=cw/t;
+  if(ch>img.height){ch=img.height;cw=ch*t;}
+  const sx=(img.width-cw)*ox,sy=(img.height-ch)*oy;
+  // cover 铺满：可能超出区域，必须裁剪到区域内，保证不溢出、不变形
+  const s=Math.max(w/cw,h/ch);
+  g.save();
+  g.beginPath();
+  g.rect(x,y,w,h);
+  g.clip();
+  g.drawImage(img,sx,sy,cw,ch,x+(w-cw*s)*ox,y+(h-ch*s)*oy,cw*s,ch*s);
+  g.restore();
+}
+function mjLines(s){return String(s==null?"":s).split("\n");}
+// 多行文字：行距随字号，整组以 y 为中心，阴影保证在照片上清晰
+function mjText(g,lines,x,y,size,font,color,align,lh,shadow){
+  g.save();
+  g.font=size+"px "+font;
+  g.textAlign=align;
+  g.textBaseline="middle";
+  g.fillStyle=color;
+  if(shadow){
+    g.shadowColor="rgba(0,0,0,.6)";
+    g.shadowBlur=Math.max(2,size*0.42);
+    g.shadowOffsetY=size*0.09;
+  }
+  for(let i=0;i<lines.length;i++){
+    g.fillText(lines[i],x,y+(i-(lines.length-1)/2)*lh);
+  }
+  g.restore();
+}
+// 中部双页之间的金属线圈装订（横跨缝隙、竖向等距排列）
+function mjCoil(g,cx,y0,y1,W){
+  const ringW=W*0.054,ringH=W*0.021;
+  const step=ringH*1.62;
+  const lw=Math.max(1,W*0.0044);
+  const n=Math.max(1,Math.floor((y1-y0)/step));
+  const start=y0+(y1-y0-n*step)/2+step/2;
+  for(let k=0;k<n;k++){
+    const cy=start+k*step;
+    g.save();
+    // 环的落影
+    g.lineWidth=lw;
+    g.strokeStyle="rgba(30,26,20,.32)";
+    g.beginPath();g.ellipse(cx+lw*0.35,cy+lw*0.55,ringW/2,ringH/2,0,0,Math.PI*2);g.stroke();
+    // 金属环本体：线性渐变模拟圆柱反光
+    const mg=g.createLinearGradient(cx-ringW/2,0,cx+ringW/2,0);
+    mg.addColorStop(0,"#7a7a7a");mg.addColorStop(.28,"#e6e6e6");
+    mg.addColorStop(.55,"#9a9a9a");mg.addColorStop(.82,"#dcdcdc");mg.addColorStop(1,"#7f7f7f");
+    g.strokeStyle=mg;
+    g.beginPath();g.ellipse(cx,cy,ringW/2,ringH/2,0,0,Math.PI*2);g.stroke();
+    // 上缘高光
+    g.lineWidth=Math.max(.6,lw*0.32);
+    g.strokeStyle="rgba(255,255,255,.9)";
+    g.beginPath();g.ellipse(cx,cy,ringW/2-lw*0.2,ringH/2-lw*0.2,0,Math.PI*1.06,Math.PI*1.74);g.stroke();
+    g.restore();
+  }
+}
+
+// 布局计划：只支持 2 张大图（第 1 张顶部、第 2 张底部），手账固定原双页效果（兜底色空页面，图片不进手账页面）
+function mjPlan(){
+  const n=mjImgs.length;
+  const plan={n:n,A:null,B:null,pages:2,rows:1,pageImgs:[null,null]};
+  if(n>=1)plan.A=0;
+  if(n>=2)plan.B=1;
+  // 手账固定双页空页面（图片只做顶部/底部大图，不进手账页面）
+  plan.pages=2;
+  plan.rows=1;
+  plan.pageImgs=[null,null];
+  return plan;
+}
+function mjPaperTypeChanged(){
+  const row=document.getElementById("mjPaper2Row");
+  if(row)row.style.display=mjV("mjPaperType","solid")==="gradient"?"":"none";
+  requestDraw();
+}
+// 从已上传的图吸取主色/副色，提亮成纸张色并自动切到渐变
+function mjPickPaper(){
+  const imgs=mjImgs.filter(function(im){return im&&im.width;});
+  if(!imgs.length){alert("请先上传任意一张图片，再吸取颜色");return;}
+  const sw=60,sh=60;
+  const off=document.createElement("canvas");off.width=sw;off.height=sh;
+  const o=off.getContext("2d");
+  const buckets={};
+  imgs.forEach(function(im){
+    try{
+      o.clearRect(0,0,sw,sh);
+      o.drawImage(im,0,0,sw,sh);
+      const d=o.getImageData(0,0,sw,sh).data;
+      for(let i=0;i<d.length;i+=4){
+        if(d[i+3]<128)continue;
+        const r=Math.floor(d[i]/16)*16,g2=Math.floor(d[i+1]/16)*16,b=Math.floor(d[i+2]/16)*16;
+        const k=r+"_"+g2+"_"+b;
+        if(!buckets[k])buckets[k]={count:0,r:r,g:g2,b:b};
+        buckets[k].count++;
+      }
+    }catch(e){}
+  });
+  const arr=Object.values(buckets).sort(function(a,b){return b.count-a.count;});
+  if(!arr.length){alert("取色失败");return;}
+  const isVivid=function(x){const mx=Math.max(x.r,x.g,x.b),mn=Math.min(x.r,x.g,x.b);return (mx-mn)>20&&mx<245&&mn>15;};
+  const vivid=arr.filter(isVivid);
+  const main=vivid[0]||arr[0];
+  const sub=vivid[1]||arr[1]||arr[0];
+  const toHex=function(v){return ("0"+Math.max(0,Math.min(255,Math.round(v))).toString(16)).slice(-2);};
+  const hex=function(x){return "#"+toHex(x.r)+toHex(x.g)+toHex(x.b);};
+  const lift=function(x,d){return {r:Math.min(255,x.r+d),g:Math.min(255,x.g+d),b:Math.min(255,x.b+d)};};
+  const p1=document.getElementById("mjPaper"),p2=document.getElementById("mjPaper2"),pt=document.getElementById("mjPaperType");
+  if(p1)p1.value=hex(lift(main,80));
+  if(p2)p2.value=hex(lift(sub,45));
+  if(pt)pt.value="gradient";
+  mjPaperTypeChanged();
+}
+function mjTexSourceChanged(){
+  const s=mjV("mjTexSource","none");
+  const pr=document.getElementById("mjTexPresetRow"),ur=document.getElementById("mjTexUploadRow");
+  if(pr)pr.style.display=s==="preset"?"":"none";
+  if(ur)ur.style.display=s==="upload"?"":"none";
+  if(s==="preset")mjTexPresetChanged();
+  else requestDraw();
+}
+function mjTexPresetChanged(){
+  const t=mjV("mjTexPreset","kraft");
+  if(!mjPresetTex||mjPresetTexType!==t){
+    mjPresetTex=generatePaperTexture(t);
+    mjPresetTexType=t;
+  }
+  requestDraw();
+}
+function mjTexUpload(input){
+  const f=input.files&&input.files[0];
+  if(!f)return;
+  const img=new Image();
+  img.onload=function(){mjTexImg=img;requestDraw();};
+  img.src=URL.createObjectURL(f);
+  input.value="";
+}
+
+function drawMagazine(){
+  const W=c.width,H=c.height,g=ctx;
+  const pl=mjPlan();
+  const topP=Math.max(25,Math.min(55,mjN("mjTop",38)));
+  const midP=Math.max(12,Math.min(40,mjN("mjMid",25)));
+  const hA=Math.round(H*topP/100);
+  const hB=Math.round(H*midP/100);
+  const hC=H-hA-hB;
+  const paper=mjV("mjPaper","#f7f2ea");
+  const oxi=function(i,a){return (i==null||!mjOff[i])?0.5:mjOff[i][a]/100;};
+  const color=mjV("mjColor","#fbf7f0");
+  const align=mjV("mjAlign","center");
+  const fontCn=mjV("mjFontCn","'Songti SC','STSong','SimSun',serif");
+  const fontEn=mjV("mjFontEn","'Times New Roman','Georgia','Songti SC',serif");
+  const ax=align==="left"?W*0.085:(align==="right"?W*0.915:W/2);
+
+  // ---------- 顶部区域：顶部大图通栏 ----------
+  mjCover(g,pl.A==null?null:mjImgs[pl.A],0,0,W,hA,oxi(pl.A,0),oxi(pl.A,1),MJ_FALLBACK[0]);
+  const va=g.createLinearGradient(0,0,0,hA);
+  va.addColorStop(0,"rgba(0,0,0,.30)");
+  va.addColorStop(.45,"rgba(0,0,0,.14)");
+  va.addColorStop(1,"rgba(0,0,0,.30)");
+  g.fillStyle=va;g.fillRect(0,0,W,hA);
+
+  // ---------- 区域 B：纸张（纯色/渐变 + 纹理）+ 多页照片 + 线圈 ----------
+  if(mjV("mjPaperType","solid")==="gradient"){
+    const p2=mjV("mjPaper2","#eee3d2");
+    const gr=mjV("mjPaperDir","v")==="h"?g.createLinearGradient(0,0,W,0):g.createLinearGradient(0,hA,0,hA+hB);
+    gr.addColorStop(0,paper);gr.addColorStop(1,p2);
+    g.fillStyle=gr;
+  }else{
+    g.fillStyle=paper;
+  }
+  g.fillRect(0,hA,W,hB);
+  // 纹理只铺在纸张区域，不覆盖上下照片
+  const texSrc=mjV("mjTexSource","none");
+  const tex=texSrc==="preset"?mjPresetTex:(texSrc==="upload"?mjTexImg:null);
+  const texOp=Math.max(0,Math.min(100,mjN("mjTexOpacity",35)))/100;
+  if(tex&&tex.width&&tex.height&&texOp>0){
+    g.save();
+    g.beginPath();g.rect(0,hA,W,hB);g.clip();
+    g.globalAlpha=texOp;
+    const r=Math.max(W/tex.width,hB/tex.height);
+    const tw=tex.width*r,th=tex.height*r;
+    g.drawImage(tex,(W-tw)/2,hA+(hB-th)/2,tw,th);
+    g.restore();
+  }
+  // 页面边距：占整幅宽度的 8.5%
+  const padF=0.085;
+  const padX=W*padF,padY=hB*0.115;
+  const gap=Math.max(1,W*0.004);
+  const rows=pl.rows,cells=pl.pages;
+  const rowGap=Math.max(2,W*0.012);
+  const ph=(hB-padY*2-rowGap*(rows-1))/rows;
+  const py=hA+padY;
+  const base=Math.floor(cells/rows),extra=cells%rows;
+  const pfb=[MJ_FALLBACK[1],MJ_FALLBACK[2],MJ_PAGE3_FB];
+  // 每行页数均衡（差 ≤1），行宽始终铺满手账宽度 → 页面数变化时手账整体宽度不变
+  const rowCols=[],rowY=[];
+  let accY=py;
+  for(let r=0;r<rows;r++){
+    rowCols.push(base+(r<extra?1:0));
+    rowY.push(accY);
+    accY+=ph+rowGap;
+  }
+  g.save();
+  g.shadowColor="rgba(72,62,46,.30)";
+  g.shadowBlur=W*0.020;
+  g.shadowOffsetY=W*0.005;
+  let k=0;
+  for(let r=0;r<rows;r++){
+    const cols=rowCols[r];
+    const pw=(W*(1-padF*2)-gap*(cols-1))/cols;
+    for(let c=0;c<cols;c++){
+      const idx=pl.pageImgs[k]==null?null:pl.pageImgs[k];
+      mjCover(g,idx==null?null:mjImgs[idx],padX+c*(pw+gap),rowY[r],pw,ph,oxi(idx,0),oxi(idx,1),pfb[k%3]);
+      k++;
+    }
+  }
+  g.restore();
+  // 每行内相邻两页之间一组金属线圈（双页时正好落在中缝）
+  for(let r=0;r<rows;r++){
+    const cols=rowCols[r];
+    const pw=(W*(1-padF*2)-gap*(cols-1))/cols;
+    for(let c=1;c<cols;c++){
+      mjCoil(g,padX+c*(pw+gap)-gap/2,rowY[r],rowY[r]+ph,W);
+    }
+  }
+
+  // ---------- 底部区域：底部大图通栏 ----------
+  mjCover(g,pl.B==null?null:mjImgs[pl.B],0,hA+hB,W,hC,oxi(pl.B,0),oxi(pl.B,1),MJ_FALLBACK[3]);
+  const vc=g.createLinearGradient(0,hA+hB,0,H);
+  vc.addColorStop(0,"rgba(0,0,0,.16)");
+  vc.addColorStop(.5,"rgba(0,0,0,.34)");
+  vc.addColorStop(1,"rgba(0,0,0,.46)");
+  g.fillStyle=vc;g.fillRect(0,hA+hB,W,hC);
+
+  // ---------- 文字：诗句在顶部图，标题 + 副标题在底部图 ----------
+  const sizeCn=W*mjN("mjSizeCn",4.8)/100;
+  const lhCn=sizeCn*1.95;
+  const topY=hA*mjN("mjYTop",52)/100;
+  mjText(g,mjLines(mjV("mjPoem",MJ_DEF.poem)),ax,topY,sizeCn,fontCn,color,align,lhCn,true);
+
+  const sizeT=W*mjN("mjSizeTitle",6.2)/100;
+  const sizeS=W*mjN("mjSizeSub",2.5)/100;
+  const baseY=hA+hB+hC*mjN("mjYBot",47)/100;
+  mjText(g,mjLines(mjV("mjTitle",MJ_DEF.title)),ax,baseY,sizeT,fontEn,color,align,sizeT*1.3,true);
+  mjText(g,mjLines(mjV("mjSub",MJ_DEF.sub)),ax,baseY+sizeT*0.72+sizeS*1.1,sizeS,fontEn,color,align,sizeS*1.85,true);
+}
+
 // ============ 主渲染 ============
 function draw(){
   ctx.clearRect(0,0,c.width,c.height);
@@ -5028,6 +5583,12 @@ function draw(){
   if(typeof currentTemplate!=="undefined"&&currentTemplate==="axis"){
     drawAxis();
     drawWatermark();
+    scheduleAutosave();
+    return;
+  }
+  // 杂志手账模板：独立渲染管线
+  if(typeof currentTemplate!=="undefined"&&currentTemplate==="magazine"){
+    drawMagazine();
     scheduleAutosave();
     return;
   }
@@ -7433,7 +7994,7 @@ function renumberSections(){
 
 // ============ 模板选择首页 / 工作区 ============
 let currentTemplate="normal";
-const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscript:"字稿风预览",polaroid:"拍立得预览",profile:"个人主页",frame:"相框风预览",axis:"作品展示轴",collage:"自由拼图"};
+const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscript:"字稿风预览",polaroid:"拍立得预览",profile:"个人主页",frame:"相框风预览",axis:"作品展示轴",collage:"自由拼图",magazine:"杂志手账"};
 // 每个模板的工作区图片互相独立：切走时存档当前模板的图片，切回时恢复，首次进入未存档则为空
 const tplImages={};
 function selectTemplate(type){
@@ -7521,6 +8082,11 @@ function applyTemplatePreset(type){
     chk("pfStatusBar",true);chk("pfTopIcons",true);chk("pfCard",true);chk("pfAvatar",true);
     chk("pfPlus",true);chk("pfOnline",true);chk("pfVip",false);chk("pfStats",true);
     chk("pfPlay",true);chk("pfSign",true);chk("pfSignIcon",true);chk("pfDate",false);chk("pfBody",true);chk("pfMusic",true);
+  }else if(type==="magazine"){
+    chk("msMode",false);
+    chk("lockScreen",false);
+    // 秋日摄影长图：纵向窄比例，顶 / 中 / 底三段
+    set("size","1080,2520");
   }else if(type==="frame"){
     chk("msMode",false);
     chk("lockScreen",false);
@@ -8116,6 +8682,8 @@ function exportPNG(){
 // 自定义字体：先挂载各下拉的导入项并恢复历史导入的字体（含时钟字体卡），
 // 再跑自动保存恢复，保证保存下来的自定义字体值能对上已存在的 option。
 wireFontSelects();
+// 杂志手账：图片上传/替换/排序控件由脚本生成（按当前张数动态生成，避免面板里重复写死）
+mjBuildSlots();
 restoreCustomFonts();
 buildClockFonts();
 restoreAutosave();
