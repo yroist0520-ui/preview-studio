@@ -9,7 +9,7 @@
      比对下面的版本号，不一致就弹「有新版本」提示（点一下带参数跳转，必定回源）。
      每次发版请把 PS_BUILD 改成新的 git 短 hash（git rev-parse --short HEAD）。 ===== -->
 <script>
-window.PS_BUILD="fd4f8f1";
+window.PS_BUILD="f8465f5";
 (function(){
   var TIP_ID="psVerTip",TIP_KEY="psVerTipShown";
   function showTip(v){
@@ -716,8 +716,9 @@ input[type=file]{font-size:11px}
             <option value="1200,1600">3:4 竖 1200×1600</option>
           </optgroup>
           <optgroup label="摄影长图">
+            <option value="3000,5400">杂志手账 3000×5400 (超清 默认)</option>
+            <option value="1440,3360">杂志手账 1440×3360 (3:7)</option>
             <option value="1080,2520">杂志手账 1080×2520 (约 3:7)</option>
-            <option value="1440,3360">杂志手账 1440×3360 (高清 3:7)</option>
             <option value="1080,1920">长图 1080×1920</option>
           </optgroup>
           <optgroup label="横幅展示轴">
@@ -8262,8 +8263,8 @@ function applyTemplatePreset(type){
   }else if(type==="magazine"){
     chk("msMode",false);
     chk("lockScreen",false);
-    // 秋日摄影长图：纵向窄比例，顶 / 中 / 底三段
-    set("size","1080,2520");
+    // 超清三段式长图：宽 3000 保证导出清晰；总像素 16.2M，控制在 Safari 画布上限 16.777M 内
+    set("size","3000,5400");
   }else if(type==="frame"){
     chk("msMode",false);
     chk("lockScreen",false);
