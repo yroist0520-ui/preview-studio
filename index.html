@@ -9,7 +9,7 @@
      比对下面的版本号，不一致就弹「有新版本」提示（点一下带参数跳转，必定回源）。
      每次发版请把 PS_BUILD 改成新的 git 短 hash（git rev-parse --short HEAD）。 ===== -->
 <script>
-window.PS_BUILD="bcd5664";
+window.PS_BUILD="fd4f8f1";
 (function(){
   var TIP_ID="psVerTip",TIP_KEY="psVerTipShown";
   function showTip(v){
@@ -939,19 +939,18 @@ input[type=file]{font-size:11px}
         <label>纹理透明度: <span id="mjTexOpVal">35</span>%</label>
         <input type="range" id="mjTexOpacity" min="0" max="100" value="35" oninput="document.getElementById('mjTexOpVal').textContent=this.value;requestDraw()">
         <div class="hint">纹理只铺在中部纸张区域，不会盖住上下照片。</div>
-        <div class="po-group">文字</div>
-        <label>顶部文案（回车换行，每行一句）</label>
+        <div class="po-group">文字（顶部 / 底部同级，无主副之分）</div>
+        <label>顶部文字（回车换行，每行一句）</label>
         <textarea id="mjPoem" rows="4" oninput="requestDraw()">Style 1 picture
 苹果的第一万六千个故事
 The 16,000th story of Apple</textarea>
-        <label>底部标题</label>
-        <input type="text" id="mjTitle" oninput="requestDraw()" value="Style 2 picture">
-        <label>底部副标题（回车换行）</label>
-        <textarea id="mjSub" rows="2" oninput="requestDraw()">爱生活这件事 永远来得及
+        <label>底部文字（回车换行，每行一句）</label>
+        <textarea id="mjBot" rows="4" oninput="requestDraw()">Style 2 picture
+爱生活这件事 永远来得及
 It's always not too late to love life</textarea>
         <button onclick="mjResetText()" style="margin-top:4px">↺ 恢复默认文案</button>
-        <div class="po-group">文字样式</div>
-        <label>中文字体（顶部诗句）</label>
+        <div class="po-group">文字样式（两段文字各自独立设置）</div>
+        <label>顶部文字字体</label>
         <select id="mjFontCn" onchange="fontChanged(this)">
           <option value="'Songti SC','STSong','SimSun',serif" selected>宋体（系统默认）</option>
           <option value="'PingFang SC','Noto Serif SC',serif">苹方 / 思源宋</option>
@@ -960,25 +959,41 @@ It's always not too late to love life</textarea>
           <option value="'KaiTi','Kaiti SC','STKaiti',serif">楷体</option>
           <option value="'Ma Shan Zheng',cursive">马善政毛笔楷书</option>
           <optgroup label="英文 · 衬线">
-          <option value="'Playfair Display',serif">Playfair Display 衬线</option>
-          <option value="'Cormorant Garamond',serif">Cormorant Garamond 衬线</option>
-          </optgroup>
-        </select>
-        <label>英文字体（底部标题 / 副标题）</label>
-        <select id="mjFontEn" onchange="fontChanged(this)">
-          <option value="'Times New Roman','Georgia','Songti SC',serif" selected>Times New Roman 衬线（默认）</option>
+          <option value="'Times New Roman','Georgia','Songti SC',serif">Times New Roman 衬线</option>
           <option value="'Playfair Display',serif">Playfair Display 衬线</option>
           <option value="'Cormorant Garamond',serif">Cormorant Garamond 衬线</option>
           <option value="'EB Garamond',serif">EB Garamond 衬线</option>
           <option value="'Lora',serif">Lora 衬线</option>
-          <option value="'Songti SC','STSong',serif">宋体</option>
+          </optgroup>
         </select>
-        <label>诗句字号: <span id="mjSizeCnVal">4.8</span>%</label>
-        <input type="range" id="mjSizeCn" min="2" max="9" step="0.1" value="4.8" oninput="document.getElementById('mjSizeCnVal').textContent=this.value;requestDraw()">
-        <label>标题字号: <span id="mjSizeTitleVal">6.2</span>%</label>
-        <input type="range" id="mjSizeTitle" min="3" max="12" step="0.1" value="6.2" oninput="document.getElementById('mjSizeTitleVal').textContent=this.value;requestDraw()">
-        <label>副标题字号: <span id="mjSizeSubVal">2.5</span>%</label>
-        <input type="range" id="mjSizeSub" min="1" max="5" step="0.1" value="2.5" oninput="document.getElementById('mjSizeSubVal').textContent=this.value;requestDraw()">
+        <label>底部文字字体</label>
+        <select id="mjFontEn" onchange="fontChanged(this)">
+          <option value="'Times New Roman','Georgia','Songti SC',serif" selected>Times New Roman 衬线（默认）</option>
+          <option value="'Songti SC','STSong',serif">宋体</option>
+          <option value="'PingFang SC','Noto Serif SC',serif">苹方 / 思源宋</option>
+          <option value="'Noto Serif SC',serif">思源宋体</option>
+          <option value="'ZCOOL XiaoWei',serif">站酷小薇（宋体）</option>
+          <option value="'KaiTi','Kaiti SC','STKaiti',serif">楷体</option>
+          <option value="'Ma Shan Zheng',cursive">马善政毛笔楷书</option>
+          <optgroup label="英文 · 衬线">
+          <option value="'Playfair Display',serif">Playfair Display 衬线</option>
+          <option value="'Cormorant Garamond',serif">Cormorant Garamond 衬线</option>
+          <option value="'EB Garamond',serif">EB Garamond 衬线</option>
+          <option value="'Lora',serif">Lora 衬线</option>
+          </optgroup>
+        </select>
+        <div class="row-2">
+          <div><label>顶部字号: <span id="mjSizeCnVal">4.8</span>%</label><input type="range" id="mjSizeCn" min="2" max="9" step="0.1" value="4.8" oninput="document.getElementById('mjSizeCnVal').textContent=this.value;requestDraw()"></div>
+          <div><label>底部字号: <span id="mjSizeBotVal">4.8</span>%</label><input type="range" id="mjSizeBot" min="2" max="9" step="0.1" value="4.8" oninput="document.getElementById('mjSizeBotVal').textContent=this.value;requestDraw()"></div>
+        </div>
+        <div class="row-2">
+          <div><label>顶部行间距: <span id="mjLineTopVal">1.95</span></label><input type="range" id="mjLineTop" min="1" max="3" step="0.05" value="1.95" oninput="document.getElementById('mjLineTopVal').textContent=this.value;requestDraw()"></div>
+          <div><label>底部行间距: <span id="mjLineBotVal">1.95</span></label><input type="range" id="mjLineBot" min="1" max="3" step="0.05" value="1.95" oninput="document.getElementById('mjLineBotVal').textContent=this.value;requestDraw()"></div>
+        </div>
+        <div class="row-2">
+          <div><label>顶部字间距: <span id="mjTrackTopVal">0</span></label><input type="range" id="mjTrackTop" min="-0.1" max="0.5" step="0.01" value="0" oninput="document.getElementById('mjTrackTopVal').textContent=this.value;requestDraw()"></div>
+          <div><label>底部字间距: <span id="mjTrackBotVal">0</span></label><input type="range" id="mjTrackBot" min="-0.1" max="0.5" step="0.01" value="0" oninput="document.getElementById('mjTrackBotVal').textContent=this.value;requestDraw()"></div>
+        </div>
         <label>文字颜色</label>
         <input type="color" id="mjColor" value="#fbf7f0" onchange="requestDraw()">
         <label>顶部文字位置: <span id="mjYTopVal">52</span>%</label>
@@ -991,7 +1006,7 @@ It's always not too late to love life</textarea>
           <option value="center" selected>居中</option>
           <option value="right">右对齐</option>
         </select>
-        <div class="hint">字号按画布宽度百分比计算，画布变大时文字等比放大。</div>
+        <div class="hint">字号按画布宽度百分比计算；行间距按字号倍数；字间距按字号比例（0 = 默认紧排），画布变大时文字等比放大。</div>
         </div>
         <div class="tpl-sec" data-tpl="collage">
         <h3 class="tool-h" style="margin-top:14px">⑧ 自由拼图（Collage）</h3>
@@ -1950,7 +1965,7 @@ love
         <div class="hint">💡 头像 / 昵称 / 统计 / 正文 / 音乐栏都可以直接在画布上拖拽移动</div>
         </div>
 
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis magazine">
         <h3 class="tool-h" style="margin-top:14px">⑬ 全屏水印</h3>
         <div class="checkbox-row"><input type="checkbox" id="wmEnable" onchange="requestDraw()"><span>启用全屏水印</span></div>
         <input type="file" id="wmUpload" accept="image/*">
@@ -2001,7 +2016,7 @@ love
         <div class="hint" id="pickerHint" style="display:none;color:#f4c842">吸管模式已开启：点击右侧画布任意位置吸取颜色</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis magazine">
         <h3 class="tool-h">⑮ 导出</h3>
         <button class="primary" onclick="exportPNG()">导出 PNG</button>
         <div class="hint" style="margin-top:10px">提示：预设只保存参数，自定义纹理图和头像需重新上传。</div>
@@ -5165,8 +5180,7 @@ function drawProfile(){
 // 三段式纵向长图：顶部诗句封面 → 中部米白双页线圈手账 → 底部英文主题页
 const MJ_DEF={
   poem:"Style 1 picture\n苹果的第一万六千个故事\nThe 16,000th story of Apple",
-  title:"Style 2 picture",
-  sub:"爱生活这件事 永远来得及\nIt's always not too late to love life"
+  bot:"Style 2 picture\n爱生活这件事 永远来得及\nIt's always not too late to love life"
 };
 // 图片列表：不进 layers，与其它模板完全隔离；张数决定排版（见 mjPlan）
 const MJ_MAX=2;                                     // 只支持 2 张大图（第 1 张在顶部，第 2 张在底部）
@@ -5324,8 +5338,7 @@ function mjResetSlot(i){
 function mjResetText(){
   const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
   set("mjPoem",MJ_DEF.poem);
-  set("mjTitle",MJ_DEF.title);
-  set("mjSub",MJ_DEF.sub);
+  set("mjBot",MJ_DEF.bot);
   requestDraw();
 }
 // 图片控件由脚本生成：顶部是多选导入框，下方按当前张数列出每张图的
@@ -5408,7 +5421,9 @@ function mjCover(g,img,x,y,w,h,ox,oy,fb){
 }
 function mjLines(s){return String(s==null?"":s).split("\n");}
 // 多行文字：行距随字号，整组以 y 为中心，阴影保证在照片上清晰
-function mjText(g,lines,x,y,size,font,color,align,lh,shadow){
+// trackEm：字间距（em，按字号比例；0 = 紧排）。非 0 时逐字绘制，预览与导出一致
+function mjText(g,lines,x,y,size,font,color,align,lh,shadow,trackEm){
+  const track=(trackEm||0)*size;
   g.save();
   g.font=size+"px "+font;
   g.textAlign=align;
@@ -5420,7 +5435,17 @@ function mjText(g,lines,x,y,size,font,color,align,lh,shadow){
     g.shadowOffsetY=size*0.09;
   }
   for(let i=0;i<lines.length;i++){
-    g.fillText(lines[i],x,y+(i-(lines.length-1)/2)*lh);
+    const ly=y+(i-(lines.length-1)/2)*lh;
+    const line=lines[i];
+    if(!track){g.fillText(line,x,ly);continue;}
+    const chars=Array.from(line);
+    const ws=chars.map(function(ch){return g.measureText(ch).width;});
+    let total=track*(chars.length-1);
+    for(let j=0;j<ws.length;j++)total+=ws[j];
+    let sx=align==="center"?x-total/2:(align==="right"?x-total:x);
+    g.textAlign="left";
+    for(let j=0;j<chars.length;j++){g.fillText(chars[j],sx,ly);sx+=ws[j]+track;}
+    g.textAlign=align;
   }
   g.restore();
 }
@@ -5570,9 +5595,6 @@ function drawMagazine(){
   va.addColorStop(.45,"rgba(0,0,0,.14)");
   va.addColorStop(1,"rgba(0,0,0,.30)");
   g.fillStyle=va;g.fillRect(0,0,W,hA);
-  // 顶部大图区域水印
-  wmClip={ox:0,oy:0,rot:0,x:0,y:0,w:W,h:hA,r:0};
-  drawWatermark();
 
   // ---------- 区域 B：纸张（纯色/渐变 + 纹理）+ 多页照片 + 线圈 ----------
   if(mjV("mjPaperType","solid")==="gradient"){
@@ -5630,9 +5652,6 @@ function drawMagazine(){
     }
   }
   g.restore();
-  // 中部纸张区域水印
-  wmClip={ox:0,oy:0,rot:0,x:padX,y:rowY[0]||py,w:W-padX*2,h:rowY[rowY.length-1]?(rowY[rowY.length-1]+ph-rowY[0]):hB,r:0};
-  drawWatermark();
   // 每行内相邻两页之间一组金属线圈（双页时正好落在中缝）
   for(let r=0;r<rows;r++){
     const cols=rowCols[r];
@@ -5649,21 +5668,23 @@ function drawMagazine(){
   vc.addColorStop(.5,"rgba(0,0,0,.34)");
   vc.addColorStop(1,"rgba(0,0,0,.46)");
   g.fillStyle=vc;g.fillRect(0,hA+hB,W,hC);
-  // 底部大图区域水印
-  wmClip={ox:0,oy:0,rot:0,x:0,y:hA+hB,w:W,h:hC,r:0};
-  drawWatermark();
 
-  // ---------- 文字：诗句在顶部图，标题 + 副标题在底部图 ----------
-  const sizeCn=W*mjN("mjSizeCn",4.8)/100;
-  const lhCn=sizeCn*1.95;
+  // ---------- 文字：顶部 / 底部同级，各自独立的字体、字号、行间距、字间距 ----------
+  const sizeTop=W*mjN("mjSizeCn",4.8)/100;
+  const lhTop=sizeTop*mjN("mjLineTop",1.95);
+  const trTop=mjN("mjTrackTop",0);
   const topY=hA*mjN("mjYTop",52)/100;
-  mjText(g,mjLines(mjV("mjPoem",MJ_DEF.poem)),ax,topY,sizeCn,fontCn,color,align,lhCn,true);
+  mjText(g,mjLines(mjV("mjPoem",MJ_DEF.poem)),ax,topY,sizeTop,fontCn,color,align,lhTop,true,trTop);
 
-  const sizeT=W*mjN("mjSizeTitle",6.2)/100;
-  const sizeS=W*mjN("mjSizeSub",2.5)/100;
+  const sizeBot=W*mjN("mjSizeBot",4.8)/100;
+  const lhBot=sizeBot*mjN("mjLineBot",1.95);
+  const trBot=mjN("mjTrackBot",0);
   const baseY=hA+hB+hC*mjN("mjYBot",47)/100;
-  mjText(g,mjLines(mjV("mjTitle",MJ_DEF.title)),ax,baseY,sizeT,fontEn,color,align,sizeT*1.3,true);
-  mjText(g,mjLines(mjV("mjSub",MJ_DEF.sub)),ax,baseY+sizeT*0.72+sizeS*1.1,sizeS,fontEn,color,align,sizeS*1.85,true);
+  mjText(g,mjLines(mjV("mjBot",MJ_DEF.bot)),ax,baseY,sizeBot,fontEn,color,align,lhBot,true,trBot);
+
+  // ---------- 全屏水印：整幅画面最上层，作用于所有图片之上 ----------
+  wmClip=null;
+  drawWatermark();
 }
 
 // ============ 主渲染 ============
@@ -7656,13 +7677,15 @@ function getSettings(){
     mjTexPreset:document.getElementById("mjTexPreset").value,
     mjTexOpacity:document.getElementById("mjTexOpacity").value,
     mjPoem:document.getElementById("mjPoem").value,
-    mjTitle:document.getElementById("mjTitle").value,
-    mjSub:document.getElementById("mjSub").value,
+    mjBot:document.getElementById("mjBot").value,
     mjFontCn:document.getElementById("mjFontCn").value,
     mjFontEn:document.getElementById("mjFontEn").value,
     mjSizeCn:document.getElementById("mjSizeCn").value,
-    mjSizeTitle:document.getElementById("mjSizeTitle").value,
-    mjSizeSub:document.getElementById("mjSizeSub").value,
+    mjSizeBot:document.getElementById("mjSizeBot").value,
+    mjLineTop:document.getElementById("mjLineTop").value,
+    mjLineBot:document.getElementById("mjLineBot").value,
+    mjTrackTop:document.getElementById("mjTrackTop").value,
+    mjTrackBot:document.getElementById("mjTrackBot").value,
     mjColor:document.getElementById("mjColor").value,
     mjYTop:document.getElementById("mjYTop").value,
     mjYBot:document.getElementById("mjYBot").value,
@@ -8045,11 +8068,21 @@ function applySettings(s){
   set("mjPaperDir",s.mjPaperDir||"v");set("mjPaper2",s.mjPaper2||"eee3d2");
   set("mjTexSource",s.mjTexSource||"none");set("mjTexPreset",s.mjTexPreset||"kraft");
   set("mjTexOpacity",s.mjTexOpacity||"35");
-  set("mjPoem",s.mjPoem||MJ_DEF.poem);set("mjTitle",s.mjTitle||MJ_DEF.title);set("mjSub",s.mjSub||MJ_DEF.sub);
+  set("mjPoem",s.mjPoem||MJ_DEF.poem);set("mjBot",s.mjBot||MJ_DEF.bot);
   set("mjFontCn",s.mjFontCn);set("mjFontEn",s.mjFontEn);
-  set("mjSizeCn",s.mjSizeCn||"4.8");set("mjSizeTitle",s.mjSizeTitle||"6.2");set("mjSizeSub",s.mjSizeSub||"2.5");
+  set("mjSizeCn",s.mjSizeCn||"4.8");set("mjSizeBot",s.mjSizeBot||"4.8");
+  set("mjLineTop",s.mjLineTop||"1.95");set("mjLineBot",s.mjLineBot||"1.95");
+  set("mjTrackTop",s.mjTrackTop||"0");set("mjTrackBot",s.mjTrackBot||"0");
   set("mjColor",s.mjColor||"#fbf7f0");set("mjYTop",s.mjYTop||"52");set("mjYBot",s.mjYBot||"47");
   set("mjAlign",s.mjAlign||"center");
+  // 同步滑块旁的数值标签，避免载入预设后显示旧数字
+  [["mjTop",s.mjTop||38],["mjMid",s.mjMid||25],["mjTexOp",s.mjTexOpacity||35],
+   ["mjSizeCn",s.mjSizeCn||4.8],["mjSizeBot",s.mjSizeBot||4.8],
+   ["mjLineTop",s.mjLineTop||1.95],["mjLineBot",s.mjLineBot||1.95],
+   ["mjTrackTop",s.mjTrackTop||0],["mjTrackBot",s.mjTrackBot||0],
+   ["mjYTop",s.mjYTop||52],["mjYBot",s.mjYBot||47]].forEach(function(p){
+    const el=document.getElementById(p[0]+"Val");if(el)el.textContent=p[1];
+  });
   resizeCanvas();
 }
 function presetKey(){
