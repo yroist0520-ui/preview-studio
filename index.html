@@ -2294,11 +2294,18 @@ function loadFamilies(list,cb){
 }
 function fontChanged(el){
   if(el&&el.value==="__import__")return;   //「＋ 导入字体文件…」占位项，由 wireFontSelects 处理
-  requestDraw();
   if(!el)return;
   // 时钟字体 select 存的是字体 id（如 playfair），其余 select 存的是 CSS 族名字符串
   const v=(el.id==="clkFont")?clkFont(el.value).css:el.value;
-  loadFamilies(parseFamilies(v),requestDraw);
+  // 检查解析出的字体族是否有非系统字体需要加载
+  const families=parseFamilies(v);
+  if(!families.length){
+    // 全是系统字体，直接绘制无需等待
+    requestDraw();
+    return;
+  }
+  // 异步加载字体，加载完成后再绘制（避免先 draw 再等字体）
+  loadFamilies(families,requestDraw);
 }
 
 // ============ 自定义字体导入（全模板字体下拉 + 时钟实验室通用） ============
@@ -5165,6 +5172,9 @@ const MJ_DEF={
 const MJ_MAX=2;                                     // 只支持 2 张大图（第 1 张在顶部，第 2 张在底部）
 const mjImgs=[];                                // 大图列表（固定最多 2 张，第 1 张顶部、第 2 张底部）
 const mjOff=[];                                 // 与 mjImgs 平行的取景中心百分比，[50,50] = 居中裁切
+const MJ_PAGE_MAX=3;                            // 中部手账页面最大图片数
+const mjPageImgs=[];                            // 中部页面图片列表（最多 MJ_PAGE_MAX 张）
+const mjPageOff=[];                             // 与 mjPageImgs 平行的取景中心百分比
 // 中部纸张纹理（独立于普通模板的全局纹理，互不干扰）
 let mjPresetTex=null,mjPresetTexType="",mjTexImg=null;
 const MJ_FALLBACK=[
@@ -5242,6 +5252,60 @@ function mjReplace(i,input){
   img.src=URL.createObjectURL(f);
   input.value="";
 }
+// 中部页面图片：上传追加（上限 MJ_PAGE_MAX 张），成功后重建槽位并重绘
+function mjUploadPage(input){
+  const all=Array.prototype.slice.call(input.files||[]);
+  if(!all.length)return;
+  const room=Math.max(0,MJ_PAGE_MAX-mjPageImgs.length);
+  const files=all.slice(0,room);
+  const dropped=all.length-files.length;
+  if(!files.length){input.value="";mjMsg("页面图片已达上限 "+MJ_PAGE_MAX+" 张，可先删除再导入。");return;}
+  const out=new Array(files.length);
+  let settled=0;
+  const settle=function(){
+    settled++;
+    if(settled<files.length)return;
+    let added=false;
+    for(let k=0;k<out.length;k++){
+      if(out[k]){mjPageImgs.push(out[k]);mjPageOff.push([50,50]);added=true;}
+    }
+    input.value="";
+    if(!added)return;
+    mjBuildSlots();
+    if(dropped>0)mjMsg("页面图片最多 "+MJ_PAGE_MAX+" 张，已忽略多出的 "+dropped+" 张。");
+    requestDraw();
+  };
+  files.forEach(function(f,k){
+    const img=new Image();
+    img.onload=function(){out[k]=img;settle();};
+    img.onerror=settle;
+    img.src=URL.createObjectURL(f);
+  });
+}
+// 替换中部第 i 张页面图
+function mjReplacePage(i,input){
+  const f=input.files&&input.files[0];
+  if(!f||i<0||i>=mjPageImgs.length){input.value="";return;}
+  const img=new Image();
+  img.onload=function(){
+    mjPageImgs[i]=img;
+    mjPageOff[i]=[50,50];
+    mjBuildSlots();
+    requestDraw();
+  };
+  img.onerror=function(){mjMsg("图片加载失败，请换一张试试");};
+  img.src=URL.createObjectURL(f);
+  input.value="";
+}
+// 删除中部第 i 张页面图
+function mjRemovePage(i){
+  if(i<0||i>=mjPageImgs.length)return;
+  mjPageImgs.splice(i,1);
+  mjPageOff.splice(i,1);
+  mjMsg("");
+  mjBuildSlots();
+  requestDraw();
+}
 // 布局方向切换能力已按需求移除：杂志手账仅保留上下布局
 function mjSetOff(i,axis,v){
   mjOff[i][axis==="x"?0:1]=parseFloat(v);
@@ -5265,7 +5329,7 @@ function mjResetText(){
   requestDraw();
 }
 // 图片控件由脚本生成：顶部是多选导入框，下方按当前张数列出每张图的
-// 角色标签 + 替换/删除 + 取景控件
+// 角色标签 + 替换/删除 + 取景控件；中部追加手账页面图片分组（最多 MJ_PAGE_MAX 张）
 function mjBuildSlots(){
   const box=document.getElementById("mjSlots");
   if(!box)return;
@@ -5276,7 +5340,7 @@ function mjBuildSlots(){
     return "大图";
   };
   let h='<input type="file" id="mjUpMulti" accept="image/*" multiple onchange="mjUploadMulti(this)" style="width:100%">';
-  h+='<div class="hint">只支持最多 '+MJ_MAX+' 张大图：第 1 张放顶部，第 2 张放底部，手账页面为固定双页。可多次追加导入、替换或删除。</div>';
+  h+='<div class="hint">大图最多 '+MJ_MAX+' 张：第 1 张放顶部，第 2 张放底部；手账页面图片最多 '+MJ_PAGE_MAX+' 张，按需填入中部页面。</div>';
   for(let i=0;i<mjImgs.length;i++){
     h+='<div class="po-group" style="margin-top:'+(i?12:0)+'px">图片'+(i+1)+" · "+roleOf(i)+"</div>";
     h+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
@@ -5289,6 +5353,23 @@ function mjBuildSlots(){
     h+='<label>垂直取景: <span id="mjOff'+i+'YVal">'+mjOff[i][1]+'</span>%</label>';
     h+='<input type="range" id="mjOff'+i+'Y" min="0" max="100" value="'+mjOff[i][1]+'" oninput="mjSetOff('+i+',\'y\',this.value)">';
     h+='<button onclick="mjResetSlot('+i+')">恢复默认位置</button>';
+  }
+  // 中部手账页面图片分组（独立于大图，最多 MJ_PAGE_MAX 张，依次对应中部各页面）
+  h+='<div class="po-group" style="margin-top:14px">中部手账页面图片（最多 '+MJ_PAGE_MAX+' 张）</div>';
+  h+='<input type="file" id="mjUpPageMulti" accept="image/*" multiple onchange="mjUploadPage(this)" style="width:100%">';
+  h+='<div class="hint">导入的图片将依次填入中部手账页面的照片区域，可多次追加、替换或删除。</div>';
+  for(let i=0;i<mjPageImgs.length;i++){
+    h+='<div class="po-group" style="margin-top:'+(i?10:0)+'px">页面图片'+(i+1)+'</div>';
+    h+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
+    h+='<input type="file" accept="image/*" id="mjPageRep'+i+'" onchange="mjReplacePage('+i+',this)" style="display:none">';
+    h+='<button onclick="document.getElementById(\'mjPageRep'+i+'\').click()">⇄ 替换</button>';
+    h+='<button class="warn small" onclick="mjRemovePage('+i+')">× 删除</button>';
+    h+='</div>';
+    h+='<label>水平取景: <span id="mjPageOff'+i+'XVal">'+mjPageOff[i][0]+'</span>%</label>';
+    h+='<input type="range" id="mjPageOff'+i+'X" min="0" max="100" value="'+mjPageOff[i][0]+'" oninput="mjSetOffPage('+i+',\'x\',this.value)">';
+    h+='<label>垂直取景: <span id="mjPageOff'+i+'YVal">'+mjPageOff[i][1]+'</span>%</label>';
+    h+='<input type="range" id="mjPageOff'+i+'Y" min="0" max="100" value="'+mjPageOff[i][1]+'" oninput="mjSetOffPage('+i+',\'y\',this.value)">';
+    h+='<button onclick="mjResetSlotPage('+i+')">恢复默认位置</button>';
   }
   box.innerHTML=h;
 }
@@ -5371,17 +5452,32 @@ function mjCoil(g,cx,y0,y1,W){
   }
 }
 
-// 布局计划：只支持 2 张大图（第 1 张顶部、第 2 张底部），手账固定原双页效果（兜底色空页面，图片不进手账页面）
+// 布局计划：大图顶部/底部 + 中部手账页面支持多张图片（最多 MJ_PAGE_MAX 张）
 function mjPlan(){
   const n=mjImgs.length;
-  const plan={n:n,A:null,B:null,pages:2,rows:1,pageImgs:[null,null]};
+  const plan={n:n,A:null,B:null,pages:2,rows:1};
   if(n>=1)plan.A=0;
   if(n>=2)plan.B=1;
-  // 手账固定双页空页面（图片只做顶部/底部大图，不进手账页面）
-  plan.pages=2;
-  plan.rows=1;
-  plan.pageImgs=[null,null];
+  // 中部页面图片映射：取 mjPageImgs 前 pages 张（pages=rows*cols，见 mjBuildSlots 渲染处）
+  plan.pageImgs=[];
+  const cnt=Math.min(mjPageImgs.length,MJ_PAGE_MAX);
+  for(let k=0;k<cnt;k++)plan.pageImgs.push(k);
   return plan;
+}
+// 中部页面图片取景控制
+function mjSetOffPage(i,axis,v){
+  mjPageOff[i][axis==="x"?0:1]=parseFloat(v);
+  const lab=document.getElementById("mjPageOff"+i+axis.toUpperCase()+"Val");
+  if(lab)lab.textContent=v;
+  requestDraw();
+}
+function mjResetSlotPage(i){
+  mjPageOff[i][0]=50;mjPageOff[i][1]=50;
+  ["X","Y"].forEach(function(a){
+    const s=document.getElementById("mjPageOff"+i+a);if(s)s.value=50;
+    const l=document.getElementById("mjPageOff"+i+a+"Val");if(l)l.textContent="50";
+  });
+  requestDraw();
 }
 function mjPaperTypeChanged(){
   const row=document.getElementById("mjPaper2Row");
@@ -5460,6 +5556,7 @@ function drawMagazine(){
   const hC=H-hA-hB;
   const paper=mjV("mjPaper","#f7f2ea");
   const oxi=function(i,a){return (i==null||!mjOff[i])?0.5:mjOff[i][a]/100;};
+  const oxiPage=function(i,a){return (i==null||i>=mjPageOff.length)?0.5:mjPageOff[i][a]/100;};
   const color=mjV("mjColor","#fbf7f0");
   const align=mjV("mjAlign","center");
   const fontCn=mjV("mjFontCn","'Songti SC','STSong','SimSun',serif");
@@ -5473,6 +5570,9 @@ function drawMagazine(){
   va.addColorStop(.45,"rgba(0,0,0,.14)");
   va.addColorStop(1,"rgba(0,0,0,.30)");
   g.fillStyle=va;g.fillRect(0,0,W,hA);
+  // 顶部大图区域水印
+  wmClip={ox:0,oy:0,rot:0,x:0,y:0,w:W,h:hA,r:0};
+  drawWatermark();
 
   // ---------- 区域 B：纸张（纯色/渐变 + 纹理）+ 多页照片 + 线圈 ----------
   if(mjV("mjPaperType","solid")==="gradient"){
@@ -5524,12 +5624,15 @@ function drawMagazine(){
     const cols=rowCols[r];
     const pw=(W*(1-padF*2)-gap*(cols-1))/cols;
     for(let c=0;c<cols;c++){
-      const idx=pl.pageImgs[k]==null?null:pl.pageImgs[k];
-      mjCover(g,idx==null?null:mjImgs[idx],padX+c*(pw+gap),rowY[r],pw,ph,oxi(idx,0),oxi(idx,1),pfb[k%3]);
+      const idx=pl.pageImgs[k]??null;
+      mjCover(g,idx==null?null:mjPageImgs[idx],padX+c*(pw+gap),rowY[r],pw,ph,oxiPage(idx,0),oxiPage(idx,1),pfb[k%3]);
       k++;
     }
   }
   g.restore();
+  // 中部纸张区域水印
+  wmClip={ox:0,oy:0,rot:0,x:padX,y:rowY[0]||py,w:W-padX*2,h:rowY[rowY.length-1]?(rowY[rowY.length-1]+ph-rowY[0]):hB,r:0};
+  drawWatermark();
   // 每行内相邻两页之间一组金属线圈（双页时正好落在中缝）
   for(let r=0;r<rows;r++){
     const cols=rowCols[r];
@@ -5546,6 +5649,9 @@ function drawMagazine(){
   vc.addColorStop(.5,"rgba(0,0,0,.34)");
   vc.addColorStop(1,"rgba(0,0,0,.46)");
   g.fillStyle=vc;g.fillRect(0,hA+hB,W,hC);
+  // 底部大图区域水印
+  wmClip={ox:0,oy:0,rot:0,x:0,y:hA+hB,w:W,h:hC,r:0};
+  drawWatermark();
 
   // ---------- 文字：诗句在顶部图，标题 + 副标题在底部图 ----------
   const sizeCn=W*mjN("mjSizeCn",4.8)/100;
@@ -7537,7 +7643,30 @@ function getSettings(){
     axBgType:document.getElementById("axBgType").value,
     axBg:document.getElementById("axBg").value,
     axBg2:document.getElementById("axBg2").value,
-    axBgDir:document.getElementById("axBgDir").value
+    axBgDir:document.getElementById("axBgDir").value,
+    // 杂志手账
+    mjTop:document.getElementById("mjTop").value,
+    mjMid:document.getElementById("mjMid").value,
+    mjRatio:document.getElementById("mjRatio").value,
+    mjPaper:document.getElementById("mjPaper").value,
+    mjPaperType:document.getElementById("mjPaperType").value,
+    mjPaperDir:document.getElementById("mjPaperDir").value,
+    mjPaper2:document.getElementById("mjPaper2").value,
+    mjTexSource:document.getElementById("mjTexSource").value,
+    mjTexPreset:document.getElementById("mjTexPreset").value,
+    mjTexOpacity:document.getElementById("mjTexOpacity").value,
+    mjPoem:document.getElementById("mjPoem").value,
+    mjTitle:document.getElementById("mjTitle").value,
+    mjSub:document.getElementById("mjSub").value,
+    mjFontCn:document.getElementById("mjFontCn").value,
+    mjFontEn:document.getElementById("mjFontEn").value,
+    mjSizeCn:document.getElementById("mjSizeCn").value,
+    mjSizeTitle:document.getElementById("mjSizeTitle").value,
+    mjSizeSub:document.getElementById("mjSizeSub").value,
+    mjColor:document.getElementById("mjColor").value,
+    mjYTop:document.getElementById("mjYTop").value,
+    mjYBot:document.getElementById("mjYBot").value,
+    mjAlign:document.getElementById("mjAlign").value
   };
 }
 function applySettings(s){
@@ -7910,6 +8039,17 @@ function applySettings(s){
   document.getElementById("pfVignetteVal").textContent=s.pfVignette||25;
   onTexSourceChange();
   if((s.texSource||"preset")==="preset"){onTexPresetChange();}
+  // 杂志手账参数
+  set("mjTop",s.mjTop||"38");set("mjMid",s.mjMid||"25");set("mjRatio",s.mjRatio||"auto");
+  set("mjPaper",s.mjPaper||"#f7f2ea");set("mjPaperType",s.mjPaperType||"solid");
+  set("mjPaperDir",s.mjPaperDir||"v");set("mjPaper2",s.mjPaper2||"eee3d2");
+  set("mjTexSource",s.mjTexSource||"none");set("mjTexPreset",s.mjTexPreset||"kraft");
+  set("mjTexOpacity",s.mjTexOpacity||"35");
+  set("mjPoem",s.mjPoem||MJ_DEF.poem);set("mjTitle",s.mjTitle||MJ_DEF.title);set("mjSub",s.mjSub||MJ_DEF.sub);
+  set("mjFontCn",s.mjFontCn);set("mjFontEn",s.mjFontEn);
+  set("mjSizeCn",s.mjSizeCn||"4.8");set("mjSizeTitle",s.mjSizeTitle||"6.2");set("mjSizeSub",s.mjSizeSub||"2.5");
+  set("mjColor",s.mjColor||"#fbf7f0");set("mjYTop",s.mjYTop||"52");set("mjYBot",s.mjYBot||"47");
+  set("mjAlign",s.mjAlign||"center");
   resizeCanvas();
 }
 function presetKey(){
@@ -8020,6 +8160,10 @@ function selectTemplate(type){
   refreshPresetUI();
   if(type==="axis"&&typeof axSyncCount==="function")axSyncCount();
   if(type==="collage"&&typeof renderCgTplCards==="function")renderCgTplCards();
+  if(type==="magazine"){
+    mjBuildSlots();
+    requestDraw();
+  }
   c.classList.toggle("cg-canvas",type==="collage");
   if(type!=="collage"){cgDrag=null;cgPinch=null;c.style.cursor="";}
   const tool=document.getElementById("tool");
