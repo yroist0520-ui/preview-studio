@@ -9,7 +9,7 @@
      比对下面的版本号，不一致就弹「有新版本」提示（点一下带参数跳转，必定回源）。
      每次发版请把 PS_BUILD 改成新的 git 短 hash（git rev-parse --short HEAD）。 ===== -->
 <script>
-window.PS_BUILD="f8465f5";
+window.PS_BUILD="86feae8";
 (function(){
   var TIP_ID="psVerTip",TIP_KEY="psVerTipShown";
   function showTip(v){
@@ -512,6 +512,35 @@ input[type=file]{font-size:11px}
           <p>仿社交平台个人主页：状态栏 + 大图背景 + 白色信息卡（圆形头像、昵称、在线状态、粉丝/关注/转评赞统计）+ 个性签名，所有元素可拖拽可显隐。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('profile')">进入制作 →</button>
         </div>
+        <div class="tpl-card" data-tpl="home" onclick="selectTemplate('home')">
+          <div class="tpl-thumb">
+            <div class="mock-home">
+              <svg viewBox="0 0 112 190" width="112" height="190" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="0" y="0" width="112" height="190" fill="#ffffff"/>
+                <defs>
+                  <linearGradient id="hmCardBg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#f6ddc7"/><stop offset="100%" stop-color="#d7ae87"/></linearGradient>
+                  <clipPath id="hmCardClip"><rect x="0" y="0" width="112" height="118"/></clipPath>
+                </defs>
+                <g clip-path="url(#hmCardClip)">
+                  <rect x="0" y="0" width="112" height="118" fill="url(#hmCardBg)"/>
+                  <circle cx="32" cy="44" r="22" fill="#c98f63" opacity=".4"/>
+                  <rect x="56" y="26" width="44" height="36" rx="8" fill="#b5794d" opacity=".32"/>
+                </g>
+                <rect x="78" y="96" width="26" height="26" rx="8" fill="#e8e2da" stroke="#ffffff" stroke-width="3"/>
+                <text x="73" y="104" text-anchor="end" font-size="10" font-weight="700" fill="#ffffff" font-family="Helvetica">Yroist</text>
+                <text x="8" y="152" font-size="13" font-weight="700" fill="#1a1a1a" font-family="Helvetica">11</text>
+                <text x="8" y="163" font-size="7" fill="#555555" font-family="Helvetica">9月</text>
+                <rect x="28" y="139" width="27" height="36" rx="3" fill="#d8d2ca"/>
+                <rect x="63" y="145" width="41" height="5" rx="2.5" fill="#2b2b2b" opacity=".75"/>
+                <rect x="63" y="154" width="33" height="5" rx="2.5" fill="#2b2b2b" opacity=".55"/>
+                <rect x="63" y="167" width="17" height="4" rx="2" fill="#9a9a9a" opacity=".7"/>
+              </svg>
+            </div>
+          </div>
+          <h3>个人主页预览</h3>
+          <p>仿社交平台个人主页：顶部背景图（上传 / 移动 / 缩放 / 模糊 / 透明度）+ 交界处悬浮头像 + 昵称简介 + 日期 / 图片 / 正文三列动态流，全部元素可点选编辑、画布拖动，支持预设与全屏水印导出。</p>
+          <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('home')">进入制作 →</button>
+        </div>
         <div class="tpl-card" data-tpl="frame" onclick="selectTemplate('frame')">
           <div class="tpl-thumb">
             <div class="mock-frame">
@@ -643,7 +672,7 @@ input[type=file]{font-size:11px}
           <button class="back-btn" onclick="backToTemplates()">← 返回模板选择</button>
           <span class="tpl-name" id="tplName"></span>
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis home">
         <h3 class="tool-h">① 预设存档</h3>
         <p class="preset-tip">仅保存于「<b id="presetTplName">普通作品预览</b>」工作区，与其他模板互不干扰；每个槽位左侧存档、右侧载入。</p>
         <div class="preset-grid" id="presetGrid"></div>
@@ -653,7 +682,7 @@ input[type=file]{font-size:11px}
         <div class="hint">预设只记录参数，自定义纹理图与头像需重新上传。</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis home">
         <h3 class="tool-h" style="margin-top:14px">② 分享预设</h3>
         <button class="primary" onclick="sharePreset()" style="margin-bottom:6px">🔗 生成短链接</button>
         <label>导入预设（粘贴链接或短码）</label>
@@ -665,7 +694,7 @@ input[type=file]{font-size:11px}
         <div class="hint" id="shareHint">生成短链接复制给别人，打开即自动应用；也可手动粘贴导入。</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis magazine">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis home magazine">
         <h3 class="tool-h">③ 画布尺寸</h3>
         <select id="size">
           <optgroup label="手机锁屏尺寸">
@@ -712,6 +741,7 @@ input[type=file]{font-size:11px}
             <option value="1600,1600">正方形 1600×1600</option>
           </optgroup>
           <optgroup label="3:4 竖版">
+            <option value="3000,4000">3:4 竖 3000×4000 (超清)</option>
             <option value="1500,2000">3:4 竖 1500×2000</option>
             <option value="1200,1600">3:4 竖 1200×1600</option>
           </optgroup>
@@ -1966,7 +1996,90 @@ love
         <div class="hint">💡 头像 / 昵称 / 统计 / 正文 / 音乐栏都可以直接在画布上拖拽移动</div>
         </div>
 
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis magazine">
+        <div class="tpl-sec" data-tpl="home">
+        <h3 class="tool-h">④ 背景设置</h3>
+        <div class="po-group">背景图片（画布上半区点击即可选中）</div>
+        <input type="file" id="hmBgUpload" accept="image/*" onchange="hmFile('bg',this)">
+        <div class="row">
+          <button onclick="document.getElementById('hmBgUpload').click()">🖼 上传 / 替换背景图</button>
+          <button class="warn" onclick="hmRemoveBg()">🗑 删除背景图</button>
+        </div>
+        <div class="row-2">
+          <div><label>图片缩放: <span id="hmBgScaleVal">100</span>%</label><input type="range" id="hmBgScale" min="50" max="300" value="100" oninput="hmSet('bg','scale',this.value)"></div>
+          <div><label>模糊程度: <span id="hmBgBlurVal">0</span>%</label><input type="range" id="hmBgBlur" min="0" max="20" step="0.5" value="0" oninput="hmSet('bg','blur',this.value)"></div>
+        </div>
+        <div class="row-2">
+          <div><label>图片透明度: <span id="hmBgOpVal">100</span>%</label><input type="range" id="hmBgOp" min="0" max="100" value="100" oninput="hmSet('bg','op',this.value)"></div>
+          <div><label>图片层级</label><select id="hmBgLayer" onchange="hmLayer('bg',this.value)"><option value="0">1（最底）</option><option value="1">2</option><option value="2">3（最顶）</option></select></div>
+        </div>
+        <div class="row-2">
+          <div><label>图片 X: <span id="hmBgXVal">50</span>%</label><input type="range" id="hmBgX" min="0" max="100" value="50" oninput="hmSet('bg','x',this.value)"></div>
+          <div><label>图片 Y: <span id="hmBgYVal">50</span>%</label><input type="range" id="hmBgY" min="0" max="100" value="50" oninput="hmSet('bg','y',this.value)"></div>
+        </div>
+        <div class="row"><button onclick="hmSelect('hmBg')">🎯 在画布上选中背景图</button></div>
+        <div class="po-group">版面配色与结构</div>
+        <div class="row-2">
+          <div><label>背景区高度: <span id="hmBgBandVal">62</span>%</label><input type="range" id="hmBgBand" min="45" max="75" value="62" oninput="hmBandChanged(this.value)"></div>
+          <div><label>背景区底色</label><input type="color" id="hmBgColor" value="#e3e9f0" oninput="hmSet('bg','color',this.value)"></div>
+        </div>
+        <div class="row-2">
+          <div><label>内容区底色</label><input type="color" id="hmBgContent" value="#ffffff" oninput="hmSet('bg','content',this.value)"></div>
+          <div><label>&nbsp;</label><span class="hint" style="margin:0">背景图支持拖动 / 缩放 / 裁剪</span></div>
+        </div>
+
+        </div>
+        <div class="tpl-sec" data-tpl="home">
+        <h3 class="tool-h">⑤ 头像设置</h3>
+        <input type="file" id="hmAvaUpload" accept="image/*" onchange="hmFile('ava',this)">
+        <div class="row">
+          <button onclick="document.getElementById('hmAvaUpload').click()">🖼 上传 / 替换头像</button>
+          <button class="warn" onclick="hmRemoveAva()">🗑 删除头像</button>
+        </div>
+        <div class="row-2">
+          <div><label>形状</label><select id="hmAvaShape" onchange="hmSet('ava','shape',this.value)"><option value="round">圆形</option><option value="rect">圆角方形</option></select></div>
+          <div><label>大小: <span id="hmAvaSizeVal">16</span>%（宽）</label><input type="range" id="hmAvaSize" min="5" max="45" step="0.5" value="16" oninput="hmSet('ava','size',this.value)"></div>
+        </div>
+        <div class="row-2">
+          <div><label>圆角: <span id="hmAvaRadiusVal">24</span>%</label><input type="range" id="hmAvaRadius" min="0" max="50" value="24" oninput="hmSet('ava','radius',this.value)"></div>
+          <div><label>描边颜色</label><input type="color" id="hmAvaRingColor" value="#ffffff" oninput="hmSet('ava','ringColor',this.value)"></div>
+        </div>
+        <div class="row-2">
+          <div><label>描边粗细: <span id="hmAvaRingWVal">0.4</span>%</label><input type="range" id="hmAvaRingW" min="0" max="3" step="0.1" value="0.4" oninput="hmSet('ava','ringW',this.value)"></div>
+          <div><label>图内缩放: <span id="hmAvaZoomVal">100</span>%</label><input type="range" id="hmAvaZoom" min="50" max="300" value="100" oninput="hmSet('ava','zoom',this.value)"></div>
+        </div>
+        <div class="row-2">
+          <div><label>图内 X: <span id="hmAvaOffXVal">50</span>%</label><input type="range" id="hmAvaOffX" min="0" max="100" value="50" oninput="hmSet('ava','offX',this.value)"></div>
+          <div><label>图内 Y: <span id="hmAvaOffYVal">50</span>%</label><input type="range" id="hmAvaOffY" min="0" max="100" value="50" oninput="hmSet('ava','offY',this.value)"></div>
+        </div>
+        <div class="row-2">
+          <div><label>位置 X: <span id="hmAvaXVal">85</span>%</label><input type="range" id="hmAvaX" min="0" max="100" value="85" oninput="hmSet('ava','x',this.value)"></div>
+          <div><label>位置 Y: <span id="hmAvaYVal">62</span>%</label><input type="range" id="hmAvaY" min="0" max="100" value="62" oninput="hmSet('ava','y',this.value)"></div>
+        </div>
+        <div class="row-2">
+          <div><label>层级</label><select id="hmAvaLayer" onchange="hmLayer('ava',this.value)"><option value="0">1（最底）</option><option value="1">2</option><option value="2">3（最顶）</option></select></div>
+          <div><label>&nbsp;</label><span class="hint" style="margin:0">头像默认骑在背景区与内容区交界处</span></div>
+        </div>
+
+        </div>
+        <div class="tpl-sec" data-tpl="home">
+        <h3 class="tool-h">⑥ 文字编辑（点选画布元素）</h3>
+        <div class="row">
+          <button class="primary small" onclick="hmSelect('hmNick')">昵称</button>
+          <button class="primary small" onclick="hmSelect('hmBio')">个人简介</button>
+          <button onclick="hmSelect(null)">取消选中</button>
+        </div>
+        <div class="hint" id="hmSelInfo">当前未选中元素：点击画布上的文字，或用动态卡片里的按钮切换</div>
+        <div id="hmCtxBox"></div>
+
+        </div>
+        <div class="tpl-sec" data-tpl="home">
+        <h3 class="tool-h">⑦ 动态内容管理</h3>
+        <button class="primary" onclick="hmAddPost()">＋ 添加一条动态</button>
+        <div class="hint">最多 8 条；动态较多时请调高画布高度或减小图片尺寸</div>
+        <div id="hmPostList"></div>
+
+        </div>
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis home magazine">
         <h3 class="tool-h" style="margin-top:14px">⑬ 全屏水印</h3>
         <div class="checkbox-row"><input type="checkbox" id="wmEnable" onchange="requestDraw()"><span>启用全屏水印</span></div>
         <input type="file" id="wmUpload" accept="image/*">
@@ -1997,6 +2110,22 @@ love
         <div class="hint">水印图会以所选混合模式叠加在作品图上</div>
 
         </div>
+        <div class="tpl-sec" data-tpl="home">
+        <h3 class="tool-h" style="margin-top:14px">文字水印</h3>
+        <div class="checkbox-row"><input type="checkbox" id="wmTextUse" onchange="requestDraw()"><span>使用文字水印（代替上方水印图片）</span></div>
+        <label>水印文字</label>
+        <input type="text" id="wmText" value="Yroist" oninput="requestDraw()">
+        <div class="row-2">
+          <div><label>水印字体</label><select id="wmFont" onchange="fontChanged(this)"></select></div>
+          <div><label>水印颜色</label><input type="color" id="wmColor" value="#ffffff" oninput="requestDraw()"></div>
+        </div>
+        <div class="row-2">
+          <div><label>排列方向</label><select id="wmDir" onchange="requestDraw()"><option value="h">水平排列</option><option value="v">竖直排列</option></select></div>
+          <div><label>字体粗细</label><select id="wmWeight" onchange="requestDraw()"><option value="400">常规</option><option value="500">中等</option><option value="700" selected>加粗</option><option value="900">特粗</option></select></div>
+        </div>
+        <div class="hint">水印大小、透明度、旋转、间距、位置与平铺方式复用上方「全屏水印」控件；勾选「启用全屏水印」后随 PNG 一起导出。</div>
+
+        </div>
         <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile">
         <h3 class="tool-h" style="margin-top:14px">⑭ 吸管取色</h3>
         <label>吸色目标</label>
@@ -2017,7 +2146,7 @@ love
         <div class="hint" id="pickerHint" style="display:none;color:#f4c842">吸管模式已开启：点击右侧画布任意位置吸取颜色</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis magazine">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis home magazine">
         <h3 class="tool-h">⑮ 导出</h3>
         <button class="primary" onclick="exportPNG()">导出 PNG</button>
         <div class="hint" style="margin-top:10px">提示：预设只保存参数，自定义纹理图和头像需重新上传。</div>
@@ -4772,6 +4901,12 @@ const dragMap={
 };
 // 拖拽目标：时钟在紧凑模式下拖动顶部区域，其余模式拖动大时钟
 function dragTargetFor(id){
+  if(id&&id.indexOf("hm")===0){
+    // 个人主页预览：命中即切换选中态，并映射到该元素的 X / Y 滑块
+    if(id==="hmNone"){ if(hmSel!==null)hmSelect(null); return null; }
+    if(hmSel!==id)hmSelect(id);
+    return {xId:id+"X",yId:id+"Y",xVal:id+"XVal",yVal:id+"YVal"};
+  }
   if(id==="lockTime"&&typeof clkMode==="function"){
     const cm=clkMode();
     if(cm==="compact")return {xId:"clkCmpX",yId:"clkCmpY",xVal:"clkCmpXVal",yVal:"clkCmpYVal"};
@@ -5175,6 +5310,693 @@ function drawProfile(){
 
   // 13) 全屏水印作用于整张照片
   wmClip={ox:0,oy:0,rot:0,x:0,y:0,w:W,h:H,r:0};
+}
+
+// ============ 个人主页预览模板（home） ============
+// 状态与图片全部保存在 hmState / HM_MEDIA 中，与其他模板完全隔离：
+// hmState 只存参数（可写入预设、分享链接、自动保存），图片存 dataURL 并持久化到 IndexedDB 的 ps-home 键。
+let hmState=null;
+let hmSel=null;
+const HM_MEDIA={bg:"",ava:"",posts:[]};
+const hmImgCache={};
+const HM_SYS="'PingFang SC','Microsoft YaHei','Helvetica Neue',Helvetica,Arial,sans-serif";
+const HM_FONTS=[
+  ["'PingFang SC','Microsoft YaHei',sans-serif","苹方 / 雅黑（默认）"],
+  ["'Noto Sans SC',sans-serif","思源黑体"],
+  ["'Noto Serif SC',serif","思源宋体"],
+  ["'ZCOOL QingKe HuangYou',sans-serif","站酷庆科黄油体（圆体）"],
+  ["'ZCOOL XiaoWei',serif","站酷小薇（宋体）"],
+  ["'KaiTi','Kaiti SC','STKaiti',serif","楷体"],
+  ["'Helvetica Neue',Helvetica,Arial,sans-serif","Helvetica / Arial"]
+];
+const hmMctx=document.createElement("canvas").getContext("2d");
+const HM_POST_MAX=8;
+
+function hm2(v){return Math.round(v*100)/100;}
+function hmCap(p){return p.charAt(0).toUpperCase()+p.slice(1);}
+function hmKeyNorm(k){
+  if(!k)return k;
+  if(k.indexOf("hm")===0)return k;
+  if(k==="bg"||k==="ava")return "hm"+k.charAt(0).toUpperCase()+k.slice(1);
+  return k;
+}
+function hmCtlId(key,prop){return hmKeyNorm(key)+hmCap(prop);}
+function hmEsc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function hmMsg(m){if(typeof fontToast==="function")fontToast(m);}
+function hmReady(im){return !!(im&&im.complete&&im.naturalWidth);}
+function hmImg(src){
+  if(!src)return null;
+  if(hmImgCache[src])return hmImgCache[src];
+  const im=new Image();
+  im.onload=function(){requestDraw();};
+  im.src=src;
+  hmImgCache[src]=im;
+  return im;
+}
+
+// ---- 状态模型 ----
+function hmText(o){
+  return Object.assign({
+    text:"",font:"'PingFang SC','Microsoft YaHei',sans-serif",size:"4",weight:"400",
+    color:"#1a1a1a",ls:"0",lh:"1.5",align:"left",x:"50",y:"50",w:"40"
+  },o||{});
+}
+function hmPostBase(cy){
+  return {
+    cy:cy,
+    img:{x:"28.8",y:cy,w:"24.9",h:"19",bw:"24.9",bh:"19",r:"6",zoom:"100",ox:"50",oy:"50"},
+    day:hmText({text:"11",x:"7.7",y:hm2(cy-4),w:"13",size:"5",weight:"700",align:"center",color:"#1a1a1a",lh:"1.2"}),
+    mon:hmText({text:"9月",x:"7.7",y:hm2(cy+0.4),w:"13",size:"2.4",align:"center",color:"#4a4a4a",lh:"1.2"}),
+    body:hmText({text:"钱没有变少，只是变成了我喜欢的东西",x:"68",y:hm2(cy-3.5),w:"50",size:"3.6",lh:"1.55",align:"left"}),
+    time:hmText({text:"10:24",x:"51",y:hm2(cy+4),w:"14",size:"2.3",align:"left",color:"#9a9a9a",lh:"1.2"})
+  };
+}
+function hmDefaults(){
+  return {
+    bg:{band:"62",color:"#e3e9f0",content:"#ffffff",scale:"100",x:"50",y:"50",blur:"0",op:"100"},
+    ava:{shape:"round",size:"16",radius:"24",ringW:"0.4",ringColor:"#ffffff",zoom:"100",offX:"50",offY:"50",x:"85",y:"62"},
+    layer:{bg:"0",img:"1",ava:"2"},
+    nick:hmText({text:"Yroist",size:"5.2",weight:"700",color:"#ffffff",align:"right",x:"57",y:"61",w:"34"}),
+    bio:hmText({text:"",size:"2.6",weight:"400",color:"#ffffff",align:"right",x:"57",y:"55.5",w:"34"}),
+    posts:[hmPostBase(81)]
+  };
+}
+function hmMerge(base,over){
+  if(over===undefined||over===null)return base;
+  if(Array.isArray(base)){
+    const a=Array.isArray(over)?over:[];
+    return a.map(function(v,i){
+      if(i>=base.length)return v;
+      return (v&&typeof v==="object"&&base[i])?hmMerge(base[i],v):base[i];
+    });
+  }
+  if(base&&typeof base==="object"){
+    const out={};
+    Object.keys(base).forEach(function(k){
+      out[k]=(base[k]&&typeof base[k]==="object")?hmMerge(base[k],over[k]):
+        (over[k]!==undefined&&over[k]!==null?over[k]:base[k]);
+    });
+    Object.keys(over).forEach(function(k){if(!(k in out))out[k]=over[k];});
+    return out;
+  }
+  return over!==undefined?over:base;
+}
+function hmEnsureState(){
+  if(!hmState)hmState=hmDefaults();
+  if(!hmState.posts||!hmState.posts.length)hmState.posts=[hmPostBase(81)];
+  if(!Array.isArray(HM_MEDIA.posts))HM_MEDIA.posts=[];
+  while(HM_MEDIA.posts.length<hmState.posts.length)HM_MEDIA.posts.push("");
+  HM_MEDIA.posts.length=hmState.posts.length;
+}
+function hmSnapshot(){return JSON.parse(JSON.stringify(hmState||hmDefaults()));}
+function hmMediaSnapshot(){return {bg:HM_MEDIA.bg||"",ava:HM_MEDIA.ava||"",posts:(HM_MEDIA.posts||[]).slice()};}
+function hmRestore(s){
+  hmState=hmMerge(hmDefaults(),s||{});
+  hmEnsureState();
+  hmSyncDom();hmRenderCtx();hmRenderPosts();
+}
+function hmRestoreMedia(m){
+  HM_MEDIA.bg=(m&&m.bg)||"";
+  HM_MEDIA.ava=(m&&m.ava)||"";
+  HM_MEDIA.posts=(m&&Array.isArray(m.posts))?m.posts.slice():[];
+  hmEnsureState();
+  requestDraw();
+}
+function hmPersistMedia(){
+  try{idbPut("ps-home",new Blob([JSON.stringify(hmMediaSnapshot())],{type:"application/json"}));}catch(e){}
+}
+function hmClearMedia(){
+  HM_MEDIA.bg="";HM_MEDIA.ava="";HM_MEDIA.posts=[];
+  hmState=hmDefaults();
+  hmEnsureState();
+  try{idbPut("ps-home",new Blob(["{}"],{type:"application/json"}));}catch(e){}
+  hmSyncDom();hmRenderCtx();hmRenderPosts();
+}
+
+// ---- 元素查找 / 参数写入 ----
+function hmFind(key){
+  if(!hmState)return null;
+  const k=hmKeyNorm(key);
+  if(k==="hmBg")return {el:hmState.bg,type:"bg",key:"hmBg",title:"背景图片"};
+  if(k==="hmAva")return {el:hmState.ava,type:"ava",key:"hmAva",title:"头像"};
+  if(k==="hmNick")return {el:hmState.nick,type:"text",key:"hmNick",title:"昵称"};
+  if(k==="hmBio")return {el:hmState.bio,type:"text",key:"hmBio",title:"个人简介"};
+  const m=/^hmP(\d+)(img|day|mon|body|time)$/.exec(k);
+  if(m){
+    const i=parseInt(m[1],10),sub=m[2],p=hmState.posts[i];
+    if(!p)return null;
+    const t={img:"动态图片",day:"日期",mon:"月份",body:"动态正文",time:"发布时间"}[sub];
+    return {el:p[sub],type:sub==="img"?"pimg":"text",post:i,key:k,title:"动态"+(i+1)+" · "+t};
+  }
+  return null;
+}
+function hmRefreshCtl(key,prop,val){
+  const el=document.getElementById(hmCtlId(key,prop));
+  if(el){
+    el.value=val;
+    const sp=document.getElementById(el.id+"Val");
+    if(sp)sp.textContent=val;
+  }
+}
+function hmSet(key,prop,val){
+  const f=hmFind(key);if(!f)return;
+  if(f.type==="pimg"&&(prop==="w"||prop==="h")){
+    const lockEl=document.getElementById("hmLock");
+    const lock=lockEl?lockEl.checked:true;
+    const old=parseFloat(prop==="w"?f.el.w:f.el.h)||1;
+    const nv=parseFloat(val)||1;
+    if(prop==="w"){
+      f.el.w=val;f.el.bw=nv;
+      if(lock&&old){
+        f.el.h=hm2((parseFloat(f.el.h)||1)*nv/old);
+        f.el.bh=f.el.h;
+        hmRefreshCtl(f.key,"h",f.el.h);
+      }
+    }else{
+      f.el.h=val;f.el.bh=nv;
+      if(lock&&old){
+        f.el.w=hm2((parseFloat(f.el.w)||1)*nv/old);
+        f.el.bw=f.el.w;
+        hmRefreshCtl(f.key,"w",f.el.w);
+      }
+    }
+    const sp=document.getElementById(hmCtlId(key,prop)+"Val");
+    if(sp)sp.textContent=val;
+    requestDraw();
+    return;
+  }
+  f.el[prop]=val;
+  const sp=document.getElementById(hmCtlId(key,prop)+"Val");
+  if(sp)sp.textContent=val;
+  requestDraw();
+}
+function hmLayer(which,val){
+  if(!hmState)return;
+  hmState.layer[which]=String(val);
+  requestDraw();
+}
+function hmBandChanged(val){
+  hmEnsureState();
+  const old=parseFloat(hmState.bg.band)||0;
+  const nw=parseFloat(val)||0;
+  const d=nw-old;
+  hmState.bg.band=String(nw);
+  if(d){
+    ["ava","nick","bio"].forEach(function(k){
+      const t=hmState[k];
+      if(t)t.y=hm2(Math.max(0,Math.min(100,(parseFloat(t.y)||0)+d)));
+    });
+    hmLayoutPosts();
+  }
+  hmSyncDom();
+  requestDraw();
+}
+// 多条动态：把各行动态均匀铺在背景区下方，保持行内相对位置
+function hmLayoutPosts(){
+  hmEnsureState();
+  const st=hmState,n=st.posts.length;
+  if(!n)return;
+  const band=parseFloat(st.bg.band)||62;
+  const start=band+3;
+  const slot=(97-start)/n;
+  st.posts.forEach(function(p,i){
+    const newCy=hm2(start+(i+0.5)*slot);
+    const oldCy=parseFloat(p.cy);
+    const d=isNaN(oldCy)?0:newCy-oldCy;
+    p.cy=newCy;
+    ["img","day","mon","body","time"].forEach(function(kk){
+      const v=parseFloat(p[kk].y);
+      if(!isNaN(v))p[kk].y=hm2(v+d);
+    });
+    const img=p.img;
+    const bh=parseFloat(img.bh)||parseFloat(img.h)||19;
+    const bw=parseFloat(img.bw)||parseFloat(img.w)||24.9;
+    const nh=Math.min(bh,slot*0.86);
+    img.h=hm2(nh);
+    img.w=hm2(bw*nh/bh);
+  });
+}
+
+// ---- 画布渲染 ----
+function hmDraw(){
+  hmEnsureState();
+  hmSyncSel();
+  const W=c.width,H=c.height;
+  ctx.fillStyle=hmState.bg.content||"#ffffff";
+  ctx.fillRect(0,0,W,H);
+  pushTextHit("hmNone",W/2,H/2,W,H);
+  const order=[
+    {v:parseFloat(hmState.layer.bg)||0,fn:hmDrawBgBand},
+    {v:parseFloat(hmState.layer.img)||1,fn:hmDrawPosts},
+    {v:parseFloat(hmState.layer.ava)||2,fn:hmDrawAva}
+  ];
+  order.sort(function(a,b){return a.v-b.v;});
+  order.forEach(function(o){o.fn();});
+  hmDrawTextEl("hmNick",hmState.nick);
+  if(hmState.bio&&hmState.bio.text)hmDrawTextEl("hmBio",hmState.bio);
+  hmState.posts.forEach(function(p,i){
+    const k="hmP"+i;
+    hmDrawTextEl(k+"day",p.day);
+    hmDrawTextEl(k+"mon",p.mon);
+    hmDrawTextEl(k+"body",p.body);
+    hmDrawTextEl(k+"time",p.time);
+  });
+}
+// 画布拖拽直接写滑块 DOM，这里把选中元素的 X / Y 同步回状态（滑块仍是唯一事实源）
+function hmSyncSel(){
+  if(!hmSel||!hmState)return;
+  const f=hmFind(hmSel);if(!f)return;
+  const gx=document.getElementById(hmCtlId(hmSel,"x"));
+  const gy=document.getElementById(hmCtlId(hmSel,"y"));
+  if(gx&&gx.value!=="")f.el.x=gx.value;
+  if(gy&&gy.value!=="")f.el.y=gy.value;
+}
+function hmDrawBgBand(){
+  const W=c.width,H=c.height,st=hmState.bg;
+  const bandH=H*(parseFloat(st.band)||62)/100;
+  ctx.save();
+  ctx.beginPath();ctx.rect(0,0,W,bandH);ctx.clip();
+  ctx.fillStyle=st.color||"#e3e9f0";
+  ctx.fillRect(0,0,W,bandH);
+  const im=hmImg(HM_MEDIA.bg);
+  if(hmReady(im)){
+    const iw=im.naturalWidth,ih=im.naturalHeight;
+    const zoom=(parseFloat(st.scale)||100)/100;
+    const s=Math.max(W/iw,bandH/ih)*zoom;
+    const dw=iw*s,dh=ih*s;
+    const dx=W/2-dw/2+((parseFloat(st.x)||50)-50)/100*W;
+    const dy=bandH/2-dh/2+((parseFloat(st.y)||50)-50)/100*H;
+    const blur=W*(parseFloat(st.blur)||0)/100;
+    const op=parseFloat(st.op);
+    ctx.globalAlpha=Math.max(0,Math.min(1,(isNaN(op)?100:op)/100));
+    if(blur>0){
+      ctx.filter="blur("+blur+"px)";
+      const pad=blur*2;
+      ctx.drawImage(im,dx-pad,dy-pad,dw+pad*2,dh+pad*2);
+      ctx.filter="none";
+    }else{
+      ctx.drawImage(im,dx,dy,dw,dh);
+    }
+    ctx.globalAlpha=1;
+  }
+  ctx.restore();
+  hmMarkSel("hmBg",W/2,bandH/2,W,bandH);
+  // 命中区只取背景区上半部，避免盖住头像与动态区的点击
+  pushTextHit("hmBg",W/2,bandH*0.3,W,bandH*0.5);
+}
+function hmDrawPosts(){
+  const W=c.width,H=c.height;
+  hmState.posts.forEach(function(p,i){
+    const img=p.img;
+    const w=W*(parseFloat(img.w)||10)/100;
+    const h=H*(parseFloat(img.h)||10)/100;
+    const cx=W*(parseFloat(img.x)||50)/100;
+    const cy=H*(parseFloat(img.y)||80)/100;
+    const rr=Math.min(w/2,h/2,Math.max(0,w*(parseFloat(img.r)||0)/100));
+    const key="hmP"+i+"img";
+    ctx.save();
+    rrPath(cx-w/2,cy-h/2,w,h,rr);
+    ctx.clip();
+    const im=hmImg(HM_MEDIA.posts[i]||"");
+    if(hmReady(im)){
+      const iw=im.naturalWidth,ih=im.naturalHeight;
+      const zoom=(parseFloat(img.zoom)||100)/100;
+      const s=Math.max(w/iw,h/ih)*zoom;
+      const dw=iw*s,dh=ih*s;
+      ctx.drawImage(im,
+        cx-dw/2+((parseFloat(img.ox)||50)-50)/100*w,
+        cy-dh/2+((parseFloat(img.oy)||50)-50)/100*h,
+        dw,dh);
+    }else{
+      ctx.fillStyle="#eef1f6";
+      ctx.fillRect(cx-w/2,cy-h/2,w,h);
+      ctx.fillStyle="#9aa3ae";
+      ctx.textAlign="center";ctx.textBaseline="middle";
+      ctx.font=hm2(Math.max(20,Math.min(w,h)*0.1))+"px "+HM_SYS;
+      ctx.fillText("＋ 上传图片",cx,cy);
+    }
+    ctx.restore();
+    hmMarkSel(key,cx,cy,w,h);
+    pushTextHit(key,cx,cy,w,h);
+  });
+}
+function hmDrawAva(){
+  const W=c.width,H=c.height,st=hmState.ava;
+  const side=W*(parseFloat(st.size)||16)/100;
+  const cx=W*(parseFloat(st.x)||85)/100;
+  const cy=H*(parseFloat(st.y)||62)/100;
+  const path=function(){
+    if(st.shape==="rect"){
+      const rr=Math.min(side/2,side*(parseFloat(st.radius)||0)/100);
+      rrPath(cx-side/2,cy-side/2,side,side,rr);
+    }else{
+      ctx.beginPath();ctx.arc(cx,cy,side/2,0,Math.PI*2);
+    }
+  };
+  ctx.save();
+  path();ctx.clip();
+  ctx.fillStyle="#e6ebf2";
+  ctx.fillRect(cx-side/2,cy-side/2,side,side);
+  const im=hmImg(HM_MEDIA.ava);
+  if(hmReady(im)){
+    const iw=im.naturalWidth,ih=im.naturalHeight;
+    const zoom=(parseFloat(st.zoom)||100)/100;
+    const s=Math.max(side/iw,side/ih)*zoom;
+    const dw=iw*s,dh=ih*s;
+    ctx.drawImage(im,
+      cx-dw/2+((parseFloat(st.offX)||50)-50)/100*side,
+      cy-dh/2+((parseFloat(st.offY)||50)-50)/100*side,
+      dw,dh);
+  }else{
+    ctx.fillStyle="#c2ccd8";
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.font=hm2(side*0.34)+"px "+HM_SYS;
+    ctx.fillText("＋",cx,cy);
+  }
+  ctx.restore();
+  const ringW=W*(parseFloat(st.ringW)||0)/100;
+  if(ringW>0){
+    ctx.save();
+    ctx.strokeStyle=st.ringColor||"#ffffff";
+    ctx.lineWidth=ringW;
+    path();ctx.stroke();
+    ctx.restore();
+  }
+  hmMarkSel("hmAva",cx,cy,side,side);
+  pushTextHit("hmAva",cx,cy,side,side);
+}
+function hmSetFont(font,weight,fs){hmMctx.font=(weight||"400")+" "+fs+"px "+(font||HM_SYS);}
+function hmMeasure(t,font,weight,fs,lsPx){
+  hmSetFont(font,weight,fs);
+  return hmMctx.measureText(t).width+(lsPx?lsPx*Math.max(0,Array.from(t).length-1):0);
+}
+function hmWrapLines(text,fs,font,weight,maxW,lsPx){
+  const out=[];
+  String(text==null?"":text).split("\n").forEach(function(par){
+    if(par===""){out.push("");return;}
+    const toks=par.match(/[A-Za-z0-9\u00C0-\u024F’'\-]+|\s+|[^\s]/g)||[par];
+    let line="";
+    toks.forEach(function(tk){
+      const test=line+tk;
+      if(!line||hmMeasure(test,font,weight,fs,lsPx)<=maxW){line=test;}
+      else{out.push(line.replace(/\s+$/,""));line=tk.replace(/^\s+/,"");}
+    });
+    out.push(line.replace(/\s+$/,""));
+  });
+  return out.length?out:[""];
+}
+function hmFillSpaced(text,ax,ly,ls,align){
+  const chars=Array.from(text);
+  const ws=chars.map(function(ch){return ctx.measureText(ch).width;});
+  let total=ls*(chars.length-1);
+  ws.forEach(function(w){total+=w;});
+  let x0=ax;
+  if(align==="center")x0=ax-total/2;
+  else if(align==="right")x0=ax-total;
+  const ta=ctx.textAlign;
+  ctx.textAlign="left";
+  chars.forEach(function(ch,i){ctx.fillText(ch,x0,ly);x0+=ws[i]+ls;});
+  ctx.textAlign=ta;
+}
+function hmDrawTextEl(key,el){
+  if(!el||!el.text)return;
+  const W=c.width,H=c.height;
+  const fs=W*(parseFloat(el.size)||4)/100;
+  const bw=W*(parseFloat(el.w)||40)/100;
+  const cx=W*(parseFloat(el.x)||50)/100;
+  const cy=H*(parseFloat(el.y)||50)/100;
+  const ls=(parseFloat(el.ls)||0)*fs;
+  const lh=fs*(parseFloat(el.lh)||1.5);
+  const lines=hmWrapLines(el.text,fs,el.font,el.weight,bw,ls);
+  const totalH=Math.max(lh,lines.length*lh);
+  ctx.save();
+  ctx.font=(el.weight||"400")+" "+fs+"px "+(el.font||HM_SYS);
+  ctx.fillStyle=el.color||"#1a1a1a";
+  ctx.textBaseline="middle";
+  let ax;
+  if(el.align==="center"){ctx.textAlign="center";ax=cx;}
+  else if(el.align==="right"){ctx.textAlign="right";ax=cx+bw/2;}
+  else{ctx.textAlign="left";ax=cx-bw/2;}
+  lines.forEach(function(ln,i){
+    const ly=cy-totalH/2+lh*(i+0.5);
+    if(Math.abs(ls)<0.01)ctx.fillText(ln,ax,ly);
+    else hmFillSpaced(ln,ax,ly,ls,el.align);
+  });
+  ctx.restore();
+  const hw=Math.max(bw,fs*0.5);
+  pushTextHit(key,cx,cy,hw,totalH);
+  hmMarkSel(key,cx,cy,hw,totalH);
+}
+function hmMarkSel(key,x,y,w,h){
+  if(hmSel!==key)return;
+  if(typeof cgExporting!=="undefined"&&cgExporting)return;
+  const lw=Math.max(2,c.width*0.004);
+  ctx.save();
+  ctx.strokeStyle="#3b82f6";
+  ctx.lineWidth=lw;
+  ctx.setLineDash([lw*3,lw*2.2]);
+  ctx.strokeRect(x-w/2-lw,y-h/2-lw,w+lw*2,h+lw*2);
+  ctx.restore();
+}
+
+// ---- 面板渲染 ----
+function hmFontOpts(v){
+  let h="";
+  HM_FONTS.forEach(function(o){
+    h+='<option value="'+o[0]+'"'+(v===o[0]?" selected":"")+'>'+o[1]+'</option>';
+  });
+  if(customFonts.length){
+    h+='<optgroup label="自定义字体" data-custom="1">';
+    customFonts.forEach(function(f){
+      h+='<option value="'+hmEsc(f.fam)+'"'+(v===f.fam?" selected":"")+'>'+hmEsc(f.name)+'</option>';
+    });
+    h+='</optgroup>';
+  }
+  if(v&&!HM_FONTS.some(function(o){return o[0]===v;})&&!customFonts.some(function(f){return f.fam===v;})){
+    h+='<option value="'+hmEsc(v)+'" selected>'+hmEsc(v)+'</option>';
+  }
+  return h;
+}
+function hmWeightOpts(v){
+  let h="";
+  ["300","400","500","600","700","900"].forEach(function(w){
+    h+='<option value="'+w+'"'+(String(v)===w?" selected":"")+'>'+w+'</option>';
+  });
+  return h;
+}
+function hmAlignOpts(v){
+  let h="";
+  [["left","居左"],["center","居中"],["right","居右"]].forEach(function(a){
+    h+='<option value="'+a[0]+'"'+(v===a[0]?" selected":"")+'>'+a[1]+'</option>';
+  });
+  return h;
+}
+function hmWireFont(sel){
+  if(!sel)return;
+  if(typeof wireFontSelects==="function")wireFontSelects();
+  customFonts.forEach(function(f){
+    if(!sel.querySelector('option[value="'+f.fam.replace(/"/g,'\\"')+'"]')&&typeof addCustomFontOption==="function"){
+      addCustomFontOption(sel,f.fam,f.name);
+    }
+  });
+}
+function hmInitFontSelects(){
+  const el=document.getElementById("wmFont");
+  if(el&&!el.options.length){
+    el.innerHTML=hmFontOpts(HM_SYS);
+    el.value=HM_SYS;
+  }
+}
+function hmSelect(key){
+  const k=key?hmKeyNorm(key):null;
+  if(hmSel===k)return;
+  hmSel=k;
+  hmRenderCtx();
+  hmRenderPosts();
+  requestDraw();
+}
+function hmRenderCtx(){
+  const box=document.getElementById("hmCtxBox");
+  const info=document.getElementById("hmSelInfo");
+  if(!box)return;
+  if(!hmSel||!hmState){
+    box.innerHTML="";
+    if(info)info.textContent="当前未选中元素：点击画布上的文字，或用动态卡片里的按钮切换";
+    return;
+  }
+  const f=hmFind(hmSel);
+  if(!f){box.innerHTML="";if(info)info.textContent="当前未选中元素";return;}
+  if(info)info.textContent="当前选中："+f.title+"（可在画布上直接拖动）";
+  if(f.type==="text"){
+    box.innerHTML=hmTextCtrlsFull(f.key,f.el,f.title);
+    hmWireFont(document.getElementById(hmCtlId(f.key,"font")));
+  }else if(f.type==="bg"){
+    box.innerHTML='<div class="hint">已选中背景图片：请在上方「背景设置」调整缩放、模糊、透明度与位置。</div>';
+  }else if(f.type==="ava"){
+    box.innerHTML='<div class="hint">已选中头像：请在上方「头像设置」调整大小、形状、描边与位置。</div>';
+  }else{
+    box.innerHTML='<div class="hint">已选中动态图片：请在下方「动态内容管理」中调整该条动态的图片。</div>';
+  }
+}
+function hmTextCtrlsFull(key,el,title){
+  const id=function(p){return hmCtlId(key,p);};
+  const range=function(p,label,min,max,step){
+    return '<div><label>'+label+': <span id="'+id(p)+'Val">'+el[p]+'</span></label>'+
+      '<input type="range" id="'+id(p)+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+el[p]+'" oninput="hmSet(\''+key+'\',\''+p+'\',this.value)"></div>';
+  };
+  const rangePct=function(p,label,min,max,step){
+    return '<div><label>'+label+': <span id="'+id(p)+'Val">'+el[p]+'</span>%</label>'+
+      '<input type="range" id="'+id(p)+'" min="'+min+'" max="'+max+'" step="'+step+'" value="'+el[p]+'" oninput="hmSet(\''+key+'\',\''+p+'\',this.value)"></div>';
+  };
+  let h="";
+  h+='<div class="po-group">'+hmEsc(title)+'（可直接在画布上拖动）</div>';
+  h+='<label>文字内容（支持多行）</label><textarea rows="3" id="'+id("text")+'" oninput="hmSet(\''+key+'\',\'text\',this.value)">'+hmEsc(el.text)+'</textarea>';
+  h+='<label>字体</label><select id="'+id("font")+'" onchange="hmSet(\''+key+'\',\'font\',this.value);fontChanged(this)">'+hmFontOpts(el.font)+'</select>';
+  h+='<div class="row-2">';
+  h+='<div><label>字号: <span id="'+id("size")+'Val">'+el.size+'</span>%（宽）</label><input type="range" id="'+id("size")+'" min="0.8" max="14" step="0.1" value="'+el.size+'" oninput="hmSet(\''+key+'\',\'size\',this.value)"></div>';
+  h+='<div><label>字体粗细</label><select id="'+id("weight")+'" onchange="hmSet(\''+key+'\',\'weight\',this.value)">'+hmWeightOpts(el.weight)+'</select></div>';
+  h+='</div>';
+  h+='<div class="row-2">';
+  h+='<div><label>文字颜色</label><input type="color" id="'+id("color")+'" value="'+hmEsc(el.color)+'" oninput="hmSet(\''+key+'\',\'color\',this.value)"></div>';
+  h+='<div><label>对齐方式</label><select id="'+id("align")+'" onchange="hmSet(\''+key+'\',\'align\',this.value)">'+hmAlignOpts(el.align)+'</select></div>';
+  h+='</div>';
+  h+='<div class="row-2">';
+  h+=range("ls","字间距 (em)","-0.2","1","0.02");
+  h+=range("lh","行间距 (倍)","0.9","3","0.05");
+  h+='</div>';
+  h+=rangePct("w","文本框宽度","5","100","0.5");
+  h+='<div class="row-2">';
+  h+=rangePct("x","位置 X","0","100","0.5");
+  h+=rangePct("y","位置 Y","0","100","0.5");
+  h+='</div>';
+  return h;
+}
+function hmActivePost(){
+  if(hmSel){
+    const m=/^hmP(\d+)/.exec(hmSel);
+    if(m)return parseInt(m[1],10);
+  }
+  return 0;
+}
+function hmRenderPosts(){
+  const box=document.getElementById("hmPostList");
+  if(!box||!hmState)return;
+  const act=hmActivePost();
+  let h="";
+  hmState.posts.forEach(function(p,i){
+    const k="hmP"+i;
+    h+='<div style="border-top:1px solid #2a2a35;margin-top:10px;padding-top:6px">';
+    h+='<div class="po-group" style="border-top:none;padding-top:0;margin-top:4px">动态 '+(i+1)+'</div>';
+    h+='<div class="row">';
+    h+='<button class="primary small" onclick="hmSelect(\''+k+'img\')">图片</button>';
+    h+='<button class="primary small" onclick="hmSelect(\''+k+'day\')">日期</button>';
+    h+='<button class="primary small" onclick="hmSelect(\''+k+'body\')">正文</button>';
+    h+='<button class="primary small" onclick="hmSelect(\''+k+'time\')">时间</button>';
+    h+='<button class="warn" onclick="hmDelPost('+i+')">删除本条</button>';
+    h+='</div>';
+    if(i===act){
+      h+='<input type="file" accept="image/*" id="'+k+'Upload" onchange="hmFile(\'post\',this,'+i+')">';
+      h+='<div class="row"><button onclick="document.getElementById(\''+k+'Upload\').click()">🖼 上传 / 替换图片</button><button class="warn" onclick="hmPostDelImg('+i+')">🗑 删除图片</button></div>';
+      h+='<div class="row-2">';
+      h+='<div><label>宽度: <span id="'+k+'imgWVal">'+p.img.w+'</span>%</label><input type="range" id="'+k+'imgW" min="3" max="95" step="0.5" value="'+p.img.w+'" oninput="hmSet(\''+k+'img\',\'w\',this.value)"></div>';
+      h+='<div><label>高度: <span id="'+k+'imgHVal">'+p.img.h+'</span>%</label><input type="range" id="'+k+'imgH" min="3" max="70" step="0.5" value="'+p.img.h+'" oninput="hmSet(\''+k+'img\',\'h\',this.value)"></div>';
+      h+='</div>';
+      h+='<div class="checkbox-row"><input type="checkbox" id="hmLock" checked><span>等比例缩放（改宽 / 高时同步另一项）</span></div>';
+      h+='<div class="row-2">';
+      h+='<div><label>圆角: <span id="'+k+'imgRVal">'+p.img.r+'</span>%</label><input type="range" id="'+k+'imgR" min="0" max="50" value="'+p.img.r+'" oninput="hmSet(\''+k+'img\',\'r\',this.value)"></div>';
+      h+='<div><label>图内缩放: <span id="'+k+'imgZoomVal">'+p.img.zoom+'</span>%</label><input type="range" id="'+k+'imgZoom" min="50" max="300" value="'+p.img.zoom+'" oninput="hmSet(\''+k+'img\',\'zoom\',this.value)"></div>';
+      h+='</div>';
+      h+='<div class="row-2">';
+      h+='<div><label>图内 X: <span id="'+k+'imgOxVal">'+p.img.ox+'</span>%</label><input type="range" id="'+k+'imgOx" min="0" max="100" value="'+p.img.ox+'" oninput="hmSet(\''+k+'img\',\'ox\',this.value)"></div>';
+      h+='<div><label>图内 Y: <span id="'+k+'imgOyVal">'+p.img.oy+'</span>%</label><input type="range" id="'+k+'imgOy" min="0" max="100" value="'+p.img.oy+'" oninput="hmSet(\''+k+'img\',\'oy\',this.value)"></div>';
+      h+='</div>';
+      h+='<div class="row-2">';
+      h+='<div><label>位置 X: <span id="'+k+'imgXVal">'+p.img.x+'</span>%</label><input type="range" id="'+k+'imgX" min="0" max="100" step="0.5" value="'+p.img.x+'" oninput="hmSet(\''+k+'img\',\'x\',this.value)"></div>';
+      h+='<div><label>位置 Y: <span id="'+k+'imgYVal">'+p.img.y+'</span>%</label><input type="range" id="'+k+'imgY" min="0" max="100" step="0.5" value="'+p.img.y+'" oninput="hmSet(\''+k+'img\',\'y\',this.value)"></div>';
+      h+='</div>';
+      h+='<div class="hint">日期 / 月份 / 正文 / 发布时间在上方「文字编辑」区调整，也可在画布上直接拖动。</div>';
+    }else{
+      h+='<div class="hint">点击上方任意按钮编辑本条动态。</div>';
+    }
+    h+='</div>';
+  });
+  box.innerHTML=h;
+}
+function hmSyncDom(){
+  if(!hmState)return;
+  [["bg",hmState.bg],["ava",hmState.ava]].forEach(function(pair){
+    const key=pair[0],obj=pair[1];
+    Object.keys(obj).forEach(function(prop){
+      const id=hmCtlId(key,prop);
+      const el=document.getElementById(id);
+      if(el){
+        el.value=obj[prop];
+        const sp=document.getElementById(id+"Val");
+        if(sp)sp.textContent=obj[prop];
+      }
+    });
+  });
+  const bl=document.getElementById("hmBgLayer");
+  if(bl)bl.value=hmState.layer.bg||"0";
+  const al=document.getElementById("hmAvaLayer");
+  if(al)al.value=hmState.layer.ava||"2";
+}
+
+// ---- 图片素材 ----
+function hmFile(kind,input,idx){
+  const f=input.files&&input.files[0];
+  if(!f)return;
+  const rd=new FileReader();
+  rd.onload=function(){
+    const url=rd.result;
+    if(kind==="bg")HM_MEDIA.bg=url;
+    else if(kind==="ava")HM_MEDIA.ava=url;
+    else if(kind==="post")HM_MEDIA.posts[idx]=url;
+    hmPersistMedia();
+    requestDraw();
+    try{input.value="";}catch(e){}
+  };
+  rd.readAsDataURL(f);
+}
+function hmRemoveBg(){
+  if(!HM_MEDIA.bg){hmMsg("当前没有背景图片");return;}
+  if(!confirm("删除背景图片？"))return;
+  HM_MEDIA.bg="";
+  hmPersistMedia();requestDraw();
+}
+function hmRemoveAva(){
+  if(!HM_MEDIA.ava){hmMsg("当前没有头像图片");return;}
+  if(!confirm("删除头像图片？"))return;
+  HM_MEDIA.ava="";
+  hmPersistMedia();requestDraw();
+}
+function hmPostDelImg(i){
+  if(!HM_MEDIA.posts[i]){hmMsg("该动态暂无图片");return;}
+  if(!confirm("删除第 "+(i+1)+" 条动态的图片？"))return;
+  HM_MEDIA.posts[i]="";
+  hmPersistMedia();requestDraw();
+}
+function hmAddPost(){
+  hmEnsureState();
+  if(hmState.posts.length>=HM_POST_MAX){hmMsg("最多添加 "+HM_POST_MAX+" 条动态");return;}
+  hmState.posts.push(hmPostBase(81));
+  HM_MEDIA.posts.push("");
+  hmLayoutPosts();
+  hmSelect("hmP"+(hmState.posts.length-1)+"img");
+  hmRenderCtx();hmRenderPosts();
+  requestDraw();
+}
+function hmDelPost(i){
+  hmEnsureState();
+  if(hmState.posts.length<=1){hmMsg("至少保留一条动态");return;}
+  if(!confirm("删除第 "+(i+1)+" 条动态？"))return;
+  hmState.posts.splice(i,1);
+  HM_MEDIA.posts.splice(i,1);
+  hmLayoutPosts();
+  if(hmSel&&/^hmP/.test(hmSel))hmSel=null;
+  hmRenderCtx();hmRenderPosts();
+  hmPersistMedia();
+  requestDraw();
 }
 
 // ============ 杂志手账模板（Editorial Journal） ============
@@ -5700,6 +6522,13 @@ function draw(){
     scheduleAutosave();
     return;
   }
+  // 个人主页预览模板：独立渲染管线
+  if(typeof currentTemplate!=="undefined"&&currentTemplate==="home"){
+    hmDraw();
+    drawWatermark();
+    scheduleAutosave();
+    return;
+  }
   // 相框风模板：独立渲染管线
   if(typeof currentTemplate!=="undefined"&&currentTemplate==="frame"){
     drawFrame();
@@ -6166,7 +6995,11 @@ function drawPolaroid(){
 // ============ 全屏水印 ============
 function drawWatermark(){
   if(!document.getElementById("wmEnable").checked) return;
-  if(!watermarkImg) return;
+  // 文字水印模式（个人主页预览提供控件）：未勾选或文字为空时保持原有图片水印行为
+  const wmTextUse=document.getElementById("wmTextUse");
+  const wmTextStr=document.getElementById("wmText")?document.getElementById("wmText").value:"";
+  const textMode=!!(wmTextUse&&wmTextUse.checked&&wmTextStr.trim());
+  if(!textMode && !watermarkImg) return;
   const blend=document.getElementById("wmBlend").value;
   const scale=parseInt(document.getElementById("wmScale").value)/100;
   const opacity=parseInt(document.getElementById("wmOpacity").value)/100;
@@ -6175,15 +7008,54 @@ function drawWatermark(){
   const wx=parseInt(document.getElementById("wmX").value)/100;
   const wy=parseInt(document.getElementById("wmY").value)/100;
   const rot=parseInt(document.getElementById("wmRot").value)*Math.PI/180;
-  // 以「画布长边」为基准等比计算水印尺寸，而不是用图片原始像素。
-  // 这样预览（缩小后的画布）与导出（全分辨率画布）渲染比例完全一致，
-  // 不会出现导出后水印缩成一小块的问题。
-  const iw=watermarkImg.naturalWidth||watermarkImg.width;
-  const ih=watermarkImg.naturalHeight||watermarkImg.height;
   const canvasLong=Math.max(c.width,c.height);
-  const k=(canvasLong*scale*0.5)/Math.max(iw,ih);
-  const w=iw*k;
-  const h=ih*k;
+  let unitW,unitH,paint;
+  if(textMode){
+    // 字号以画布长边为基准：预览与全分辨率导出的比例完全一致
+    const fs=canvasLong*scale*0.1;
+    const font=document.getElementById("wmFont").value;
+    const weight=document.getElementById("wmWeight").value;
+    const color=document.getElementById("wmColor").value;
+    const dir=document.getElementById("wmDir").value;
+    const chars=Array.from(Array.from(wmTextStr.trim()));
+    const stepCh=fs*1.15;
+    ctx.save();
+    ctx.font=weight+" "+fs+"px "+font;
+    let tw=0;
+    chars.forEach(function(ch){tw+=ctx.measureText(ch).width;});
+    ctx.restore();
+    if(dir==="v"){unitW=fs*1.3;unitH=stepCh*chars.length;}
+    else{unitW=tw+fs*0.3;unitH=fs*1.3;}
+    paint=function(px,py){
+      ctx.save();
+      ctx.translate(px,py);
+      ctx.font=weight+" "+fs+"px "+font;
+      ctx.fillStyle=color;
+      ctx.textAlign="center";ctx.textBaseline="middle";
+      if(dir==="v"){
+        let y0=-(chars.length-1)*stepCh/2;
+        chars.forEach(function(ch,i){ctx.fillText(ch,0,y0+i*stepCh);});
+      }else{
+        let x0=-tw/2;
+        chars.forEach(function(ch){
+          const cw=ctx.measureText(ch).width;
+          ctx.fillText(ch,x0+cw/2,0);
+          x0+=cw;
+        });
+      }
+      ctx.restore();
+    };
+  }else{
+    // 以「画布长边」为基准等比计算水印尺寸，而不是用图片原始像素。
+    // 这样预览（缩小后的画布）与导出（全分辨率画布）渲染比例完全一致，
+    // 不会出现导出后水印缩成一小块的问题。
+    const iw=watermarkImg.naturalWidth||watermarkImg.width;
+    const ih=watermarkImg.naturalHeight||watermarkImg.height;
+    const k=(canvasLong*scale*0.5)/Math.max(iw,ih);
+    unitW=iw*k;
+    unitH=ih*k;
+    paint=function(px,py){ctx.drawImage(watermarkImg,px-unitW/2,py-unitH/2,unitW,unitH);};
+  }
   ctx.save();
   // 只覆盖照片本体：存在照片区域时裁剪到该区域，不涉及白边/背景
   if(wmClip){
@@ -6196,23 +7068,23 @@ function drawWatermark(){
   ctx.globalAlpha=opacity;
   ctx.globalCompositeOperation=blend;
   if(tile){
-    const stepX=w*(1+gap);
-    const stepY=h*(1+gap);
+    const stepX=unitW*(1+gap);
+    const stepY=unitH*(1+gap);
     // 平铺网格也要跟随 X/Y 拉条偏移（X/Y 默认在平铺下也生效），边距留双倍对角线保证偏移后仍铺满
     const ext=Math.hypot(c.width,c.height)*2;
     ctx.translate(c.width/2,c.height/2);
     ctx.rotate(rot);
     ctx.translate(-c.width/2,-c.height/2);
     ctx.translate(c.width*(wx-0.5),c.height*(wy-0.5));
-    for(let y=-h-ext;y<c.height+h+ext;y+=stepY){
-      for(let x=-w-ext;x<c.width+w+ext;x+=stepX){
-        ctx.drawImage(watermarkImg,x,y,w,h);
+    for(let y=-unitH-ext;y<c.height+unitH+ext;y+=stepY){
+      for(let x=-unitW-ext;x<c.width+unitW+ext;x+=stepX){
+        paint(x+unitW/2,y+unitH/2);
       }
     }
   }else{
     ctx.translate(c.width*wx,c.height*wy);
     ctx.rotate(rot);
-    ctx.drawImage(watermarkImg,-w/2,-h/2,w,h);
+    paint(0,0);
   }
   ctx.restore();
 }
@@ -7525,6 +8397,12 @@ function getSettings(){
     wmRot:document.getElementById("wmRot").value,
     wmTile:chk("wmTile"),
     wmGap:document.getElementById("wmGap").value,
+    wmTextUse:chk("wmTextUse"),
+    wmText:document.getElementById("wmText").value,
+    wmFont:document.getElementById("wmFont").value,
+    wmColor:document.getElementById("wmColor").value,
+    wmDir:document.getElementById("wmDir").value,
+    wmWeight:document.getElementById("wmWeight").value,
     poEnable:chk("poEnable"),
     poDateLeft:document.getElementById("poDateLeft").value,
     poDateRight:document.getElementById("poDateRight").value,
@@ -7690,7 +8568,8 @@ function getSettings(){
     mjColor:document.getElementById("mjColor").value,
     mjYTop:document.getElementById("mjYTop").value,
     mjYBot:document.getElementById("mjYBot").value,
-    mjAlign:document.getElementById("mjAlign").value
+    mjAlign:document.getElementById("mjAlign").value,
+    home:hmSnapshot()
   };
 }
 function applySettings(s){
@@ -7797,6 +8676,13 @@ function applySettings(s){
   set("wmX",s.wmX||"50");set("wmY",s.wmY||"50");
   set("wmRot",s.wmRot||"0");
   chk("wmTile",s.wmTile!==false);set("wmGap",s.wmGap||"60");
+  // 个人主页预览 · 文字水印
+  chk("wmTextUse",!!s.wmTextUse);
+  set("wmText",s.wmText||"Yroist");
+  if(s.wmFont){set("wmFont",s.wmFont);const wf=document.getElementById("wmFont");if(wf&&wf.value!==s.wmFont)wf.value=HM_SYS;}
+  set("wmColor",s.wmColor||"#ffffff");
+  set("wmDir",s.wmDir||"h");
+  set("wmWeight",s.wmWeight||"700");
   // 拍立得参数
   chk("poEnable",s.poEnable!==false);
   set("poDateLeft",s.poDateLeft||"2026");
@@ -8084,6 +8970,9 @@ function applySettings(s){
    ["mjYTop",s.mjYTop||52],["mjYBot",s.mjYBot||47]].forEach(function(p){
     const el=document.getElementById(p[0]+"Val");if(el)el.textContent=p[1];
   });
+  // 个人主页预览：状态与图片素材一并恢复
+  if(s.home)hmRestore(s.home);
+  if(s.homeImg)hmRestoreMedia(s.homeImg);
   resizeCanvas();
 }
 function presetKey(){
@@ -8116,7 +9005,20 @@ function refreshPresetUI(){
 function savePreset(n){
   const presets=readPresets();
   presets[n]=getSettings();
-  writePresets(presets);
+  // 个人主页预览：预设槽保存在本机 localStorage，容量足够时图片素材一起存入以便完整恢复
+  if(currentTemplate==="home"&&typeof hmMediaSnapshot==="function")presets[n].homeImg=hmMediaSnapshot();
+  try{
+    writePresets(presets);
+  }catch(err){
+    if(presets[n]&&presets[n].homeImg){
+      delete presets[n].homeImg;
+      try{writePresets(presets);}catch(e2){alert("保存失败：本地存储空间不足");refreshPresetUI();return;}
+      refreshPresetUI();
+      alert("已保存到预设槽 "+n+"（图片素材过大未写入，仅保存全部参数）");
+      return;
+    }
+    alert("保存失败：本地存储空间不足");refreshPresetUI();return;
+  }
   refreshPresetUI();
   const tpl=(typeof TPL_NAMES!=="undefined"&&TPL_NAMES[currentTemplate])||"当前模板";
   alert("已保存到「"+tpl+"」预设槽 "+n);
@@ -8138,6 +9040,7 @@ function resetAll(){
   document.getElementById("pfAvatarUpload").value="";
   document.getElementById("axUpload").value="";
   if(typeof axSyncCount==="function")axSyncCount();
+  if(typeof hmClearMedia==="function")hmClearMedia();
   requestDraw();
 }
 
@@ -8168,7 +9071,7 @@ function renumberSections(){
 
 // ============ 模板选择首页 / 工作区 ============
 let currentTemplate="normal";
-const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscript:"字稿风预览",polaroid:"拍立得预览",profile:"个人主页",frame:"相框风预览",axis:"作品展示轴",collage:"自由拼图",magazine:"杂志手账"};
+const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscript:"字稿风预览",polaroid:"拍立得预览",profile:"个人主页",home:"个人主页预览",frame:"相框风预览",axis:"作品展示轴",collage:"自由拼图",magazine:"杂志手账"};
 // 每个模板的工作区图片互相独立：切走时存档当前模板的图片，切回时恢复，首次进入未存档则为空
 const tplImages={};
 function selectTemplate(type){
@@ -8260,6 +9163,18 @@ function applyTemplatePreset(type){
     chk("pfStatusBar",true);chk("pfTopIcons",true);chk("pfCard",true);chk("pfAvatar",true);
     chk("pfPlus",true);chk("pfOnline",true);chk("pfVip",false);chk("pfStats",true);
     chk("pfPlay",true);chk("pfSign",true);chk("pfSignIcon",true);chk("pfDate",false);chk("pfBody",true);chk("pfMusic",true);
+  }else if(type==="home"){
+    chk("msMode",false);
+    chk("lockScreen",false);
+    // 个人主页预览：3:4 竖版超清画布，总像素 12M，低于 Safari 画布上限 16.777M
+    set("size","3000,4000");
+    set("featherMode","none");
+    set("bgBlur","0");
+    hmEnsureState();
+    hmSyncDom();
+    hmRenderCtx();
+    hmRenderPosts();
+    requestDraw();
   }else if(type==="magazine"){
     chk("msMode",false);
     chk("lockScreen",false);
@@ -8859,6 +9774,8 @@ function exportPNG(){
 // 初始化：恢复自动保存 + 恢复图片 + 生成纹理
 // 自定义字体：先挂载各下拉的导入项并恢复历史导入的字体（含时钟字体卡），
 // 再跑自动保存恢复，保证保存下来的自定义字体值能对上已存在的 option。
+// 个人主页预览：文字水印字体下拉先于 wireFontSelects 填充，保证导入项排在末尾
+hmInitFontSelects();
 wireFontSelects();
 // 杂志手账：图片上传/替换/排序控件由脚本生成（按当前张数动态生成，避免面板里重复写死）
 mjBuildSlots();
@@ -8883,6 +9800,18 @@ idbGet("ps-texture").then(blob=>{
   const img=new Image();
   img.onload=()=>{textureImg=img;document.getElementById("texSource").value="upload";requestDraw();};
   img.src=URL.createObjectURL(blob);
+});
+// 个人主页预览：恢复背景图 / 头像 / 动态图片（JSON 快照存于 ps-home 键）
+idbGet("ps-home").then(blob=>{
+  if(!blob)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const m=JSON.parse(rd.result);
+      if(m&&typeof m==="object"){hmRestoreMedia(m);requestDraw();}
+    }catch(e){}
+  };
+  rd.readAsText(blob);
 });
 onTexPresetChange();
 buildPresetGrid();
