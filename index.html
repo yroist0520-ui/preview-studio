@@ -9,7 +9,7 @@
      比对下面的版本号，不一致就弹「有新版本」提示（点一下带参数跳转，必定回源）。
      每次发版请把 PS_BUILD 改成新的 git 短 hash（git rev-parse --short HEAD）。 ===== -->
 <script>
-window.PS_BUILD="86feae8";
+window.PS_BUILD="0d10746";
 (function(){
   var TIP_ID="psVerTip",TIP_KEY="psVerTipShown";
   function showTip(v){
@@ -254,7 +254,9 @@ input[type=file]{font-size:11px}
 .mock-dual{width:100%;height:100%;border-radius:10px;background:linear-gradient(160deg,#eceef0,#dfe2e6);display:flex;align-items:center;justify-content:center;padding:8px;box-sizing:border-box}
 /* 缩略 mock：个人主页 */
 .mock-profile{width:112px;height:190px;border-radius:14px;background:linear-gradient(180deg,#bfe0ea 0%,#dceef0 42%,#e8d3a8 78%,#dcc293 100%);box-shadow:0 10px 26px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;overflow:hidden}
-.tpl-thumb .mock-normal,.tpl-thumb .mock-lock,.tpl-thumb .mock-ms,.tpl-thumb .mock-polaroid,.tpl-thumb .mock-dual,.tpl-thumb .mock-profile,.tpl-thumb .mock-frame,.tpl-thumb .mock-axis{transform:scale(var(--mk,1));transform-origin:center;transition:transform .25s ease}
+/* 缩略 mock：个人主页预览 */
+.mock-home{width:112px;height:190px;border-radius:14px;background:#fff;box-shadow:0 10px 26px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.tpl-thumb .mock-normal,.tpl-thumb .mock-lock,.tpl-thumb .mock-ms,.tpl-thumb .mock-polaroid,.tpl-thumb .mock-dual,.tpl-thumb .mock-profile,.tpl-thumb .mock-home,.tpl-thumb .mock-frame,.tpl-thumb .mock-axis{transform:scale(var(--mk,1));transform-origin:center;transition:transform .25s ease}
 /* 缩略 mock：相框风（纯 SVG 图标） */
 .mock-frame{width:140px;height:140px;border-radius:10px;box-shadow:0 10px 26px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,#e9e3d8,#c8d5e2)}
 /* 缩略 mock：作品展示轴 */
