@@ -226,6 +226,16 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
             <div class="color-in"><input type="color" id="fBg"><span id="vBg"></span></div>
           </div>
         </div>
+        <div class="field">
+          <label>背景图案</label>
+          <div class="seg" id="segPat">
+            <button data-v="dots">波点</button>
+            <button data-v="stripe">斜纹</button>
+            <button data-v="grid">网格</button>
+            <button data-v="checker">棋盘</button>
+            <button data-v="none">无</button>
+          </div>
+        </div>
       </section>
 
       <section class="panel">
@@ -289,7 +299,7 @@ function qrResultText(r){
 var KEY="qr-studio-v1";
 var DEF={
   content:"https://github.com",name:"署名",label:"WeChat",
-  style:"square",fg:"#17181c",card:"#ffffff",bg:"#f4f4f6",size:140
+  style:"square",fg:"#17181c",card:"#ffffff",bg:"#f4f4f6",size:140,bgPat:"dots"
 };
 var S=Object.assign({},DEF);
 try{var saved=JSON.parse(localStorage.getItem(KEY)||"{}");Object.assign(S,saved)}catch(e){}
@@ -384,18 +394,46 @@ function layout(){
     payY:210,qrY:266,qrX:(W-qs)/2};
 }
 
+/* 背景图案：none / dots 波点 / stripe 斜纹 / grid 网格 / checker 棋盘 */
+function drawBgPattern(L){
+  var p=S.bgPat||"none";
+  if(p==="none")return;
+  ctx.save();
+  if(p==="dots"){
+    ctx.fillStyle="rgba(20,20,25,.05)";
+    var step=20,r=2.2;
+    for(var y=step/2,row=0;y<L.H;y+=step,row++){
+      var off=(row%2)?step/2:0;
+      for(var x=off+step/2;x<W;x+=step){
+        ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+      }
+    }
+  }else if(p==="stripe"){
+    ctx.strokeStyle="rgba(20,20,25,.03)";ctx.lineWidth=1;
+    for(var i=-L.H;i<W;i+=14){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i+L.H,L.H);ctx.stroke()}
+  }else if(p==="grid"){
+    ctx.strokeStyle="rgba(20,20,25,.04)";ctx.lineWidth=1;
+    for(var gx=0;gx<=W;gx+=22){ctx.beginPath();ctx.moveTo(gx+.5,0);ctx.lineTo(gx+.5,L.H);ctx.stroke()}
+    for(var gy=0;gy<=L.H;gy+=22){ctx.beginPath();ctx.moveTo(0,gy+.5);ctx.lineTo(W,gy+.5);ctx.stroke()}
+  }else if(p==="checker"){
+    ctx.fillStyle="rgba(20,20,25,.028)";
+    var cs=24;
+    for(var cy=0,r2=0;cy<L.H;cy+=cs,r2++){
+      for(var cx=(r2%2)*cs;cx<W;cx+=cs*2){ctx.fillRect(cx,cy,cs,cs)}
+    }
+  }
+  ctx.restore();
+}
+
 function render(){
   if(!buildQR(S.content)){matrix=null}
   var L=layout();
   cv.width=W;cv.height=L.H;
   ctx.clearRect(0,0,W,L.H);
 
-  // 页面底色 + 斜纹肌理
+  // 页面底色 + 背景图案
   ctx.fillStyle=S.bg;ctx.fillRect(0,0,W,L.H);
-  ctx.save();
-  ctx.strokeStyle="rgba(20,20,25,.03)";ctx.lineWidth=1;
-  for(var i=-L.H;i<W;i+=14){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i+L.H,L.H);ctx.stroke()}
-  ctx.restore();
+  drawBgPattern(L);
 
   // ---- 头像 ----
   ctx.save();
@@ -544,6 +582,8 @@ function syncDom(){
   $("fSize").value=S.size;$("vSize").textContent=S.size+"px";
   var btns=$("segStyle").querySelectorAll("button");
   for(var i=0;i<btns.length;i++)btns[i].classList.toggle("on",btns[i].dataset.v===S.style);
+  var pbtns=$("segPat").querySelectorAll("button");
+  for(var j=0;j<pbtns.length;j++)pbtns[j].classList.toggle("on",pbtns[j].dataset.v===(S.bgPat||"dots"));
 }
 
 /* ============ 事件 ============ */
@@ -566,6 +606,11 @@ $("fSize").addEventListener("input",function(){S.size=+this.value;$("vSize").tex
 $("segStyle").addEventListener("click",function(e){
   var b=e.target.closest("button");if(!b)return;
   S.style=b.dataset.v;syncDom();schedule();
+});
+
+$("segPat").addEventListener("click",function(e){
+  var b=e.target.closest("button");if(!b)return;
+  S.bgPat=b.dataset.v;syncDom();schedule();
 });
 
 /* 二维码图片识别 */
