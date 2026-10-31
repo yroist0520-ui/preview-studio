@@ -9,7 +9,7 @@
      比对下面的版本号，不一致就弹「有新版本」提示（点一下带参数跳转，必定回源）。
      每次发版请把 PS_BUILD 改成新的 git 短 hash（git rev-parse --short HEAD）。 ===== -->
 <script>
-window.PS_BUILD="ad05f32";
+window.PS_BUILD="f11931f";
 (function(){
   var TIP_ID="psVerTip",TIP_KEY="psVerTipShown";
   function showTip(v){
@@ -78,9 +78,13 @@ img{max-width:100%;display:block}
 .nav-links{display:flex;gap:32px;font-size:14px;color:var(--muted)}
 .nav-links a{transition:color .2s}
 .nav-links a:hover{color:var(--text)}
-.nav-cta{padding:8px 18px;border-radius:8px;background:var(--accent);color:#1a1a1a;font-weight:600;font-size:14px;transition:transform .15s}
-.nav-cta:hover{transform:translateY(-1px)}
-@media(max-width:768px){.nav-links{display:none}.nav-cta{padding:6px 14px;font-size:13px}}
+.nav-cta{padding:8px 18px;border-radius:8px;background:var(--accent);color:#1a1a1a;font-weight:600;font-size:14px;transition:transform .15s,box-shadow .2s;box-shadow:0 4px 16px rgba(201,163,124,.25)}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(201,163,124,.35)}
+.nav-refresh{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:8px;background:transparent;color:var(--muted);border:1px solid var(--border);font-size:13px;font-weight:500;transition:all .15s;cursor:pointer}
+.nav-refresh:hover{color:var(--accent);border-color:rgba(201,163,124,.45);background:rgba(201,163,124,.08)}
+.nav-refresh svg{transition:transform .2s}
+.nav-refresh:hover svg{transform:rotate(180deg)}
+@media(max-width:768px){.nav-links{display:none}.nav-cta{padding:6px 14px;font-size:13px}.nav-refresh span{display:none}}
 
 /* HERO */
 .hero{padding:90px 0 70px;text-align:center;position:relative;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(201,163,124,.12),transparent 60%),radial-gradient(ellipse 60% 40% at 50% 100%,rgba(58,90,138,.08),transparent 60%)}
@@ -256,7 +260,9 @@ input[type=file]{font-size:11px}
 .mock-profile{width:112px;height:190px;border-radius:14px;background:linear-gradient(180deg,#bfe0ea 0%,#dceef0 42%,#e8d3a8 78%,#dcc293 100%);box-shadow:0 10px 26px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;overflow:hidden}
 /* 缩略 mock：个人主页预览 */
 .mock-home{width:112px;height:190px;border-radius:14px;background:#fff;box-shadow:0 10px 26px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;overflow:hidden}
-.tpl-thumb .mock-normal,.tpl-thumb .mock-lock,.tpl-thumb .mock-ms,.tpl-thumb .mock-polaroid,.tpl-thumb .mock-dual,.tpl-thumb .mock-profile,.tpl-thumb .mock-home,.tpl-thumb .mock-frame,.tpl-thumb .mock-axis{transform:scale(var(--mk,1));transform-origin:center;transition:transform .25s ease}
+/* 缩略 mock：二维码名片 */
+.mock-qr{width:112px;height:116px;border-radius:14px;background:#fff;box-shadow:0 10px 26px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.tpl-thumb .mock-normal,.tpl-thumb .mock-lock,.tpl-thumb .mock-ms,.tpl-thumb .mock-polaroid,.tpl-thumb .mock-dual,.tpl-thumb .mock-profile,.tpl-thumb .mock-home,.tpl-thumb .mock-frame,.tpl-thumb .mock-axis,.tpl-thumb .mock-qr{transform:scale(var(--mk,1));transform-origin:center;transition:transform .25s ease}
 /* 缩略 mock：相框风（纯 SVG 图标） */
 .mock-frame{width:140px;height:140px;border-radius:10px;box-shadow:0 10px 26px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;background:linear-gradient(150deg,#e9e3d8,#c8d5e2)}
 /* 缩略 mock：作品展示轴 */
@@ -372,6 +378,10 @@ input[type=file]{font-size:11px}
     </div>
     <div style="display:flex;align-items:center;gap:10px">
       <span id="unlockBadge" style="display:none;font-size:12px;color:var(--accent);border:1px solid rgba(201,163,124,.35);border-radius:999px;padding:4px 12px;cursor:pointer" title="点击退出解锁" onclick="relock()"></span>
+      <button class="nav-refresh" id="navRefresh" title="刷新页面，查看最新版本" onclick="hardRefresh()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.3-6.3L21 7"/><path d="M21 7v5h-5"/><path d="M21 12a9 9 0 0 1-15.3 6.3L3 17"/><path d="M3 17v-5h5"/></svg>
+        <span>刷新</span>
+      </button>
       <a href="#tool" class="nav-cta">立即使用</a>
     </div>
   </div>
@@ -663,6 +673,44 @@ input[type=file]{font-size:11px}
           <h3>壁纸＋方图双模板</h3>
           <p>左侧手机壁纸、右侧方形商品图双画布实时预览，元素自由拖拽缩放、头像上传、白色信息栏独立编辑，支持高清 PNG 导出。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();location.href='dual-studio.html'">进入制作 →</button>
+        </div>
+        <div class="tpl-card" data-tpl="qr" onclick="location.href='qr-studio.html'">
+          <div class="tpl-thumb">
+            <div class="mock-qr">
+              <svg viewBox="0 0 112 116" width="112" height="116" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="qrThumbBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f7f7f9"/><stop offset="100%" stop-color="#ebebf0"/></linearGradient>
+                  <linearGradient id="qrThumbAva" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#d7dce3"/><stop offset="100%" stop-color="#98a1ab"/></linearGradient>
+                  <clipPath id="qrThumbClip"><circle cx="56" cy="34" r="19"/></clipPath>
+                </defs>
+                <rect x="0" y="0" width="112" height="116" fill="url(#qrThumbBg)"/>
+                <circle cx="56" cy="34" r="20.5" fill="#ffffff"/>
+                <g clip-path="url(#qrThumbClip)">
+                  <rect x="37" y="15" width="38" height="38" fill="url(#qrThumbAva)"/>
+                  <circle cx="56" cy="28" r="5.6" fill="#ffffff" opacity=".92"/>
+                  <path d="M45 47 Q45 35 56 35 Q67 35 67 47 Z" fill="#ffffff" opacity=".92"/>
+                </g>
+                <rect x="42" y="62" width="28" height="5" rx="2.5" fill="#2b2b30"/>
+                <rect x="10" y="76" width="92" height="34" rx="8" fill="#ffffff" stroke="rgba(0,0,0,.05)"/>
+                <g stroke="#2b2b30" stroke-width="1.2" stroke-linecap="round">
+                  <path d="M17 86 v-3 h3 M28 83 h3 v3 M31 92 v3 h-3 M20 95 h-3 v-3"/>
+                </g>
+                <rect x="34" y="84" width="30" height="4" rx="2" fill="#2b2b30"/>
+                <path d="M91 84.5 l3.6 3.5 l-3.6 3.5" stroke="#b0b0b6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+                <g fill="#17181c">
+                  <rect x="36" y="93" width="40" height="13" rx="2"/>
+                </g>
+                <g fill="#ffffff">
+                  <rect x="39" y="96" width="2.6" height="2.6"/><rect x="45" y="96" width="2.6" height="2.6"/><rect x="53" y="96" width="2.6" height="2.6"/><rect x="61" y="96" width="2.6" height="2.6"/><rect x="69" y="96" width="2.6" height="2.6"/>
+                  <rect x="42" y="100" width="2.6" height="2.6"/><rect x="50" y="100" width="2.6" height="2.6"/><rect x="58" y="100" width="2.6" height="2.6"/><rect x="66" y="100" width="2.6" height="2.6"/><rect x="72" y="100" width="2.6" height="2.6"/>
+                  <rect x="39" y="103" width="2.6" height="2.6"/><rect x="47" y="103" width="2.6" height="2.6"/><rect x="56" y="103" width="2.6" height="2.6"/><rect x="64" y="103" width="2.6" height="2.6"/><rect x="71" y="103" width="2.6" height="2.6"/>
+                </g>
+              </svg>
+            </div>
+          </div>
+          <h3>二维码名片</h3>
+          <p>朋友圈个人主页风格：圆形头像 + 署名 + 收款码区。支持上传二维码图片自动识别、三种模块样式、本机回读自检，3 倍高清 PNG 导出仍可扫。</p>
+          <button class="tpl-enter" onclick="event.stopPropagation();location.href='qr-studio.html'">进入制作 →</button>
         </div>
       </div>
 
@@ -2208,6 +2256,14 @@ love
 const UNLOCK_KEY="ps-unlock-v2";
 const UNLOCK_SECRET="PREVIEW-STUDIO-2026-SECRET-KEY";
 const UNLOCK_API=""; // 本地验证模式（后端已停用）
+// 硬刷新：带随机参数绕开 GitHub Pages 的 10 分钟强缓存，必定拉到最新版
+function hardRefresh(){
+  try{
+    var u=new URL(location.href);
+    u.searchParams.set("psv",String(Date.now()));
+    location.replace(u.toString());
+  }catch(e){location.reload();}
+}
 const CARD_TYPES={
   DAY:{label:"日卡",ms:24*60*60*1000},
   MONTH:{label:"月卡",ms:30*24*60*60*1000},
