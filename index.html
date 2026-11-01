@@ -234,6 +234,26 @@ input[type=file]{font-size:11px}
 
 /* ===== 模板选择首页 ===== */
 .tpl-picker{padding:6px 0 24px}
+/* 分区容器 */
+.tpl-section{margin-bottom:52px}
+.tpl-section:last-child{margin-bottom:0}
+.tpl-sec-head{display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.tpl-sec-title{font-size:18px;font-weight:700;letter-spacing:-.3px;color:var(--text)}
+.tpl-sec-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:.8px;text-transform:uppercase}
+.tpl-sec-badge.free{background:rgba(111,209,138,.12);color:#6fd18a;border:1px solid rgba(111,209,138,.3)}
+.tpl-sec-badge.paid{background:rgba(201,163,124,.12);color:var(--accent);border:1px solid rgba(201,163,124,.3)}
+.tpl-sec-note{color:var(--muted);font-size:12.5px;margin-left:auto;max-width:340px;text-align:right;line-height:1.6}
+/* 付费占位卡片 */
+.paid-placeholder{background:var(--card);border:1px dashed var(--border);border-radius:18px;padding:22px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:default}
+.paid-placeholder .pp-svg{width:72px;height:72px;display:flex;align-items:center;justify-content:center}
+.paid-placeholder h3{font-size:16px;font-weight:700;color:var(--text)}
+.paid-placeholder p{color:var(--muted);font-size:12.5px;line-height:1.6}
+.paid-placeholder .pp-tag{font-size:10.5px;font-weight:600;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:2px 10px;margin-top:4px}
+.paid-disclaimer{background:linear-gradient(135deg,rgba(201,163,124,.06),rgba(201,163,124,.02));border:1px solid rgba(201,163,124,.2);border-radius:14px;padding:16px 20px;margin-top:18px;display:flex;align-items:center;gap:12px}
+.paid-disclaimer .pd-icon{font-size:22px;flex-shrink:0}
+.paid-disclaimer .pd-text{color:var(--muted);font-size:13px;line-height:1.7}
+.paid-disclaimer .pd-text b{color:var(--accent);font-weight:600}
+/* 网格 */
 .tpl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:24px}
 /* 网格子项默认 min-width:auto，内容过长会撑破轨道；统一压成 1fr 最小宽，防溢出错位 */
 .features-grid>*,.tpl-grid>*{min-width:0}
@@ -373,17 +393,13 @@ input[type=file]{font-size:11px}
 
 <nav class="nav">
   <div class="nav-inner">
-    <a href="#top" class="brand"><div class="brand-logo">P</div><span>Preview Studio</span></a>
-    <div class="nav-links">
-      <a href="#features">功能</a><a href="#tool">工具</a><a href="#how">教程</a><a href="#about">关于</a>
-    </div>
+    <a href="#tool" class="brand"><div class="brand-logo">P</div><span>Preview Studio</span></a>
     <div style="display:flex;align-items:center;gap:10px">
       <span id="unlockBadge" style="display:none;white-space:nowrap;flex:none;font-size:12px;color:var(--accent);border:1px solid rgba(201,163,124,.35);border-radius:999px;padding:4px 12px;cursor:pointer" title="点击退出解锁" onclick="relock()"></span>
       <button class="nav-refresh" id="navRefresh" title="刷新页面，查看最新版本" onclick="hardRefresh()">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.3-6.3L21 7"/><path d="M21 7v5h-5"/><path d="M21 12a9 9 0 0 1-15.3 6.3L3 17"/><path d="M3 17v-5h5"/></svg>
         <span>刷新</span>
       </button>
-      <a href="#tool" class="nav-cta">立即使用</a>
     </div>
   </div>
 </nav>
@@ -395,48 +411,25 @@ input[type=file]{font-size:11px}
     <p>专为创作者打造的作品预览图生成器。新增字稿风模式：图片铺满 + 智能取色 + 头像署名 + 四角星装饰，一键导出适配手机 / 平板 / 1:1 正方形的 PNG。</p>
     <div class="hero-cta">
       <a href="#tool" class="btn-primary">开始创作</a>
-      <a href="#features" class="btn-ghost">查看功能</a>
-    </div>
-    <div class="hero-stats">
-      <div class="stat"><div class="stat-num">12</div><div class="stat-label">画布尺寸预设</div></div>
-      <div class="stat"><div class="stat-num">4</div><div class="stat-label">内置撕纸素材</div></div>
-      <div class="stat"><div class="stat-num">5</div><div class="stat-label">每模板预设槽位</div></div>
-      <div class="stat"><div class="stat-num">1</div><div class="stat-label">字稿风预设</div></div>
+      <a href="#tool" class="btn-ghost">查看模板</a>
     </div>
   </div>
 </header>
 
-<section class="section" id="features">
-  <div class="container">
-    <div class="section-head">
-      <div class="section-eyebrow">Features</div>
-      <h2>一个工具，搞定预览图全部细节</h2>
-      <p class="section-sub">从背景到文字、从作品图到撕纸纹理，每一项都为你调好。</p>
-    </div>
-    <div class="features-grid">
-      <div class="feature"><div class="feature-icon">✦</div><h3>字稿风模式</h3><p>图片铺满画布 + 冷调滤镜 + 底部信息栏 + 头像署名 + 四角星装饰，一键还原字稿圈美学。</p></div>
-      <div class="feature"><div class="feature-icon">🎨</div><h3>智能取色渐变</h3><p>上传图片后一键采样像素，自动提取主色 + 副色，填入背景渐变，配色不再凭感觉。</p></div>
-      <div class="feature"><div class="feature-icon">🖼️</div><h3>作品图描边 + 向下投影</h3><p>描边颜色可选，独立的向下投影距离、模糊、角度可调。</p></div>
-      <div class="feature"><div class="feature-icon">📜</div><h3>内置 4 种撕纸素材</h3><p>牛皮纸 / 米色宣纸 / 白卡 / 复古纸，Canvas 离屏生成，免上传。</p></div>
-      <div class="feature"><div class="feature-icon">🌫️</div><h3>上下羽化蒙版</h3><p>作品图上方 / 下方 / 上下双羽化，羽化宽度可调，柔和过渡到背景。</p></div>
-      <div class="feature"><div class="feature-icon">📐</div><h3>iPhone / iPad 横竖屏 / 1:1</h3><p>12 种画布尺寸，覆盖手机壁纸、平板横屏壁纸、社交正方形封面。</p></div>
-      <div class="feature"><div class="feature-icon">✍️</div><h3>手写英文 + 楷体中文</h3><p>顶部 Great Vibes 手写体英文，底部 KaiTi 楷体中文多行排版。</p></div>
-      <div class="feature"><div class="feature-icon">💾</div><h3>模板独立预设槽</h3><p>每个模板各自 5 个槽位，存 / 载成对对齐，只保存于本模板工作区，互不干扰。</p></div>
-    </div>
-  </div>
-</section>
-
 <section class="tool-section" id="tool">
   <div class="container">
-    <div class="section-head">
-      <div class="section-eyebrow">Studio</div>
-      <h2>在线工具台</h2>
-      <p class="section-sub">先选择一种预览风格，进入对应工作区。所有操作即时渲染，左边调参，右边看效果。</p>
-    </div>
 
     <div class="tpl-picker" id="tplPicker">
-      <div class="tpl-grid">
-        <div class="tpl-card" data-tpl="normal" onclick="selectTemplate('normal')">
+
+      <!-- ============ 免费模板区 ============ -->
+      <div class="tpl-section free">
+        <div class="tpl-sec-head">
+          <span class="tpl-sec-badge free">Free</span>
+          <span class="tpl-sec-title">免费模板</span>
+          <span class="tpl-sec-note">所有基础模板永久免费使用，无次数限制、无水印。</span>
+        </div>
+        <div class="tpl-grid">
+          <div class="tpl-card" data-tpl="normal" onclick="selectTemplate('normal')">
           <div class="tpl-thumb">
             <div class="mock-normal">
               <div class="mn-img"></div>
@@ -445,7 +438,6 @@ input[type=file]{font-size:11px}
             </div>
           </div>
           <h3>普通作品预览</h3>
-          <p>方形 / 竖版画布，背景 + 作品图 + 描边投影 + 手写英文标题，最经典的作品展示方式。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('normal')">进入制作 →</button>
         </div>
         <div class="tpl-card" data-tpl="lock" onclick="selectTemplate('lock')">
@@ -464,7 +456,6 @@ input[type=file]{font-size:11px}
             </div>
           </div>
           <h3>锁屏排版预览</h3>
-          <p>竖屏锁屏比例，可自由叠加时间、日期、底部快捷按钮与底部指示条（通用锁屏排版风格）。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('lock')">进入制作 →</button>
         </div>
         <div class="tpl-card" data-tpl="manuscript" onclick="selectTemplate('manuscript')">
@@ -484,7 +475,6 @@ input[type=file]{font-size:11px}
             </div>
           </div>
           <h3>字稿风预览</h3>
-          <p>图片铺满 + 暖金叠加 + 信息栏 + 头像署名 + 四角星，一键还原字稿圈美学。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('manuscript')">进入制作 →</button>
         </div>
         <div class="tpl-card" data-tpl="polaroid" onclick="selectTemplate('polaroid')">
@@ -501,7 +491,6 @@ input[type=file]{font-size:11px}
             </div>
           </div>
           <h3>拍立得预览</h3>
-          <p>浅米色渐变背景 + 若隐若现英文花体 + 顶部日期横线 + 经典拍立得白框 + 手写体文字，治愈系排版。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('polaroid')">进入制作 →</button>
         </div>
         <div class="tpl-card" data-tpl="profile" onclick="selectTemplate('profile')">
@@ -522,7 +511,6 @@ input[type=file]{font-size:11px}
             </div>
           </div>
           <h3>个人主页模板</h3>
-          <p>仿社交平台个人主页：状态栏 + 大图背景 + 白色信息卡（圆形头像、昵称、在线状态、粉丝/关注/转评赞统计）+ 个性签名，所有元素可拖拽可显隐。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('profile')">进入制作 →</button>
         </div>
         <div class="tpl-card" data-tpl="home" onclick="selectTemplate('home')">
@@ -551,7 +539,6 @@ input[type=file]{font-size:11px}
             </div>
           </div>
           <h3>个人主页预览</h3>
-          <p>仿社交平台个人主页：顶部背景图（上传 / 移动 / 缩放 / 模糊 / 透明度）+ 交界处悬浮头像 + 昵称简介 + 日期 / 图片 / 正文三列动态流，全部元素可点选编辑、画布拖动，支持预设与全屏水印导出。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('home')">进入制作 →</button>
         </div>
         <div class="tpl-card" data-tpl="frame" onclick="selectTemplate('frame')">
@@ -574,7 +561,6 @@ input[type=file]{font-size:11px}
             </div>
           </div>
           <h3>相框风预览</h3>
-          <p>同一张作品图放大模糊铺满背景，中央清晰展示原图；四角白色 L 形角标 + 顶部小条 + 底部指示条，画框缩放、圆角、角标长度与粗细、模糊与薄纱全部可调。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('frame')">进入制作 →</button>
         </div>
         <div class="tpl-card" data-tpl="axis" onclick="selectTemplate('axis')">
@@ -597,7 +583,6 @@ input[type=file]{font-size:11px}
             </div>
           </div>
           <h3>作品展示轴</h3>
-          <p>一次上传多张作品，横向铺成一条展轴：中间最大、两侧递减，垂直错落叠压，白底柔和投影，长横幅画布适合系列作品陈列。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('axis')">进入制作 →</button>
         </div>
         <div class="tpl-card" data-tpl="collage" onclick="selectTemplate('collage')">
@@ -623,7 +608,6 @@ input[type=file]{font-size:11px}
             </div>
           </div>
           <h3>自由拼图</h3>
-          <p>多张图片任意排列成网格拼图，自由设置行列数、间距、圆角、边框，支持等宽/等高等比铺满，图片清晰不模糊。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('collage')">进入制作 →</button>
         </div>
         <div class="tpl-card" data-tpl="magazine" onclick="selectTemplate('magazine')">
@@ -656,7 +640,6 @@ input[type=file]{font-size:11px}
             </div>
           </div>
           <h3>杂志手账</h3>
-          <p>秋日摄影长图：顶部诗句封面 + 中部米白双页线圈手账 + 底部英文主题页，独立杂志与摄影手账气质。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();selectTemplate('magazine')">进入制作 →</button>
         </div>
         <div class="tpl-card" data-tpl="dual" onclick="location.href='dual-studio.html'">
@@ -672,7 +655,6 @@ input[type=file]{font-size:11px}
             </div>
           </div>
           <h3>壁纸＋方图双模板</h3>
-          <p>左侧手机壁纸、右侧方形商品图双画布实时预览，元素自由拖拽缩放、头像上传、白色信息栏独立编辑，支持高清 PNG 导出。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();location.href='dual-studio.html'">进入制作 →</button>
         </div>
         <div class="tpl-card" data-tpl="qr" onclick="location.href='qr-studio.html'">
@@ -697,10 +679,65 @@ input[type=file]{font-size:11px}
             </div>
           </div>
           <h3>二维码名片</h3>
-          <p>朋友圈个人主页风格：圆形头像 + 署名 + 收款码区。支持 1~6 个二维码同时排布、上传图片自动识别、三种模块样式、本机回读自检，4 倍高清 PNG 导出仍可扫。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();location.href='qr-studio.html'">进入制作 →</button>
         </div>
-      </div>
+        </div><!-- /tpl-grid 免费 -->
+      </div><!-- /tpl-section free -->
+
+      <!-- ============ 付费模板区 ============ -->
+      <div class="tpl-section paid">
+        <div class="tpl-sec-head">
+          <span class="tpl-sec-badge paid">Pro</span>
+          <span class="tpl-sec-title">付费模板</span>
+          <span class="tpl-sec-note">按需购买，非强制消费</span>
+        </div>
+        <div class="tpl-grid">
+          <div class="paid-placeholder">
+            <div class="pp-svg">
+              <svg viewBox="0 0 80 80" width="72" height="72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="8" y="10" width="64" height="60" rx="8" stroke="#5a5a66" stroke-width="1.5" stroke-dasharray="4 3"/>
+                <circle cx="40" cy="38" r="11" stroke="#6a6a77" stroke-width="1.5"/>
+                <rect x="35" y="46" width="10" height="8" rx="2" fill="#4a4a55"/>
+                <rect x="32" y="26" width="16" height="4" rx="2" fill="#5a5a66"/>
+                <circle cx="62" cy="60" r="8" fill="#3a3a44" stroke="#5a5a66" stroke-width="1.2"/>
+              </svg>
+            </div>
+            <h3>付费模板 01</h3>
+            <p>开发中…</p>
+            <span class="pp-tag">即将上线</span>
+          </div>
+          <div class="paid-placeholder">
+            <div class="pp-svg">
+              <svg viewBox="0 0 80 80" width="72" height="72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="10" y="14" width="60" height="52" rx="4" stroke="#5a5a66" stroke-width="1.5" stroke-dasharray="4 3"/>
+                <rect x="18" y="22" width="18" height="18" rx="2" fill="#3a3a44"/>
+                <rect x="42" y="22" width="20" height="6" rx="2" fill="#5a5a66"/>
+                <rect x="42" y="32" width="14" height="4" rx="2" fill="#4a4a55"/>
+                <rect x="18" y="46" width="44" height="4" rx="2" fill="#4a4a55"/>
+                <rect x="18" y="54" width="30" height="4" rx="2" fill="#3a3a44"/>
+                <circle cx="62" cy="62" r="8" fill="#3a3a44" stroke="#5a5a66" stroke-width="1.2"/>
+              </svg>
+            </div>
+            <h3>付费模板 02</h3>
+            <p>开发中…</p>
+            <span class="pp-tag">即将上线</span>
+          </div>
+          <div class="paid-placeholder">
+            <div class="pp-svg">
+              <svg viewBox="0 0 80 80" width="72" height="72" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 50 L40 20 L60 50 Z" stroke="#5a5a66" stroke-width="1.5" fill="#2a2a32"/>
+                <rect x="28" y="48" width="24" height="14" rx="2" fill="#3a3a44" stroke="#4a4a55" stroke-width="1"/>
+                <line x1="40" y1="20" x2="40" y2="62" stroke="#4a4a55" stroke-width="1" stroke-dasharray="2 2"/>
+                <line x1="30" y1="42" x2="50" y2="42" stroke="#4a4a55" stroke-width="1" stroke-dasharray="2 2"/>
+                <circle cx="64" cy="64" r="8" fill="#3a3a44" stroke="#5a5a66" stroke-width="1.2"/>
+              </svg>
+            </div>
+            <h3>付费模板 03</h3>
+            <p>开发中…</p>
+            <span class="pp-tag">即将上线</span>
+          </div>
+        </div>
+      </div><!-- /tpl-section paid -->
 
     </div>
 
@@ -2197,47 +2234,6 @@ love
     </div>
   </div>
 </section>
-
-<section class="section" id="how" style="background:var(--bg-soft)">
-  <div class="container">
-    <div class="section-head">
-      <div class="section-eyebrow">How it works</div>
-      <h2>四步出图</h2>
-      <p class="section-sub">从打开页面到导出 PNG，全流程不超过 30 秒。</p>
-    </div>
-    <div class="steps-grid">
-      <div class="step"><div class="step-num">1</div><h4>选尺寸 / 一键字稿风</h4><p>选 12 种画布尺寸任一，或直接点「一键应用字稿风预设」自动配好全部参数。</p></div>
-      <div class="step"><div class="step-num">2</div><h4>上传作品 + 智能取色</h4><p>「⑤」上传主图后点「从图片提取主色」，背景渐变自动跟随图片色调。</p></div>
-      <div class="step"><div class="step-num">3</div><h4>调字稿风细节</h4><p>开字稿风模式，上传头像、填署名、调四角星 / 竖排英文 / 底部信息栏。</p></div>
-      <div class="step"><div class="step-num">4</div><h4>存预设并导出</h4><p>满意后点「存到 1」留档（各模板独立），再点「导出 PNG」即下载，手机平板电脑全兼容。</p></div>
-    </div>
-    <div class="cta-banner">
-      <h2>准备好了吗？</h2>
-      <p>所有渲染在浏览器本地完成，不上传任何图片，安全又快速。手机、平板、电脑均可使用。</p>
-      <a href="#tool" class="btn-primary">立即开始创作</a>
-    </div>
-  </div>
-</section>
-
-<footer class="footer" id="about">
-  <div class="container">
-    <div class="footer-inner">
-      <div class="footer-brand">
-        <a href="#top" class="brand"><div class="brand-logo">P</div><span>Preview Studio</span></a>
-        <p>面向创作者的作品预览图生成器。Canvas 渲染、本地存储、零依赖、一键导出、全设备适配。</p>
-      </div>
-      <div class="footer-cols">
-        <div class="footer-col"><h5>产品</h5><a href="#features">功能特性</a><a href="#tool">在线工具</a><a href="#how">使用教程</a></div>
-        <div class="footer-col"><h5>资源</h5><a href="#">更新日志</a><a href="#">字体说明</a><a href="#">纹理素材</a></div>
-        <div class="footer-col"><h5>关于</h5><a href="#">项目背景</a><a href="#">技术栈</a><a href="#">反馈建议</a></div>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>© 2026 Preview Studio. All rights reserved.</span>
-      <span>Built with Canvas API · No backend · 100% local · Mobile ready</span>
-    </div>
-  </div>
-</footer>
 
 <script>
 // ============ 解锁码系统 ============
