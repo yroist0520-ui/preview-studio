@@ -84,7 +84,8 @@ img{max-width:100%;display:block}
 .nav-refresh:hover{color:var(--accent);border-color:rgba(201,163,124,.45);background:rgba(201,163,124,.08)}
 .nav-refresh svg{transition:transform .2s}
 .nav-refresh:hover svg{transform:rotate(180deg)}
-@media(max-width:768px){.nav-links{display:none}.nav-cta{padding:6px 14px;font-size:13px}.nav-refresh span{display:none}}
+.nav-cta,.nav-refresh{white-space:nowrap;flex:none;width:auto}
+@media(max-width:768px){.nav-links{display:none}.nav-cta{padding:6px 12px;font-size:12.5px}.nav-refresh span{display:none}}
 
 /* HERO */
 .hero{padding:90px 0 70px;text-align:center;position:relative;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(201,163,124,.12),transparent 60%),radial-gradient(ellipse 60% 40% at 50% 100%,rgba(58,90,138,.08),transparent 60%)}
@@ -377,7 +378,7 @@ input[type=file]{font-size:11px}
       <a href="#features">功能</a><a href="#tool">工具</a><a href="#how">教程</a><a href="#about">关于</a>
     </div>
     <div style="display:flex;align-items:center;gap:10px">
-      <span id="unlockBadge" style="display:none;font-size:12px;color:var(--accent);border:1px solid rgba(201,163,124,.35);border-radius:999px;padding:4px 12px;cursor:pointer" title="点击退出解锁" onclick="relock()"></span>
+      <span id="unlockBadge" style="display:none;white-space:nowrap;flex:none;font-size:12px;color:var(--accent);border:1px solid rgba(201,163,124,.35);border-radius:999px;padding:4px 12px;cursor:pointer" title="点击退出解锁" onclick="relock()"></span>
       <button class="nav-refresh" id="navRefresh" title="刷新页面，查看最新版本" onclick="hardRefresh()">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.3-6.3L21 7"/><path d="M21 7v5h-5"/><path d="M21 12a9 9 0 0 1-15.3 6.3L3 17"/><path d="M3 17v-5h5"/></svg>
         <span>刷新</span>
