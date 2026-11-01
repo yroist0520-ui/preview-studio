@@ -379,10 +379,10 @@ input[type=file]{font-size:11px}
 <div class="lock-overlay" id="lockOverlay" style="display:none">
   <div class="lock-card">
     <div class="lock-icon">🔒</div>
-    <h2>Preview Studio</h2>
-    <p>输入解锁码后即可使用全部功能</p>
-    <input type="text" id="unlockInput" placeholder="PS-XXXX-XXXX-XXXX" autocomplete="off" onkeydown="if(event.key==='Enter')unlockNow()">
-    <button class="primary" onclick="unlockNow()">解锁</button>
+    <h2>解锁「票根风预览」</h2>
+    <p>输入解锁码后即可使用票根模板（其他模板免费使用）</p>
+    <input type="text" id="unlockInput" placeholder="TK-XXXX-XXXX-XXXX" autocomplete="off" onkeydown="if(event.key==='Enter')tkUnlockNow()">
+    <button class="primary" onclick="tkUnlockNow()">解锁</button>
     <div class="lock-msg" id="unlockMsg"></div>
     <div class="lock-types">
       <span class="lock-type-chip">日卡 24h</span>
@@ -392,6 +392,7 @@ input[type=file]{font-size:11px}
     </div>
     <div class="lock-info" id="unlockInfo" style="display:none"></div>
     <div class="lock-footer">解锁状态绑定本设备（一机一用），刷新无需重复输入</div>
+    <a href="javascript:void(0)" onclick="tkPendingEnter=false;document.getElementById('lockOverlay').style.display='none'" style="display:block;margin-top:12px;font-size:12px;color:#666">稍后再说，返回模板页</a>
   </div>
 </div>
 
@@ -741,8 +742,8 @@ input[type=file]{font-size:11px}
             </div>
             <h3>票根风预览</h3>
             <p>左右海报 + 中央票根 · 可撕下半部</p>
-            <span class="pp-tag">Pro</span>
-            <span class="tpl-enter">进入制作 →</span>
+            <span class="pp-tag" id="tkLockTag">🔒 需解锁码</span>
+            <span class="tpl-enter" id="tkLockEnter">输入解锁码 →</span>
           </div>
           <div class="paid-placeholder">
             <div class="pp-svg">
@@ -2277,10 +2278,8 @@ love
 
         <div class="tpl-sec" data-tpl="ticket">
         <h3 class="tool-h">⑤ 票根外观</h3>
-        <div class="row-2">
-          <div><label>票根主体颜色</label><input type="color" id="tkColor" value="#ffffff" oninput="tkSet('color',this.value)"></div>
-          <div><label>打孔颜色</label><input type="color" id="tkHoleColor" value="#0d0d10" oninput="tkSet('holeColor',this.value)"></div>
-        </div>
+        <label>票根主体颜色（打孔为镂空，透出背景）</label>
+        <input type="color" id="tkColor" value="#ffffff" oninput="tkSet('color',this.value)">
         <div class="row-2">
           <div><label>撕线颜色</label><input type="color" id="tkTearColor" value="#cccccc" oninput="tkSet('tearColor',this.value)"></div>
           <div><label>撕线样式</label>
@@ -2323,6 +2322,9 @@ love
             <option value="r">径向</option>
           </select>
         </div>
+        <label>背景大小: <span id="tkBgSizeVal">100</span>%</label>
+        <input type="range" id="tkBgSize" min="40" max="100" value="100" oninput="document.getElementById('tkBgSizeVal').textContent=this.value;tkSet('bgSize',this.value)">
+        <div class="hint">调小后背景变成居中圆角卡片包住票根，四周露出透明。</div>
         <button class="ms-btn" onclick="tkExtractBgFromMain()" style="margin-top:4px">✦ 从主海报吸色填背景</button>
         <label>左侧海报旋转: <span id="tkLeftRotVal">-15</span>°</label>
         <input type="range" id="tkLeftRot" min="-30" max="0" value="-15" oninput="document.getElementById('tkLeftRotVal').textContent=this.value;tkSet('leftRot',this.value)">
@@ -2433,9 +2435,50 @@ function checkUnlocked(){
 }
 function showLockOverlay(){
   document.getElementById("lockOverlay").style.display="flex";
-  if(checkUnlocked()){
+  if(tkCheckUnlocked()){
     document.getElementById("lockOverlay").style.display="none";
   }
+}
+// 票根上锁：点票根卡片时若未解锁，置此标记；解锁成功后自动进入模板
+let tkPendingEnter=false;
+
+// ===== 票根模板独立解锁码（TK-，与网站 PS- 码互不通用）=====
+const TK_UNLOCK_KEY="ps-ticket-unlock-v1";
+const TK_SECRET="TICKET-TEMPLATE-2026-SECRET-KEY";
+function tkCheckUnlocked(){
+  try{
+    const raw=localStorage.getItem(TK_UNLOCK_KEY);
+    if(!raw)return false;
+    const u=JSON.parse(raw);
+    if(u.deviceId&&u.deviceId!==getDeviceFingerprint())return false;
+    if(u.type==="FOREVER")return true;
+    return Date.now()<u.expiresAt;
+  }catch(e){return false;}
+}
+function tkUnlockNow(){
+  const input=document.getElementById("unlockInput");
+  const msg=document.getElementById("unlockMsg");
+  const code=(input.value||"").trim().toUpperCase();
+  msg.className="lock-msg";
+  if(!code){msg.className="lock-msg err";msg.textContent="请输入解锁码";return;}
+  const parts=code.split("-");
+  if(parts.length!==4||parts[0]!=="TK"){
+    msg.className="lock-msg err";msg.textContent="格式错误，应为 TK-类型-随机码-校验码（PS- 码是网站解锁码，不适用于票根）";return;
+  }
+  const type=parts[1],random=parts[2],checksum=parts[3];
+  const card=CARD_TYPES[type];
+  if(!card){msg.className="lock-msg err";msg.textContent="未知的卡类型："+type;return;}
+  const expect=unlockHash(type+random+TK_SECRET).slice(0,8).toUpperCase();
+  if(expect!==checksum){msg.className="lock-msg err";msg.textContent="解锁码无效（校验失败）";return;}
+  const expiresAt=type==="FOREVER"?0:Date.now()+card.ms;
+  localStorage.setItem(TK_UNLOCK_KEY,JSON.stringify({type,expiresAt,activatedAt:Date.now(),code,deviceId:getDeviceFingerprint()}));
+  msg.className="lock-msg ok";
+  msg.textContent="✅ 解锁成功（已绑定本设备）！"+(type==="FOREVER"?"（永久）":"");
+  updateBadge();
+  setTimeout(()=>{
+    document.getElementById("lockOverlay").style.display="none";
+    if(tkPendingEnter){tkPendingEnter=false;selectTemplate("ticket");}
+  },600);
 }
 function unlockNow(){
   const input=document.getElementById("unlockInput");
@@ -2461,7 +2504,11 @@ function unlockNow(){
     msg.className="lock-msg ok";
     msg.textContent="✅ 解锁成功（已绑定本设备）！"+(type==="FOREVER"?"（永久）":"");
     updateBadge();
-    setTimeout(()=>{document.getElementById("lockOverlay").style.display="none";},600);
+    setTimeout(()=>{
+      document.getElementById("lockOverlay").style.display="none";
+      // 从票根卡片进来的：解锁成功后自动进入票根模板
+      if(tkPendingEnter){tkPendingEnter=false;selectTemplate("ticket");}
+    },600);
   };
   // 有后端：在线激活（统计次数 + 下架校验）；无后端：本地验证
   if(UNLOCK_API){
@@ -2480,35 +2527,44 @@ function unlockNow(){
 }
 function updateBadge(){
   const badge=document.getElementById("unlockBadge");
-  if(checkUnlocked()){
-    const u=JSON.parse(localStorage.getItem(UNLOCK_KEY)||"{}");
+  const unlocked=tkCheckUnlocked();
+  if(unlocked){
+    const u=JSON.parse(localStorage.getItem(TK_UNLOCK_KEY)||"{}");
     const label=(CARD_TYPES[u.type]?CARD_TYPES[u.type].label:u.type)||"已解锁";
-    badge.textContent="🔓 "+label;
+    badge.textContent="🔓 票根 · "+label;
     badge.style.display="inline-block";
   }else{
     badge.style.display="none";
   }
+  // 票根卡片锁定态同步
+  const tag=document.getElementById("tkLockTag"),enter=document.getElementById("tkLockEnter");
+  if(tag&&enter){
+    if(unlocked){tag.textContent="Pro · 已解锁";enter.textContent="进入制作 →";}
+    else{tag.textContent="🔒 需解锁码";enter.textContent="输入解锁码 →";}
+  }
 }
 function relock(){
-  if(!confirm("退出当前解锁？退出后需重新输入解锁码。"))return;
-  localStorage.removeItem(UNLOCK_KEY);
+  if(!confirm("退出当前解锁？票根模板将重新上锁，需重新输入解锁码。"))return;
+  localStorage.removeItem(TK_UNLOCK_KEY);
   updateBadge();
+  // 当前在票根工作区：退回模板选择页
+  if(typeof currentTemplate!=="undefined"&&currentTemplate==="ticket"&&typeof backToTemplates==="function")backToTemplates();
   showLockOverlay();
 }
-// 页面加载时检查解锁状态
+// 页面加载时：不再整站上锁（免费模板直接用）；仅刷新解锁徽章与票根剩余时长
 (function(){
-  if(!checkUnlocked()){
-    showLockOverlay();
-  }else{
-    updateBadge();
-    const u=JSON.parse(localStorage.getItem(UNLOCK_KEY)||"{}");
-    if(u.type&&u.type!=="FOREVER"){
-      const info=document.getElementById("unlockInfo");
-      const remain=Math.max(0,u.expiresAt-Date.now());
-      const days=Math.ceil(remain/86400000);
-      info.style.display="block";
-      info.innerHTML="当前：<b>"+(CARD_TYPES[u.type]?CARD_TYPES[u.type].label:u.type)+"</b> · 剩余约 "+days+" 天<br>右上角可点「🔓」徽章退出解锁更换。";
-    }
+  updateBadge();
+  if(tkCheckUnlocked()){
+    try{
+      const u=JSON.parse(localStorage.getItem(TK_UNLOCK_KEY)||"{}");
+      if(u.type&&u.type!=="FOREVER"){
+        const info=document.getElementById("unlockInfo");
+        const remain=Math.max(0,u.expiresAt-Date.now());
+        const days=Math.ceil(remain/86400000);
+        info.style.display="block";
+        info.innerHTML="当前：<b>"+(CARD_TYPES[u.type]?CARD_TYPES[u.type].label:u.type)+"</b> · 剩余约 "+days+" 天<br>右上角可点「🔓」徽章退出解锁更换。";
+      }
+    }catch(e){}
   }
 })();
 
@@ -6195,9 +6251,9 @@ const TK_FB=[
 ];
 function tkText(o){return Object.assign({text:"",font:TK_SYS,size:"3",weight:"400",color:"#333",ls:"0",lh:"1.5",align:"center",x:"50",y:"85",w:"40"},o||{});}
 function tkDefaults(){return{
-  color:"#ffffff",holeColor:"#0d0d10",tearColor:"#cccccc",tearStyle:"zigzag",
+  color:"#ffffff",tearColor:"#cccccc",tearStyle:"zigzag",
   torn:"closed",tornAngle:"40",
-  bgType:"solid",bg1:"#0d0d10",bg2:"#1a1a22",bgDir:"v",
+  bgType:"solid",bg1:"#0d0d10",bg2:"#1a1a22",bgDir:"v",bgSize:"100",
   leftRot:"-15",rightRot:"15",backX:"35",shadow:"35",
   footColor:"#ffffff",
   leftFootColor:"#ffffff",rightFootColor:"#ffffff",
@@ -6256,10 +6312,11 @@ function tkSetTextProp(prop,val){
 function tkSyncDom(){
   if(!tkState)return;
   const sf=function(id,val){const el=document.getElementById(id);if(el){el.value=val;const sp=document.getElementById(id+"Val");if(sp)sp.textContent=val;}};
-  sf("tkColor",tkState.color);sf("tkHoleColor",tkState.holeColor);
+  sf("tkColor",tkState.color);
   sf("tkTearColor",tkState.tearColor);sf("tkTearStyle",tkState.tearStyle);
   sf("tkTorn",tkState.torn);sf("tkTornAngle",tkState.tornAngle);
   sf("tkBgType",tkState.bgType);sf("tkBg1",tkState.bg1);sf("tkBg2",tkState.bg2);sf("tkBgDir",tkState.bgDir);
+  sf("tkBgSize",tkState.bgSize);
   sf("tkFootColor",tkState.footColor);sf("tkLeftFootColor",tkState.leftFootColor);sf("tkRightFootColor",tkState.rightFootColor);
   sf("tkLeftRot",tkState.leftRot);sf("tkRightRot",tkState.rightRot);
   sf("tkBackX",tkState.backX);sf("tkShadow",tkState.shadow);
@@ -6387,21 +6444,41 @@ function tkDraw(){
   const backW=ticketW*0.52;
   const backH=backW*1.05;
 
-  // —— 1) 画布背景：纯色 / 渐变 ——
+  // —— 锯齿撕边：上下两块共用同一条曲线（点集），拼合无缝、撕开匹配 ——
+  const tkZs=ticketW*0.038, tkAmp=tkZs*0.55;
+  function tkZigPts(x0,x1,y){
+    const pts=[[x0,y]];let up=false;
+    for(let x=x0;x<x1-0.01;x+=tkZs){
+      const px=Math.min(x+tkZs/2,x1);
+      pts.push([px,y+(up?-tkAmp:tkAmp)]);
+      up=!up;
+    }
+    pts.push([x1,y]);
+    return pts;
+  }
+  const tkZigOn=(st.tearStyle==="zigzag");
+  const tkZig=tkZigOn?tkZigPts(ticketCX-ticketW/2+rr,ticketCX+ticketW/2-rr,tearY):null;
+
+  // —— 1) 背景：纯色 / 渐变，大小可调（居中，圆角卡片） ——
+  const bgPct=Math.max(30,Math.min(100,parseFloat(st.bgSize)||100));
+  const bgW=W*bgPct/100, bgH=H*bgPct/100;
+  const bgX=(W-bgW)/2, bgY=(H-bgH)/2;
+  const bgR=Math.min(bgW,bgH)*0.035;
   ctx.save();
+  if(bgPct<100){rrPath(bgX,bgY,bgW,bgH,bgR);ctx.clip();}
   if((st.bgType||"solid")==="gradient"){
     let grad;
-    if(st.bgDir==="h")grad=ctx.createLinearGradient(0,0,W,0);
-    else if(st.bgDir==="d")grad=ctx.createLinearGradient(0,0,W,H);
-    else if(st.bgDir==="r")grad=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.1,W/2,H/2,Math.max(W,H)*0.7);
-    else grad=ctx.createLinearGradient(0,0,0,H);
+    if(st.bgDir==="h")grad=ctx.createLinearGradient(bgX,0,bgX+bgW,0);
+    else if(st.bgDir==="d")grad=ctx.createLinearGradient(bgX,bgY,bgX+bgW,bgY+bgH);
+    else if(st.bgDir==="r")grad=ctx.createRadialGradient(W/2,H/2,Math.min(bgW,bgH)*0.1,W/2,H/2,Math.max(bgW,bgH)*0.7);
+    else grad=ctx.createLinearGradient(0,bgY,0,bgY+bgH);
     grad.addColorStop(0,st.bg1||"#0d0d10");
     grad.addColorStop(1,st.bg2||"#1a1a22");
     ctx.fillStyle=grad;
   }else{
     ctx.fillStyle=st.bg1||"#0d0d10";
   }
-  ctx.fillRect(0,0,W,H);
+  ctx.fillRect(bgX,bgY,bgW,bgH);
   ctx.restore();
 
   // —— 2) 左右后面票根（每张都有图片区 + 底部飘根） ——
@@ -6499,6 +6576,31 @@ function tkDraw(){
   // —— 3) 中央白色票根卡 ——
   const torn=(st.torn==="torn");
 
+  // 主体路径构建（closed：到 tearY 拼接锯齿底边；torn：同上，只有上半部）
+  // 打孔用 evenodd 反镂空：孔是主体内的半圆子路径，fill 后透出背景
+  function tkBodyPath(){
+    const L=ticketCX-ticketW/2,R=ticketCX+ticketW/2;
+    ctx.beginPath();
+    ctx.moveTo(L,ticketTopY+rr);
+    ctx.quadraticCurveTo(L,ticketTopY,L+rr,ticketTopY);
+    ctx.lineTo(R-rr,ticketTopY);
+    ctx.quadraticCurveTo(R,ticketTopY,R,ticketTopY+rr);
+    ctx.lineTo(R,tearY);
+    if(tkZigOn){
+      // 底边沿共用锯齿点集走（与撕下纸片拼合无缝）
+      ctx.lineTo(ticketCX+ticketW/2-rr,tearY);
+      for(let i=tkZig.length-1;i>=0;i--)ctx.lineTo(tkZig[i][0],tkZig[i][1]);
+      ctx.lineTo(L,tearY);
+    }else{
+      ctx.lineTo(L,tearY);
+    }
+    ctx.closePath();
+    // 顶打孔（半圆朝下挖进纸内）→ evenodd 镂空
+    ctx.moveTo(ticketCX+holeR,ticketTopY);
+    ctx.arc(ticketCX,ticketTopY,holeR,0,Math.PI,false);
+    ctx.closePath();
+  }
+
   if(!torn){
     ctx.save();
     if(shadow>0){
@@ -6507,19 +6609,11 @@ function tkDraw(){
       ctx.shadowOffsetY=S*0.025;
     }
     ctx.fillStyle=st.color;
-    rrPath(ticketCX-ticketW/2,ticketTopY,ticketW,ticketH,rr);
-    ctx.fill();
-    ctx.restore();
-    ctx.save();
-    ctx.fillStyle=st.holeColor;
-    ctx.beginPath();ctx.arc(ticketCX,ticketTopY,holeR,0,Math.PI,false);ctx.fill();
-    ctx.restore();
-    ctx.save();
-    ctx.fillStyle=st.holeColor;
-    ctx.beginPath();ctx.arc(ticketCX,ticketBotY,holeR,Math.PI,0,false);ctx.fill();
+    tkBodyPath();
+    ctx.fill("evenodd");
     ctx.restore();
   }else{
-    // TORN：上半部
+    // TORN：上半部（结构与 closed 相同，下半块由 drawTornFoot 单独绘制）
     ctx.save();
     if(shadow>0){
       ctx.shadowColor="rgba(0,0,0,"+Math.min(0.95,shadow*1.3)+")";
@@ -6527,39 +6621,60 @@ function tkDraw(){
       ctx.shadowOffsetY=S*0.025;
     }
     ctx.fillStyle=st.color;
-    rrPath(ticketCX-ticketW/2,ticketTopY,ticketW,tearY-ticketTopY+rr,rr);
-    ctx.fill();
-    ctx.restore();
-    ctx.save();
-    ctx.fillStyle=st.holeColor;
-    ctx.beginPath();ctx.arc(ticketCX,ticketTopY,holeR,0,Math.PI,false);ctx.fill();
+    tkBodyPath();
+    ctx.fill("evenodd");
     ctx.restore();
   }
 
   // —— 4) 主海报图（贴在白色内部，几乎满铺） ——
+  // 底边沿锯齿撕口走：图片区下缘跟着撕线起伏（"图片的地方也有锯齿"）
+  function tkZigY(x){
+    // 与 tkZig 同相位的三角波：t 单位 = tkZs，节点(整数t)=tearY，峰在 t=k+0.5
+    const t=(x-(ticketCX-ticketW/2+rr))/tkZs;
+    const s=t*2,i=Math.floor(s),f=s-i;
+    const val=function(k){k=((k%4)+4)%4;return k===1?tkAmp:(k===3?-tkAmp:0);};
+    const v1=val(i),v2=val(i+1);
+    return tearY+v1+(v2-v1)*f;
+  }
   const mainIm=tkImg(TK_MEDIA.main);
   ctx.save();
-  // 海报区是白色内部的矩形，有圆角
-  rrPath(posterX,posterY,posterW,posterH,Math.max(0,rr*0.75));
+  const pR=Math.max(0,rr*0.75);
+  const pBotY=tkZigOn?(tearY+tkAmp+1):(tearY+1);   // 底边下探到撕口（锯齿最低点之下）
+  ctx.beginPath();
+  ctx.moveTo(posterX+pR,posterY);
+  ctx.lineTo(posterX+posterW-pR,posterY);
+  ctx.quadraticCurveTo(posterX+posterW,posterY,posterX+posterW,posterY+pR);
+  ctx.lineTo(posterX+posterW,pBotY);
+  if(tkZigOn){
+    const step=tkZs/4;
+    for(let x=posterX+posterW-step;x>posterX;x-=step)ctx.lineTo(x,tkZigY(x));
+    ctx.lineTo(posterX,tkZigY(posterX));
+  }else{
+    ctx.lineTo(posterX,pBotY);
+  }
+  ctx.lineTo(posterX,posterY+pR);
+  ctx.quadraticCurveTo(posterX,posterY,posterX+pR,posterY);
+  ctx.closePath();
   ctx.clip();
+  const pEffH=pBotY-posterY;   // 图片区实际高度（底边含锯齿下探）
   if(tkReady(mainIm)){
     const iw=mainIm.naturalWidth,ih=mainIm.naturalHeight;
-    const s=Math.max(posterW/iw,posterH/ih);
+    const s=Math.max(posterW/iw,pEffH/ih);
     const dw=iw*s,dh=ih*s;
-    ctx.drawImage(mainIm,posterX+posterW/2-dw/2,posterY+posterH/2-dh/2,dw,dh);
+    ctx.drawImage(mainIm,posterX+posterW/2-dw/2,posterY+pEffH/2-dh/2,dw,dh);
   }else{
-    const g=ctx.createLinearGradient(posterX,posterY,posterX+posterW,posterY+posterH);
+    const g=ctx.createLinearGradient(posterX,posterY,posterX+posterW,posterY+pEffH);
     g.addColorStop(0,"#3a3a48");g.addColorStop(1,"#1a1a22");
-    ctx.fillStyle=g;ctx.fillRect(posterX,posterY,posterW,posterH);
+    ctx.fillStyle=g;ctx.fillRect(posterX,posterY,posterW,pEffH);
     ctx.fillStyle="rgba(255,255,255,0.22)";
     ctx.font=posterW*0.06+"px "+TK_SYS;
     ctx.textAlign="center";ctx.textBaseline="middle";
-    ctx.fillText("＋ 上传主海报",posterX+posterW/2,posterY+posterH/2);
+    ctx.fillText("＋ 上传主海报",posterX+posterW/2,posterY+pEffH/2);
   }
   ctx.restore();
 
   // 水印裁剪覆盖主海报图区域
-  wmClip={ox:0,oy:0,rot:0,x:posterX,y:posterY,w:posterW,h:posterH,r:Math.max(0,rr*0.75)};
+  wmClip={ox:0,oy:0,rot:0,x:posterX,y:posterY,w:posterW,h:pEffH,r:Math.max(0,rr*0.75)};
 
   // —— 5) 撕线（锯齿 / 虚线 / 无） ——
   // —— 6) 底部（closed：正常；torn：下半块整块撕下来） ——
@@ -6571,19 +6686,13 @@ function tkDraw(){
 
   // —— 撕线在上半部下沿（不管 torn / closed，上半部都有撕线上沿） ——
   if(st.tearStyle==="zigzag"){
+    // 锯齿边已是真实形状，这里沿同一 tkZig 点集描一条撕口色（同相位）
     ctx.save();
     ctx.strokeStyle=st.tearColor;
     ctx.lineWidth=Math.max(1,S*0.0014);
     ctx.beginPath();
-    const zs=ticketW*0.038;
-    let up=true;
-    ctx.moveTo(ticketCX-ticketW/2+rr,tearY);
-    for(let x=ticketCX-ticketW/2+rr;x<ticketCX+ticketW/2-rr;x+=zs){
-      const px=x+zs/2;
-      ctx.lineTo(px,tearY+(up?-zs*0.55:zs*0.55));
-      up=!up;
-    }
-    ctx.lineTo(ticketCX+ticketW/2-rr,tearY);
+    ctx.moveTo(tkZig[0][0],tkZig[0][1]);
+    for(let i=1;i<tkZig.length;i++)ctx.lineTo(tkZig[i][0],tkZig[i][1]);
     ctx.stroke();
     ctx.restore();
   }else if(st.tearStyle==="dash"){
@@ -6610,18 +6719,12 @@ function tkDraw(){
     ctx.fillStyle=st.color;
     ctx.beginPath();
     if(st.tearStyle==="zigzag"){
-      const zs=ticketW*0.038;
-      let up=false;
-      ctx.moveTo(-ticketW/2+rr,0);
-      for(let x=-ticketW/2+rr;x<ticketW/2-rr;x+=zs){
-        const px=x+zs/2;
-        ctx.lineTo(px,0+(up?-zs*0.55:zs*0.55));
-        up=!up;
-      }
-      ctx.lineTo(ticketW/2-rr,0);
-    }else if(st.tearStyle==="dash"){
-      ctx.moveTo(-ticketW/2+rr,0);
-      ctx.lineTo(ticketW/2-rr,0);
+      // 顶边沿共用 tkZig 点集走（换算到局部坐标：x-票根中心，y-tearY），与上半部拼合无缝
+      // 两端补齐到全宽（±ticketW/2），否则纸片左右上角会露出缺口
+      ctx.moveTo(-ticketW/2,0);
+      ctx.lineTo(tkZig[0][0]-ticketCX,tkZig[0][1]-tearY);
+      for(let i=1;i<tkZig.length;i++)ctx.lineTo(tkZig[i][0]-ticketCX,tkZig[i][1]-tearY);
+      ctx.lineTo(ticketW/2,0);
     }else{
       ctx.moveTo(-ticketW/2,0);
       ctx.lineTo(ticketW/2,0);
@@ -6631,14 +6734,11 @@ function tkDraw(){
     ctx.lineTo(-ticketW/2+rr,footH);
     ctx.quadraticCurveTo(-ticketW/2,footH,-ticketW/2,footH-rr);
     ctx.closePath();
-    ctx.fill();
-    ctx.restore();
-    // 底打孔（半圆向上挖）
-    ctx.save();
-    ctx.fillStyle=st.holeColor;
-    ctx.beginPath();
+    // 底打孔 → evenodd 镂空（半圆子路径朝上挖进纸内，透出背景）
+    ctx.moveTo(-holeR,footH);
     ctx.arc(0,footH,holeR,Math.PI,0,false);
-    ctx.closePath();ctx.fill();
+    ctx.closePath();
+    ctx.fill("evenodd");
     ctx.restore();
 
     // —— 文字（用局部坐标，clamp 到纸片内部） ——
@@ -9816,6 +9916,12 @@ const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscrip
 // 每个模板的工作区图片互相独立：切走时存档当前模板的图片，切回时恢复，首次进入未存档则为空
 const tplImages={};
 function selectTemplate(type){
+  // 付费模板上锁：票根需 TK- 解锁码（与网站 PS- 码不通用）；未解锁时弹解锁框，解锁成功后自动进入
+  if(type==="ticket"&&!tkCheckUnlocked()){
+    tkPendingEnter=true;
+    showLockOverlay();
+    return;
+  }
   if(currentTemplate&&currentTemplate!==type){
     tplImages[currentTemplate]=layers.slice();
     currentTemplate=type;

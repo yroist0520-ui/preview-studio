@@ -54,7 +54,13 @@ button.ghost:hover{background:#3a3a45}
     <h1>🔑 解锁码生成器</h1>
     <div class="sub">生成 Preview Studio 的激活码 · 与主站联动</div>
 
-    <h3>① 选择卡类型</h3>
+    <h3>① 选择解锁对象</h3>
+    <div class="type-grid" style="grid-template-columns:repeat(2,1fr)">
+      <button class="type-btn" data-scope="SITE"><span class="t">PS</span><span class="d">网站整站解锁码</span></button>
+      <button class="type-btn active" data-scope="TICKET"><span class="t">TK</span><span class="d">票根模板解锁码</span></button>
+    </div>
+
+    <h3>② 选择卡类型</h3>
     <div class="type-grid">
       <button class="type-btn" data-type="DAY"><span class="t">日卡</span><span class="d">24 小时</span></button>
       <button class="type-btn active" data-type="MONTH"><span class="t">月卡</span><span class="d">30 天</span></button>
@@ -62,7 +68,7 @@ button.ghost:hover{background:#3a3a45}
       <button class="type-btn" data-type="FOREVER"><span class="t">永卡</span><span class="d">永久</span></button>
     </div>
 
-    <h3>② 生成数量</h3>
+    <h3>③ 生成数量</h3>
     <label>批量生成数量（1-50）</label>
     <input type="number" id="count" value="1" min="1" max="50">
 
@@ -72,6 +78,7 @@ button.ghost:hover{background:#3a3a45}
 
     <div class="note">
       <b>说明：</b>解锁码在用户首次输入时开始计时（日卡 24h、月卡 30 天、年卡 365 天），永卡永久有效。每个码绑定激活设备，一台设备激活一次。<br><br>
+      <b>PS 码</b>解锁网站整站，<b>TK 码</b>只解锁「票根风预览」模板——两套密钥独立，互不通用。<br><br>
       本生成器与主站共用同一密钥算法，请勿公开此页面链接。
     </div>
 
@@ -80,7 +87,11 @@ button.ghost:hover{background:#3a3a45}
 </div>
 
 <script>
-const SECRET="PREVIEW-STUDIO-2026-SECRET-KEY";
+// 两套独立密钥：PS = 网站整站；TK = 票根模板（与主站 index.html 中的一一对应）
+const SECRETS={
+  SITE:{prefix:"PS",secret:"PREVIEW-STUDIO-2026-SECRET-KEY",label:"网站"},
+  TICKET:{prefix:"TK",secret:"TICKET-TEMPLATE-2026-SECRET-KEY",label:"票根"}
+};
 const TYPE_LABEL={DAY:"日卡",MONTH:"月卡",YEAR:"年卡",FOREVER:"永卡"};
 
 // 与主站一致的 djb2 哈希
@@ -96,16 +107,27 @@ function randomStr(n){
   return s;
 }
 function generateCode(type){
+  const sc=SECRETS[currentScope];
   const random=randomStr(8);
-  const checksum=hash(type+random+SECRET).slice(0,8).toUpperCase();
-  return "PS-"+type+"-"+random+"-"+checksum;
+  const checksum=hash(type+random+sc.secret).slice(0,8).toUpperCase();
+  return sc.prefix+"-"+type+"-"+random+"-"+checksum;
 }
+
+// 解锁对象选择（PS / TK）
+let currentScope="TICKET";
+document.querySelectorAll(".type-btn[data-scope]").forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll(".type-btn[data-scope]").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    currentScope=btn.dataset.scope;
+  };
+});
 
 // 卡类型选择
 let currentType="MONTH";
-document.querySelectorAll(".type-btn").forEach(btn=>{
+document.querySelectorAll(".type-btn[data-type]").forEach(btn=>{
   btn.onclick=()=>{
-    document.querySelectorAll(".type-btn").forEach(b=>b.classList.remove("active"));
+    document.querySelectorAll(".type-btn[data-type]").forEach(b=>b.classList.remove("active"));
     btn.classList.add("active");
     currentType=btn.dataset.type;
   };
@@ -119,7 +141,7 @@ function generate(){
     const code=generateCode(currentType);
     const row=document.createElement("div");
     row.className="code-row";
-    row.innerHTML='<span class="tag">'+TYPE_LABEL[currentType]+'</span><span class="code">'+code+'</span><button class="copy">复制</button>';
+    row.innerHTML='<span class="tag">'+SECRETS[currentScope].label+' · '+TYPE_LABEL[currentType]+'</span><span class="code">'+code+'</span><button class="copy">复制</button>';
     row.querySelector(".copy").onclick=()=>{
       copyText(code);
       row.querySelector(".copy").textContent="已复制";
