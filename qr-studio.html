@@ -274,7 +274,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
           <button class="btn primary" id="btnPng">下载 PNG（高清）</button>
           <button class="btn ghost" id="btnCopy">复制图片</button>
         </div>
-        <div class="hint">导出 4 倍高清，含完整名片与二维码；导出后仍可正常扫描。</div>
+        <div class="hint">导出 6 倍高清，含完整名片与二维码；导出后仍可正常扫描。</div>
       </section>
     </div>
 
@@ -471,7 +471,7 @@ function drawBgPattern(g,L){
   g.restore();
 }
 
-/* 名片绘制：在给定 ctx 上以 scale 倍率矢量重绘（预览 1x / 导出 3x 均清晰） */
+/* 名片绘制：在给定 ctx 上以 scale 倍率矢量重绘（预览 1x / 导出 6x 均清晰） */
 function paint(g,scale,L){
   g.save();
   g.setTransform(scale,0,0,scale,0,0);
@@ -613,15 +613,18 @@ function download(blob,name){
   document.body.appendChild(a);a.click();
   setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},800);
 }
-function exportPNGHi(){
-  if(!mats.some(function(x){return x.m})){toast("请先输入二维码内容");return}
-  var L=layout(),scale=4;
+function makeHiCanvas(){
+  var L=layout(),scale=6;   // 6 倍全矢量重绘（2250px 宽），微信/朋友圈压缩后依旧清晰
   var big=document.createElement("canvas");
   big.width=W*scale;big.height=L.H*scale;
   var bg=big.getContext("2d");
-  // 全矢量重绘：文字/头像/背景/二维码均按 4x 原生绘制，导出清晰可扫
+  bg.imageSmoothingEnabled=true;bg.imageSmoothingQuality="high";
   paint(bg,scale,L);
-  big.toBlob(function(b){download(b,"qr-card-hi.png");toast("已下载 4 倍高清 PNG")},"image/png");
+  return big;
+}
+function exportPNGHi(){
+  if(!mats.some(function(x){return x.m})){toast("请先输入二维码内容");return}
+  makeHiCanvas().toBlob(function(b){download(b,"qr-card-hi.png");toast("已下载 6 倍高清 PNG")},"image/png");
 }
 
 /* ============ DOM 同步 ============ */
@@ -769,7 +772,8 @@ $("btnPng").addEventListener("click",exportPNGHi);
 $("btnCopy").addEventListener("click",function(){
   if(!mats.some(function(x){return x&&x.m})){toast("请先输入二维码内容");return}
   try{
-    cv.toBlob(function(b){
+    // 拷贝也走 6 倍高清画布，避免粘贴出去是模糊的预览图
+    makeHiCanvas().toBlob(function(b){
       if(navigator.clipboard&&window.ClipboardItem){
         navigator.clipboard.write([new ClipboardItem({"image/png":b})])
           .then(function(){toast("已复制图片")})
