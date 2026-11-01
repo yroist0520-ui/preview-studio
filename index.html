@@ -410,9 +410,7 @@ input[type=file]{font-size:11px}
 
 <header class="hero" id="top">
   <div class="container">
-    <div class="hero-eyebrow"><span class="dot"></span><span>v4.0 · 字稿风预设 + 智能取色</span></div>
     <h1>把你的作品<br>变成<span class="accent">Preview</span>级视觉</h1>
-    <p>专为创作者打造的作品预览图生成器。新增字稿风模式：图片铺满 + 智能取色 + 头像署名 + 四角星装饰，一键导出适配手机 / 平板 / 1:1 正方形的 PNG。</p>
     <div class="hero-cta">
       <a href="#tool" class="btn-primary">开始创作</a>
       <a href="#tool" class="btn-ghost">查看模板</a>
@@ -2225,7 +2223,7 @@ love
         <div class="hint">水印图会以所选混合模式叠加在作品图上</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="home ticket">
+        <div class="tpl-sec" data-tpl="home">
         <h3 class="tool-h" style="margin-top:14px">文字水印</h3>
         <div class="checkbox-row"><input type="checkbox" id="wmTextUse" onchange="requestDraw()"><span>使用文字水印（代替上方水印图片）</span></div>
         <label>水印文字</label>
@@ -2313,17 +2311,38 @@ love
 
         <div class="tpl-sec" data-tpl="ticket">
         <h3 class="tool-h">⑥ 背景与层叠</h3>
+        <label>背景类型</label>
+        <select id="tkBgType" onchange="tkSet('bgType',this.value);document.getElementById('tkBg2Row').style.display=(this.value==='gradient')?'block':'none'">
+          <option value="solid" selected>纯色</option>
+          <option value="gradient">渐变</option>
+        </select>
         <div class="row-2">
-          <div><label>画布背景色</label><input type="color" id="tkBg" value="#0d0d10" oninput="tkSet('bg',this.value)"></div>
-          <div><label>背景亮度: <span id="tkBgDimVal">0</span>%</label><input type="range" id="tkBgDim" min="0" max="60" value="0" oninput="document.getElementById('tkBgDimVal').textContent=this.value;tkSet('bgDim',this.value)"></div>
+          <div><label>主色</label><input type="color" id="tkBg1" value="#0d0d10" oninput="tkSet('bg1',this.value)"></div>
+          <div><label>副色</label><input type="color" id="tkBg2" value="#1a1a22" oninput="tkSet('bg2',this.value)"></div>
         </div>
-        <label>左侧海报旋转: <span id="tkLeftRotVal">-12</span>°</label>
-        <input type="range" id="tkLeftRot" min="-30" max="0" value="-12" oninput="document.getElementById('tkLeftRotVal').textContent=this.value;tkSet('leftRot',this.value)">
-        <label>右侧海报旋转: <span id="tkRightRotVal">12</span>°</label>
-        <input type="range" id="tkRightRot" min="0" max="30" value="12" oninput="document.getElementById('tkRightRotVal').textContent=this.value;tkSet('rightRot',this.value)">
+        <div id="tkBg2Row">
+          <label>渐变方向</label>
+          <select id="tkBgDir" onchange="tkSet('bgDir',this.value)">
+            <option value="v">上 → 下</option>
+            <option value="h">左 → 右</option>
+            <option value="d">左上 → 右下</option>
+            <option value="r">径向</option>
+          </select>
+        </div>
+        <button class="ms-btn" onclick="tkExtractBgFromMain()" style="margin-top:4px">✦ 从主海报吸色填背景</button>
+        <label>左侧海报旋转: <span id="tkLeftRotVal">-15</span>°</label>
+        <input type="range" id="tkLeftRot" min="-30" max="0" value="-15" oninput="document.getElementById('tkLeftRotVal').textContent=this.value;tkSet('leftRot',this.value)">
+        <label>右侧海报旋转: <span id="tkRightRotVal">15</span>°</label>
+        <input type="range" id="tkRightRot" min="0" max="30" value="15" oninput="document.getElementById('tkRightRotVal').textContent=this.value;tkSet('rightRot',this.value)">
         <div class="row-2">
-          <div><label>左右海报前后偏移: <span id="tkBackXVal">28</span>%</label><input type="range" id="tkBackX" min="10" max="50" value="28" oninput="document.getElementById('tkBackXVal').textContent=this.value;tkSet('backX',this.value)"></div>
-          <div><label>投影强度: <span id="tkShadowVal">30</span></label><input type="range" id="tkShadow" min="0" max="80" value="30" oninput="document.getElementById('tkShadowVal').textContent=this.value;tkSet('shadow',this.value)"></div>
+          <div><label>左右海报前后偏移: <span id="tkBackXVal">35</span>%</label><input type="range" id="tkBackX" min="10" max="50" value="35" oninput="document.getElementById('tkBackXVal').textContent=this.value;tkSet('backX',this.value)"></div>
+          <div><label>投影强度: <span id="tkShadowVal">35</span></label><input type="range" id="tkShadow" min="0" max="80" value="35" oninput="document.getElementById('tkShadowVal').textContent=this.value;tkSet('shadow',this.value)"></div>
+        </div>
+        <label>后海报飘根颜色（跟随主体统一）</label>
+        <input type="color" id="tkFootColor" value="#ffffff" oninput="tkSet('footColor',this.value)">
+        <div class="row-2" style="margin-top:4px">
+          <div><label>左飘根单独色</label><input type="color" id="tkLeftFootColor" value="#ffffff" oninput="tkSet('leftFootColor',this.value)"></div>
+          <div><label>右飘根单独色</label><input type="color" id="tkRightFootColor" value="#ffffff" oninput="tkSet('rightFootColor',this.value)"></div>
         </div>
         </div>
 
@@ -6178,10 +6197,12 @@ function tkText(o){return Object.assign({text:"",font:TK_SYS,size:"3",weight:"40
 function tkDefaults(){return{
   color:"#ffffff",holeColor:"#0d0d10",tearColor:"#cccccc",tearStyle:"zigzag",
   torn:"closed",tornAngle:"40",
-  bg:"#0d0d10",bgDim:"0",
+  bgType:"solid",bg1:"#0d0d10",bg2:"#1a1a22",bgDir:"v",
   leftRot:"-15",rightRot:"15",backX:"35",shadow:"35",
-  title:tkText({text:"Love Letter",font:"'Playfair Display',Georgia,serif",size:"3.8",weight:"700",color:"#e74c3c",align:"center",x:"50",y:"85",w:"55",ls:"0"}),
-  subtitle:tkText({text:"情 书",font:"'PingFang SC','Microsoft YaHei',sans-serif",size:"2.4",weight:"400",color:"#888888",align:"center",x:"50",y:"90",w:"30",ls:"0"})
+  footColor:"#ffffff",
+  leftFootColor:"#ffffff",rightFootColor:"#ffffff",
+  title:tkText({text:"Love Letter",font:"'Playfair Display',Georgia,serif",size:"3.8",weight:"700",color:"#e74c3c",align:"center",x:"50",y:"68",w:"55",ls:"0"}),
+  subtitle:tkText({text:"情 书",font:"'PingFang SC','Microsoft YaHei',sans-serif",size:"2.4",weight:"400",color:"#888888",align:"center",x:"50",y:"73",w:"30",ls:"0"})
 };}
 function tkMerge(base,over){
   if(over===undefined||over===null)return base;
@@ -6238,9 +6259,31 @@ function tkSyncDom(){
   sf("tkColor",tkState.color);sf("tkHoleColor",tkState.holeColor);
   sf("tkTearColor",tkState.tearColor);sf("tkTearStyle",tkState.tearStyle);
   sf("tkTorn",tkState.torn);sf("tkTornAngle",tkState.tornAngle);
-  sf("tkBg",tkState.bg);sf("tkBgDim",tkState.bgDim);
+  sf("tkBgType",tkState.bgType);sf("tkBg1",tkState.bg1);sf("tkBg2",tkState.bg2);sf("tkBgDir",tkState.bgDir);
+  sf("tkFootColor",tkState.footColor);sf("tkLeftFootColor",tkState.leftFootColor);sf("tkRightFootColor",tkState.rightFootColor);
   sf("tkLeftRot",tkState.leftRot);sf("tkRightRot",tkState.rightRot);
   sf("tkBackX",tkState.backX);sf("tkShadow",tkState.shadow);
+  const row=document.getElementById("tkBg2Row");if(row)row.style.display=(tkState.bgType==="gradient")?"block":"none";
+}
+function tkExtractBgFromMain(){
+  const im=tkImg(TK_MEDIA.main);
+  if(!tkReady(im)){alert("请先上传中央主海报");return;}
+  // 采样 32×32 小块，取像素中位数
+  const off=document.createElement("canvas");
+  off.width=32;off.height=32;
+  const octx=off.getContext("2d");
+  octx.drawImage(im,0,0,32,32);
+  const d=octx.getImageData(0,0,32,32).data;
+  const rows=[];
+  for(let i=0;i<d.length;i+=4){rows.push([d[i],d[i+1],d[i+2]]);}
+  rows.sort(function(a,b){return (a[0]+a[1]+a[2])-(b[0]+b[1]+b[2]);});
+  const bot=rows[Math.floor(rows.length*0.2)];
+  const top=rows[Math.floor(rows.length*0.8)];
+  const hex=function(rgb){return "#"+rgb.map(function(v){return ("0"+Math.max(0,Math.min(255,v|0)).toString(16)).slice(-2);}).join("");};
+  tkState.bgType="gradient";
+  tkState.bg1=hex(bot);
+  tkState.bg2=hex(top);
+  tkSyncDom();requestDraw();
 }
 function tkFile(kind,input){
   const f=input.files&&input.files[0];if(!f)return;
@@ -6308,95 +6351,146 @@ function tkDraw(){
   tkSyncSel();
   const W=c.width, H=c.height;
   const st=tkState;
-  const shadow=Math.max(0,Math.min(1,(parseFloat(st.shadow)||30)/100));
-  // 以短边为基准 —— 任意比例画布都能自适应
+  const shadow=Math.max(0,Math.min(1,(parseFloat(st.shadow)||35)/100));
   const S=Math.min(W,H);
+  const cx=W/2, cy=H/2;
+  const ticketCX=cx;  // 向后兼容：大量地方仍用 ticketCX 名称
 
-  // 1) 画布背景
-  ctx.save();
-  ctx.fillStyle=st.bg;
-  ctx.fillRect(0,0,W,H);
-  if((parseFloat(st.bgDim)||0)>0){
-    const g=ctx.createRadialGradient(W/2,H/2,S*0.3,W/2,H/2,Math.max(W,H)*0.75);
-    g.addColorStop(0,"rgba(0,0,0,0)");
-    g.addColorStop(1,"rgba(0,0,0,"+(parseFloat(st.bgDim)||0)/100+")");
-    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  // —— 读尺寸选择器拿 poster 目标比例（高/宽） ——
+  const sizeSel=document.getElementById("size");
+  let posterRatio=1;
+  if(sizeSel&&sizeSel.value){
+    const parts=sizeSel.value.split(",");
+    if(parts.length===2){
+      const w=parseFloat(parts[0]),h=parseFloat(parts[1]);
+      if(w>0&&h>0)posterRatio=h/w;
+    }
   }
-  ctx.restore();
 
-  // —— 几何（以 S 为基准，100% 自适应） ——
-  // 中央白色票根（完整一张卡，上下打孔凹口）
-  const ticketCX=W/2;
-  const ticketW=S*0.58;
-  const ticketH=ticketW*1.62;                    // 竖长海报比例 1.62:1
-  const ticketTopY=Math.max(H*0.05,(H-ticketH)/2);
-  const ticketBotY=ticketTopY+ticketH;
-  const rr=Math.min(ticketW*0.028,12);            // 圆角很小
-  // 打孔：向下挖的半圆凹口（顶 / 底各一个）
-  const holeR=ticketW*0.06;
-  // 撕线位置（在海报底部和文字区之间）
-  const footH=ticketH*0.14;                       // 底部文字区高度（含撕线）
-  const tearY=ticketBotY-footH;                   // 撕线 y
-  // 主海报区：从顶边（跳过打孔）到撕线（跳过一点撕线间距）
-  const posterTopY=ticketTopY+holeR*0.9;           // 海报上缘（顶孔下沿）
-  const posterBotY=tearY-holeR*0.5;               // 海报下缘（撕线上方一点）
-  const posterPad=ticketW*0.025;                  // 细白边
-  const posterX=ticketCX-ticketW/2+posterPad;
-  const posterY=posterTopY+posterPad*0.5;
+  // —— 核心几何（直接按真实 canvas 算，一次完成，不用自动改 canvas） ——
+  // 基准票根宽度：让三联紧凑包裹在画布中央（比 S 小 10%）
+  const ticketW=Math.min(S*0.34,W*0.30);
+  const holeR=ticketW*0.055;
+  const footH=ticketW*0.16;
+  const posterPad=ticketW*0.02;
   const posterW=ticketW-posterPad*2;
-  const posterH=(posterBotY-posterTopY)-posterPad;
-
-  // 左右后海报（体积大，靠在票根后）
+  const posterH=posterW*posterRatio;
+  const ticketH=posterH+holeR*2+footH;
+  const rr=Math.min(ticketW*0.03,10);
+  const ticketTopY=cy-ticketH/2;
+  const ticketBotY=ticketTopY+ticketH;
+  const tearY=ticketBotY-footH;
+  const posterTopY=ticketTopY+holeR;
+  const posterY=posterTopY+posterPad;
+  const posterX=cx-posterW/2;
   const backOffsetX=W*((parseFloat(st.backX)||35)/100);
   const backW=ticketW*0.52;
-  const backH=ticketH*0.95;
+  const backH=backW*1.05;
 
-  // —— 2) 左右后面海报 ——
+  // —— 1) 画布背景：纯色 / 渐变 ——
+  ctx.save();
+  if((st.bgType||"solid")==="gradient"){
+    let grad;
+    if(st.bgDir==="h")grad=ctx.createLinearGradient(0,0,W,0);
+    else if(st.bgDir==="d")grad=ctx.createLinearGradient(0,0,W,H);
+    else if(st.bgDir==="r")grad=ctx.createRadialGradient(W/2,H/2,Math.min(W,H)*0.1,W/2,H/2,Math.max(W,H)*0.7);
+    else grad=ctx.createLinearGradient(0,0,0,H);
+    grad.addColorStop(0,st.bg1||"#0d0d10");
+    grad.addColorStop(1,st.bg2||"#1a1a22");
+    ctx.fillStyle=grad;
+  }else{
+    ctx.fillStyle=st.bg1||"#0d0d10";
+  }
+  ctx.fillRect(0,0,W,H);
+  ctx.restore();
+
+  // —— 2) 左右后面票根（每张都有图片区 + 底部飘根） ——
   function drawBackCard(kind,rotDeg,side){
-    const cx=side==="left"?(ticketCX-backOffsetX):(ticketCX+backOffsetX);
-    const cy=(ticketTopY+ticketBotY)/2;
+    const off=(parseFloat(st.backX)||35)/100;
+    const bx=side==="left"?(ticketCX-W*off):(ticketCX+W*off);
+    const by=(ticketTopY+ticketBotY)/2;
     const rad=rotDeg*Math.PI/180;
+    const bgColor=(kind==="left")?(st.leftFootColor||st.footColor||"#ffffff"):(st.rightFootColor||st.footColor||"#ffffff");
+    const bhNoFoot=backW*0.88;                // 图片 + 主体高度
+    const bhFoot=backW*0.15;                  // 飘根高度
+    const bh=bhNoFoot+bhFoot;                 // 总高
+
     ctx.save();
-    ctx.translate(cx,cy);
+    ctx.translate(bx,by);
     ctx.rotate(rad);
-    // 投影层（厚一点，参考图里后层有明显阴影）
+    // 阴影
     if(shadow>0){
       ctx.save();
       ctx.shadowColor="rgba(0,0,0,"+Math.min(0.9,shadow*0.8)+")";
-      ctx.shadowBlur=S*0.055;
-      ctx.shadowOffsetY=S*0.015;
+      ctx.shadowBlur=S*0.05;
+      ctx.shadowOffsetY=S*0.012;
       ctx.fillStyle="#1a1a22";
-      rrPath(-backW/2,-backH/2,backW,backH,rr);
+      rrPath(-backW/2,-bh/2,backW,bh,rr);
       ctx.fill();
       ctx.restore();
     }
-    ctx.fillStyle="#2a2a34";
-    rrPath(-backW/2,-backH/2,backW,backH,rr);
+    // 主体（图片区：上方大矩形）
+    ctx.fillStyle=bgColor;
+    rrPath(-backW/2,-bh/2,backW,bhNoFoot,rr);
     ctx.fill();
     const im=tkImg(kind==="left"?TK_MEDIA.left:TK_MEDIA.right);
     if(tkReady(im)){
       ctx.save();
-      rrPath(-backW/2,-backH/2,backW,backH,rr);
+      rrPath(-backW/2+rr,-bh/2+rr/2,backW-rr*2,bhNoFoot-rr,Math.max(0,rr*0.7));
       ctx.clip();
       const iw=im.naturalWidth,ih=im.naturalHeight;
-      const s=Math.max(backW/iw,backH/ih);
+      const clipH=bhNoFoot-rr;
+      const s=Math.max((backW-rr*2)/iw,clipH/ih);
       const dw=iw*s,dh=ih*s;
-      ctx.drawImage(im,-dw/2,-dh/2,dw,dh);
+      ctx.drawImage(im,-dw/2,-bh/2,backW,clipH);
       ctx.restore();
     }else{
       ctx.save();
-      rrPath(-backW/2,-backH/2,backW,backH,rr);
+      rrPath(-backW/2+rr,-bh/2+rr/2,backW-rr*2,bhNoFoot-rr,Math.max(0,rr*0.7));
       ctx.clip();
       const fb=TK_FB[kind==="left"?0:1];
-      const g=ctx.createLinearGradient(-backW/2,-backH/2,backW/2,backH/2);
+      const g=ctx.createLinearGradient(-backW/2,-bh/2,backW/2,-bh/2+bhNoFoot);
       g.addColorStop(0,fb[0]);g.addColorStop(1,fb[1]);
-      ctx.fillStyle=g;ctx.fillRect(-backW/2,-backH/2,backW,backH);
+      ctx.fillStyle=g;ctx.fillRect(-backW/2,-bh/2,backW,bhNoFoot);
       ctx.fillStyle="rgba(255,255,255,0.22)";
-      ctx.font=backW*0.05+"px "+TK_SYS;
+      ctx.font=backW*0.045+"px "+TK_SYS;
       ctx.textAlign="center";ctx.textBaseline="middle";
-      ctx.fillText(kind==="left"?"＋ 左海报":"＋ 右海报",0,0);
+      ctx.fillText(kind==="left"?"＋ 左海报":"＋ 右海报",0,-bh/2+bhNoFoot/2);
       ctx.restore();
     }
+    // 飘根（底部独立纸张，有细撕线）
+    ctx.save();
+    ctx.fillStyle=bgColor;
+    // 飘根主体（顶边沿撕线锯齿底走）
+    const zs2=backW*0.07;
+    ctx.beginPath();
+    let up2=false;
+    ctx.moveTo(-backW/2+rr,bhNoFoot-bh/2);
+    for(let x=-backW/2+rr;x<backW/2-rr;x+=zs2){
+      const px=x+zs2/2;
+      ctx.lineTo(px,bhNoFoot-bh/2+(up2?-zs2*0.5:zs2*0.5));
+      up2=!up2;
+    }
+    ctx.lineTo(backW/2,bhNoFoot-bh/2);
+    ctx.lineTo(backW/2,bh/2-rr);
+    ctx.quadraticCurveTo(backW/2,bh/2,backW/2-rr,bh/2);
+    ctx.lineTo(-backW/2+rr,bh/2);
+    ctx.quadraticCurveTo(-backW/2,bh/2,-backW/2,bh/2-rr);
+    ctx.closePath();
+    ctx.fill();
+    // 撕线（锯齿波浪，在飘根上沿）
+    ctx.strokeStyle="rgba(0,0,0,0.22)";
+    ctx.lineWidth=Math.max(1,S*0.001);
+    ctx.beginPath();
+    let up3=true;
+    ctx.moveTo(-backW/2+rr,bhNoFoot-bh/2);
+    for(let x=-backW/2+rr;x<backW/2-rr;x+=zs2){
+      const px=x+zs2/2;
+      ctx.lineTo(px,bhNoFoot-bh/2+(up3?-zs2*0.5:zs2*0.5));
+      up3=!up3;
+    }
+    ctx.stroke();
+    ctx.restore();
     ctx.restore();
   }
   drawBackCard("left",parseFloat(st.leftRot)||-15,"left");
@@ -6406,7 +6500,6 @@ function tkDraw(){
   const torn=(st.torn==="torn");
 
   if(!torn){
-    // CLOSED：一整张白色卡，投影一次、上下都有打孔
     ctx.save();
     if(shadow>0){
       ctx.shadowColor="rgba(0,0,0,"+Math.min(0.95,shadow*1.3)+")";
@@ -6417,18 +6510,16 @@ function tkDraw(){
     rrPath(ticketCX-ticketW/2,ticketTopY,ticketW,ticketH,rr);
     ctx.fill();
     ctx.restore();
-    // 顶打孔（半圆向下挖）
     ctx.save();
     ctx.fillStyle=st.holeColor;
     ctx.beginPath();ctx.arc(ticketCX,ticketTopY,holeR,0,Math.PI,false);ctx.fill();
     ctx.restore();
-    // 底打孔（半圆向上挖）
     ctx.save();
     ctx.fillStyle=st.holeColor;
     ctx.beginPath();ctx.arc(ticketCX,ticketBotY,holeR,Math.PI,0,false);ctx.fill();
     ctx.restore();
   }else{
-    // TORN：上半部独立 —— 底打孔不在上半部（跟着被撕掉的下半部走）
+    // TORN：上半部
     ctx.save();
     if(shadow>0){
       ctx.shadowColor="rgba(0,0,0,"+Math.min(0.95,shadow*1.3)+")";
@@ -6439,7 +6530,6 @@ function tkDraw(){
     rrPath(ticketCX-ticketW/2,ticketTopY,ticketW,tearY-ticketTopY+rr,rr);
     ctx.fill();
     ctx.restore();
-    // 顶打孔
     ctx.save();
     ctx.fillStyle=st.holeColor;
     ctx.beginPath();ctx.arc(ticketCX,ticketTopY,holeR,0,Math.PI,false);ctx.fill();
@@ -6473,9 +6563,11 @@ function tkDraw(){
 
   // —— 5) 撕线（锯齿 / 虚线 / 无） ——
   // —— 6) 底部（closed：正常；torn：下半块整块撕下来） ——
-  const tornRad=torn?-(parseFloat(st.tornAngle)||40)*Math.PI/180:0;
-  // 撕下来时下半块除了旋转还往下"掉"一点
-  const tornDrop=torn?S*0.022:0;
+  // canvas Y 轴向下：正角逆时针 → 主体底部往右下掉；负角顺时针 → 往上跑
+  // 我们要主体往下掉，挂在左边 → 用正角
+  const tornRad=torn?(parseFloat(st.tornAngle)||45)*Math.PI/180:0;
+  const tornDropX=torn?ticketW*0.02:0;
+  const tornDropY=torn?ticketW*0.02:0;
 
   // —— 撕线在上半部下沿（不管 torn / closed，上半部都有撕线上沿） ——
   if(st.tearStyle==="zigzag"){
@@ -6506,31 +6598,9 @@ function tkDraw(){
     ctx.restore();
   }
 
-  function tkPaintTextLocal(el,localX,localY,localW){
-    if(!el||!el.text)return;
-    const fs=W*(parseFloat(el.size)||3)/100;
-    const bw=W*(parseFloat(el.w)||40)/100;
-    const w=Math.min(bw,localW?localW:Infinity);
-    const ls=(parseFloat(el.ls)||0)*fs;
-    ctx.save();
-    ctx.font=(el.weight||"400")+" "+fs+"px "+(el.font||TK_SYS);
-    ctx.fillStyle=el.color||"#333";
-    ctx.textBaseline="middle";
-    const chars=Array.from(el.text);
-    const ws=chars.map(function(ch){return ctx.measureText(ch).width;});
-    let totalW=ls*(chars.length-1);
-    ws.forEach(function(w2){totalW+=w2;});
-    let x0;ctx.textAlign="left";
-    if(el.align==="center")x0=localX-totalW/2;
-    else if(el.align==="right")x0=localX-totalW;
-    else x0=localX-w/2;
-    chars.forEach(function(ch,i){ctx.fillText(ch,x0,localY);x0+=ws[i]+ls;});
-    ctx.restore();
-  }
-
-  // 画"下半块矩形"（局部坐标系：0,0 = tearY 中心，方向 = 全局 x 向右 / 全局 y 向下）
+  // 画"下半块矩形" + 文字（transform 已由调用方设置好：0,0 = tearY 中心，x→右，y→下）
   function drawTornFoot(){
-    // 下半块主体（顶边 = 撕线锯齿底，底边 = 圆角 + 底打孔）
+    // —— 下半块白色主体 ——
     ctx.save();
     if(shadow>0){
       ctx.shadowColor="rgba(0,0,0,"+Math.min(0.9,shadow*1.0)+")";
@@ -6539,10 +6609,9 @@ function tkDraw(){
     }
     ctx.fillStyle=st.color;
     ctx.beginPath();
-    // 顶边沿撕线锯齿底走（让撕下来的边缘有真实的锯齿状）
     if(st.tearStyle==="zigzag"){
       const zs=ticketW*0.038;
-      let up=false;                          // 锯齿底部（上半部的锯齿顶是 up=true，下半部的底就是 up=false）
+      let up=false;
       ctx.moveTo(-ticketW/2+rr,0);
       for(let x=-ticketW/2+rr;x<ticketW/2-rr;x+=zs){
         const px=x+zs/2;
@@ -6557,7 +6626,6 @@ function tkDraw(){
       ctx.moveTo(-ticketW/2,0);
       ctx.lineTo(ticketW/2,0);
     }
-    // 往下画到底边，带圆角
     ctx.lineTo(ticketW/2,footH-rr);
     ctx.quadraticCurveTo(ticketW/2,footH,ticketW/2-rr,footH);
     ctx.lineTo(-ticketW/2+rr,footH);
@@ -6565,35 +6633,60 @@ function tkDraw(){
     ctx.closePath();
     ctx.fill();
     ctx.restore();
-    // 底打孔（半圆向上挖，在底边）
+    // 底打孔（半圆向上挖）
     ctx.save();
     ctx.fillStyle=st.holeColor;
     ctx.beginPath();
     ctx.arc(0,footH,holeR,Math.PI,0,false);
     ctx.closePath();ctx.fill();
     ctx.restore();
-    // 文字（相对 tearY 的局部 y 偏移）
-    tkPaintTextLocal(st.title,W*(parseFloat(st.title.x)||50)/100,
-                     H*(parseFloat(st.title.y)||85)/100-tearY,
-                     W*(parseFloat(st.title.w)||50)/100);
-    tkPaintTextLocal(st.subtitle,W*(parseFloat(st.subtitle.x)||50)/100,
-                     H*(parseFloat(st.subtitle.y)||90)/100-tearY,
-                     W*(parseFloat(st.subtitle.w)||30)/100);
+
+    // —— 文字（用局部坐标，clamp 到纸片内部） ——
+    function placeText(el){
+      if(!el||!el.text)return null;
+      // 画布百分比 → 局部坐标
+      let lx=W*(parseFloat(el.x)||50)/100-ticketCX;       // 局部 0 = 票根中心
+      let ly=H*(parseFloat(el.y)||85)/100-tearY;            // 局部 0 = tearY 上边
+      // clamp 到纸片内部（别飘出去）
+      lx=Math.max(-ticketW/2+rr+2,Math.min(ticketW/2-rr-2,lx));
+      ly=Math.max(rr+2,Math.min(footH-rr-2,ly));
+      // 画
+      const fs=W*(parseFloat(el.size)||3)/100;
+      const ls=(parseFloat(el.ls)||0)*fs;
+      const bw=W*(parseFloat(el.w)||40)/100;
+      ctx.save();
+      ctx.font=(el.weight||"400")+" "+fs+"px "+(el.font||TK_SYS);
+      ctx.fillStyle=el.color||"#333";
+      ctx.textBaseline="middle";
+      const chars=Array.from(el.text);
+      const ws=chars.map(function(ch){return ctx.measureText(ch).width;});
+      let totalW=ls*(chars.length-1);
+      ws.forEach(function(w2){totalW+=w2;});
+      let x0;ctx.textAlign="left";
+      if(el.align==="center")x0=lx-totalW/2;
+      else if(el.align==="right")x0=lx-totalW;
+      else x0=lx-Math.min(bw,totalW)/2;
+      chars.forEach(function(ch,i){ctx.fillText(ch,x0,ly);x0+=ws[i]+ls;});
+      ctx.restore();
+      return {lx:lx,ly:ly,fS:fs,bw:Math.min(bw,totalW+2)};
+    }
+    const tp=placeText(st.title);
+    const sp=placeText(st.subtitle);
+    return {titleBox:tp,subBox:sp};
   }
 
   if(!torn){
-    // CLOSED：下半块正常贴着（不旋转不掉落）
+    // CLOSED：中心对齐贴上去
     ctx.save();
-    ctx.translate(0,0);
+    ctx.translate(ticketCX,tearY);
     drawTornFoot();
     ctx.restore();
   }else{
-    // TORN：下半块整块以 tearY 为铰链，旋转 + 往下掉一点
+    // TORN：铰链点 = tearY 左边那个点；主体从那里往右下掉，自然挂在左边
     ctx.save();
-    ctx.translate(ticketCX,tearY+tornDrop);
-    ctx.rotate(tornRad);
-    // 再把局部原点平移一点，让块旋转后自然往下"挂着"
-    ctx.translate(0,S*0.003);
+    ctx.translate(ticketCX-ticketW/2+tornDropX,tearY+tornDropY);
+    ctx.rotate(tornRad);                                  // 正角（canvas Y↓ 下 = 往右下掉）
+    ctx.translate(ticketW/2,0);                           // 主体左边缘对齐到铰链点
     drawTornFoot();
     ctx.restore();
   }
@@ -9749,6 +9842,7 @@ function selectTemplate(type){
     mjBuildSlots();
     requestDraw();
   }
+  // ticket 模板不强制尺寸，由用户选择的尺寸控制主海报比例
   c.classList.toggle("cg-canvas",type==="collage");
   if(type!=="collage"){cgDrag=null;cgPinch=null;c.style.cursor="";}
   const tool=document.getElementById("tool");
@@ -9838,7 +9932,12 @@ function applyTemplatePreset(type){
   }else if(type==="ticket"){
     chk("msMode",false);
     chk("lockScreen",false);
-    // 票根风：尺寸自适应用户选择（正方形 / 竖版 / 横版都能正确布局）
+    // 票根风：首次进入给 1080×1080 正方形，用户可切换任意比例；尺寸控制主海报图区比例
+    const sizeSel=document.getElementById("size");
+    if(sizeSel){
+      const cur=sizeSel.value||"";
+      if(!cur||cur==="w,h")set("size","1080,1080");
+    }
     set("featherMode","none");
     set("bgBlur","0");
     tkEnsureState();tkSyncDom();tkRenderCtx();requestDraw();
