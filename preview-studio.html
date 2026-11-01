@@ -2058,7 +2058,9 @@ love
 
 <script>
 // ============ 解锁码系统 ============
-const UNLOCK_KEY="ps-unlock-v2";
+const WORKSPACE_ID="HOME";
+const WORKSPACE_LABEL="Preview Studio";
+const UNLOCK_KEY="ps-unlock-"+WORKSPACE_ID+"-v2";
 const UNLOCK_SECRET="PREVIEW-STUDIO-2026-SECRET-KEY";
 const UNLOCK_API=""; // 本地验证模式（后端已停用）
 const CARD_TYPES={
@@ -2127,14 +2129,20 @@ function unlockNow(){
   msg.className="lock-msg";
   if(!code){msg.className="lock-msg err";msg.textContent="请输入解锁码";return;}
   const parts=code.split("-");
-  if(parts.length!==4 || parts[0]!=="PS"){
-    msg.className="lock-msg err";msg.textContent="格式错误，应为 PS-类型-随机码-校验码";return;
+  let ws,type,random,checksum;
+  if(parts.length===5 && parts[0]==="PS"){
+    ws=parts[1];type=parts[2];random=parts[3];checksum=parts[4];
+  }else if(parts.length===4 && parts[0]==="PS"){
+    ws="HOME";type=parts[1];random=parts[2];checksum=parts[3];
+  }else{
+    msg.className="lock-msg err";msg.textContent="格式错误，应为 PS-工作区-类型-随机码-校验码";return;
   }
-  const type=parts[1], random=parts[2], checksum=parts[3];
+  if(ws!==WORKSPACE_ID){
+    msg.className="lock-msg err";msg.textContent="此解锁码属于 "+ws+" 工作区，无法在此使用";return;
+  }
   const card=CARD_TYPES[type];
   if(!card){msg.className="lock-msg err";msg.textContent="未知的卡类型："+type;return;}
-  // 校验签名
-  const expect=unlockHash(type+random+UNLOCK_SECRET).slice(0,8).toUpperCase();
+  const expect=unlockHash(ws+type+random+UNLOCK_SECRET).slice(0,8).toUpperCase();
   if(expect!==checksum){msg.className="lock-msg err";msg.textContent="解锁码无效（校验失败）";return;}
   const now=Date.now();
   const expiresAt=type==="FOREVER"?0:now+card.ms;

@@ -164,9 +164,44 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
   font-size:12.5px;font-weight:600;padding:10px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:.22s;
   z-index:999;box-shadow:0 6px 24px rgba(201,163,124,.35)}
 .toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ===== 解锁码遮罩 ===== */
+.lock-overlay{position:fixed;inset:0;z-index:9999;background:rgba(10,10,14,.96);display:flex;align-items:center;justify-content:center;padding:24px}
+.lock-card{width:100%;max-width:420px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:40px 32px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.lock-card .lock-icon{font-size:44px;margin-bottom:12px}
+.lock-card h2{font-size:22px;font-weight:700;margin-bottom:8px;letter-spacing:-.3px}
+.lock-card p{color:var(--muted);font-size:14px;margin-bottom:24px}
+.lock-card input{text-align:center;font-size:15px;letter-spacing:2px;text-transform:uppercase;padding:14px}
+.lock-card button{width:100%;margin-top:6px;padding:14px;font-size:15px}
+.lock-types{display:flex;gap:6px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+.lock-type-chip{font-size:11px;color:var(--muted);border:1px solid var(--border);border-radius:999px;padding:4px 10px}
+.lock-msg{margin-top:12px;font-size:13px;min-height:20px}
+.lock-msg.ok{color:#6fd18a}
+.lock-msg.err{color:#f08a8a}
+.lock-footer{margin-top:20px;font-size:11px;color:#555}
+.lock-info{margin-top:16px;text-align:left;background:#121218;border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.7}
 </style>
 </head>
 <body>
+
+<div class="lock-overlay" id="lockOverlay" style="display:none">
+  <div class="lock-card">
+    <div class="lock-icon">🔒</div>
+    <h2>QR Studio</h2>
+    <p>输入解锁码后即可使用二维码名片工作区</p>
+    <input type="text" id="unlockInput" placeholder="PS-QR-XXXX-XXXX-XXXX" autocomplete="off" onkeydown="if(event.key==='Enter')unlockNow()">
+    <button class="nav-cta" style="width:100%;margin-top:6px;padding:14px" onclick="unlockNow()">解锁</button>
+    <div class="lock-msg" id="unlockMsg"></div>
+    <div class="lock-types">
+      <span class="lock-type-chip">日卡 24h</span>
+      <span class="lock-type-chip">月卡 30天</span>
+      <span class="lock-type-chip">年卡 365天</span>
+      <span class="lock-type-chip">永卡 永久</span>
+    </div>
+    <div class="lock-info" id="unlockInfo" style="display:none"></div>
+    <div class="lock-footer">本工作区独立解锁码，与主页不通用 · 绑定本设备，刷新无需重复输入</div>
+  </div>
+</div>
 
 <nav class="nav">
   <div class="nav-inner">
@@ -175,6 +210,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
       <a href="index.html#features">功能</a><a href="index.html#tool">工具</a><a href="index.html#how">教程</a>
     </div>
     <div class="nav-right">
+      <span id="unlockBadge" style="display:none;white-space:nowrap;flex:none;font-size:12px;color:var(--accent);border:1px solid rgba(201,163,124,.35);border-radius:999px;padding:4px 12px;cursor:pointer" title="点击退出解锁" onclick="relock()"></span>
       <button class="nav-refresh" title="刷新页面，查看最新版本" onclick="location.reload()">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 15.3-6.3L21 7"/><path d="M21 7v5h-5"/><path d="M21 12a9 9 0 0 1-15.3 6.3L3 17"/><path d="M3 17v-5h5"/></svg>
         <span>刷新</span>
@@ -787,6 +823,116 @@ $("btnCopy").addEventListener("click",function(){
 syncDom();
 renderQrList();
 render();
+
+// ============ 解锁码系统（QR Studio 独立解锁） ============
+// 本工作区 WORKSPACE_ID="QR"，与主页 HOME 完全独立：localStorage key 不同、校验 hash 不同、码格式不同
+const WORKSPACE_ID="QR";
+const WORKSPACE_LABEL="QR Studio";
+const UNLOCK_KEY="ps-unlock-"+WORKSPACE_ID+"-v2";
+const UNLOCK_SECRET="PREVIEW-STUDIO-2026-SECRET-KEY";
+const UNLOCK_API="";
+const CARD_TYPES={
+  DAY:{label:"日卡",ms:24*60*60*1000},
+  MONTH:{label:"月卡",ms:30*24*60*60*1000},
+  YEAR:{label:"年卡",ms:365*24*60*60*1000},
+  FOREVER:{label:"永卡",ms:0}
+};
+function unlockHash(str){
+  let h=5381;
+  for(let i=0;i<str.length;i++){h=((h<<5)+h)^str.charCodeAt(i);}
+  return (h>>>0).toString(36);
+}
+function getDeviceFingerprint(){
+  try{
+    const cv=document.createElement("canvas");
+    cv.width=220;cv.height=60;
+    const g=cv.getContext("2d");
+    g.textBaseline="top";g.font="14px Arial";
+    g.fillStyle="#f60";g.fillRect(125,1,62,20);
+    g.fillStyle="#069";g.fillText("DeviceFingerprint!@#",2,15);
+    g.fillStyle="rgba(102,204,0,0.7)";g.fillText("指纹锁定🔒",4,34);
+    g.beginPath();g.arc(30,20,12,0,Math.PI*2);g.stroke();
+    const features=[cv.toDataURL(),navigator.userAgent,navigator.language,navigator.platform||"",
+      screen.width+"x"+screen.height+"x"+screen.colorDepth,new Date().getTimezoneOffset(),
+      navigator.hardwareConcurrency||"",navigator.maxTouchPoints||""].join("|");
+    let h=5381;for(let i=0;i<features.length;i++){h=((h<<5)+h)^features.charCodeAt(i);}
+    return "fp-"+((h>>>0).toString(36))+"-"+features.length.toString(36);
+  }catch(e){return "fp-unknown";}
+}
+function checkUnlocked(){
+  try{
+    const raw=localStorage.getItem(UNLOCK_KEY);
+    if(!raw)return false;
+    const u=JSON.parse(raw);
+    if(u.deviceId && u.deviceId!==getDeviceFingerprint())return false;
+    if(u.type==="FOREVER")return true;
+    return Date.now()<u.expiresAt;
+  }catch(e){return false;}
+}
+function showLockOverlay(){
+  document.getElementById("lockOverlay").style.display="flex";
+  if(checkUnlocked())document.getElementById("lockOverlay").style.display="none";
+}
+function unlockNow(){
+  const input=document.getElementById("unlockInput");
+  const msg=document.getElementById("unlockMsg");
+  const code=(input.value||"").trim().toUpperCase();
+  msg.className="lock-msg";
+  if(!code){msg.className="lock-msg err";msg.textContent="请输入解锁码";return;}
+  const parts=code.split("-");
+  let ws,type,random,checksum;
+  if(parts.length===5 && parts[0]==="PS"){
+    ws=parts[1];type=parts[2];random=parts[3];checksum=parts[4];
+  }else if(parts.length===4 && parts[0]==="PS"){
+    ws="HOME";type=parts[1];random=parts[2];checksum=parts[3];
+  }else{
+    msg.className="lock-msg err";msg.textContent="格式错误：应为 PS-QR-类型-随机码-校验码";return;
+  }
+  if(ws!==WORKSPACE_ID){
+    msg.className="lock-msg err";msg.textContent="此解锁码属于 "+ws+" 工作区，无法在 "+WORKSPACE_LABEL+" 使用";return;
+  }
+  const card=CARD_TYPES[type];
+  if(!card){msg.className="lock-msg err";msg.textContent="未知的卡类型："+type;return;}
+  const expect=unlockHash(ws+type+random+UNLOCK_SECRET).slice(0,8).toUpperCase();
+  if(expect!==checksum){msg.className="lock-msg err";msg.textContent="解锁码无效（校验失败）";return;}
+  const now=Date.now();
+  const expiresAt=type==="FOREVER"?0:now+card.ms;
+  const saveUnlock=()=>{
+    localStorage.setItem(UNLOCK_KEY,JSON.stringify({type,expiresAt,activatedAt:Date.now(),code,deviceId:getDeviceFingerprint()}));
+    msg.className="lock-msg ok";
+    msg.textContent="✅ QR Studio 解锁成功（已绑定本设备）！"+(type==="FOREVER"?"（永久）":"");
+    updateBadge();
+    setTimeout(()=>{document.getElementById("lockOverlay").style.display="none";},600);
+  };
+  saveUnlock();
+}
+function updateBadge(){
+  const badge=document.getElementById("unlockBadge");
+  if(checkUnlocked()){
+    const u=JSON.parse(localStorage.getItem(UNLOCK_KEY)||"{}");
+    const label=(CARD_TYPES[u.type]?CARD_TYPES[u.type].label:u.type)||"已解锁";
+    badge.textContent="🔓 QR · "+label;
+    badge.style.display="inline-block";
+  }else{badge.style.display="none";}
+}
+function relock(){
+  if(!confirm("退出当前解锁？退出后需重新输入解锁码。"))return;
+  localStorage.removeItem(UNLOCK_KEY);updateBadge();showLockOverlay();
+}
+// 页面加载时检查（QR Studio 独立检查，不影响主页解锁状态）
+(function(){
+  if(!checkUnlocked()){showLockOverlay();}
+  else{updateBadge();
+    const u=JSON.parse(localStorage.getItem(UNLOCK_KEY)||"{}");
+    if(u.type&&u.type!=="FOREVER"){
+      const remain=Math.max(0,u.expiresAt-Date.now());
+      const days=Math.ceil(remain/86400000);
+      const info=document.getElementById("unlockInfo");
+      info.style.display="block";
+      info.innerHTML="当前 QR Studio：<b>"+(CARD_TYPES[u.type]?CARD_TYPES[u.type].label:u.type)+"</b> · 剩余约 "+days+" 天";
+    }
+  }
+})();
 </script>
 </body>
 </html>
