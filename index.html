@@ -679,38 +679,25 @@ input[type=file]{font-size:11px}
           <div class="tpl-thumb">
             <div class="mock-qr">
               <svg viewBox="0 0 112 116" width="112" height="116" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="qrThumbBg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f7f7f9"/><stop offset="100%" stop-color="#ebebf0"/></linearGradient>
-                  <linearGradient id="qrThumbAva" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#d7dce3"/><stop offset="100%" stop-color="#98a1ab"/></linearGradient>
-                  <clipPath id="qrThumbClip"><circle cx="56" cy="34" r="19"/></clipPath>
-                </defs>
-                <rect x="0" y="0" width="112" height="116" fill="url(#qrThumbBg)"/>
-                <circle cx="56" cy="34" r="20.5" fill="#ffffff"/>
-                <g clip-path="url(#qrThumbClip)">
-                  <rect x="37" y="15" width="38" height="38" fill="url(#qrThumbAva)"/>
-                  <circle cx="56" cy="28" r="5.6" fill="#ffffff" opacity=".92"/>
-                  <path d="M45 47 Q45 35 56 35 Q67 35 67 47 Z" fill="#ffffff" opacity=".92"/>
-                </g>
-                <rect x="42" y="62" width="28" height="5" rx="2.5" fill="#2b2b30"/>
-                <rect x="10" y="76" width="92" height="34" rx="8" fill="#ffffff" stroke="rgba(0,0,0,.05)"/>
-                <g stroke="#2b2b30" stroke-width="1.2" stroke-linecap="round">
-                  <path d="M17 86 v-3 h3 M28 83 h3 v3 M31 92 v3 h-3 M20 95 h-3 v-3"/>
-                </g>
-                <rect x="34" y="84" width="30" height="4" rx="2" fill="#2b2b30"/>
-                <path d="M91 84.5 l3.6 3.5 l-3.6 3.5" stroke="#b0b0b6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-                <g fill="#17181c">
-                  <rect x="36" y="93" width="40" height="13" rx="2"/>
-                </g>
+                <rect width="112" height="116" fill="#ffffff"/>
+                <circle cx="56" cy="38" r="15" fill="#e7e7ec"/>
+                <circle cx="56" cy="34" r="4.6" fill="#b5b5be"/>
+                <path d="M47.6 48.5 Q47.6 39.4 56 39.4 Q64.4 39.4 64.4 48.5 Z" fill="#b5b5be"/>
+                <rect x="44" y="60" width="24" height="4.5" rx="2.25" fill="#2b2b30"/>
+                <rect x="36" y="70" width="40" height="40" rx="3" fill="#17181c"/>
                 <g fill="#ffffff">
-                  <rect x="39" y="96" width="2.6" height="2.6"/><rect x="45" y="96" width="2.6" height="2.6"/><rect x="53" y="96" width="2.6" height="2.6"/><rect x="61" y="96" width="2.6" height="2.6"/><rect x="69" y="96" width="2.6" height="2.6"/>
-                  <rect x="42" y="100" width="2.6" height="2.6"/><rect x="50" y="100" width="2.6" height="2.6"/><rect x="58" y="100" width="2.6" height="2.6"/><rect x="66" y="100" width="2.6" height="2.6"/><rect x="72" y="100" width="2.6" height="2.6"/>
-                  <rect x="39" y="103" width="2.6" height="2.6"/><rect x="47" y="103" width="2.6" height="2.6"/><rect x="56" y="103" width="2.6" height="2.6"/><rect x="64" y="103" width="2.6" height="2.6"/><rect x="71" y="103" width="2.6" height="2.6"/>
+                  <path d="M41 75h11v11H41V75zm2.6 2.6v5.8h5.8v-5.8h-5.8z" fill-rule="evenodd"/>
+                  <path d="M61 75h11v11H61V75zm2.6 2.6v5.8h5.8v-5.8h-5.8z" fill-rule="evenodd"/>
+                  <path d="M41 94h11v11H41V94zm2.6 2.6v5.8h5.8v-5.8h-5.8z" fill-rule="evenodd"/>
+                  <rect x="55" y="77" width="3.2" height="3.2"/><rect x="55" y="86" width="3.2" height="3.2"/>
+                  <rect x="64" y="86" width="3.2" height="3.2"/><rect x="68.8" y="80.8" width="3.2" height="3.2"/>
+                  <rect x="55" y="99" width="3.2" height="3.2"/><rect x="64" y="103.8" width="3.2" height="3.2"/>
                 </g>
               </svg>
             </div>
           </div>
           <h3>二维码名片</h3>
-          <p>朋友圈个人主页风格：圆形头像 + 署名 + 收款码区。支持上传二维码图片自动识别、三种模块样式、本机回读自检，3 倍高清 PNG 导出仍可扫。</p>
+          <p>朋友圈个人主页风格：圆形头像 + 署名 + 收款码区。支持 1~6 个二维码同时排布、上传图片自动识别、三种模块样式、本机回读自检，4 倍高清 PNG 导出仍可扫。</p>
           <button class="tpl-enter" onclick="event.stopPropagation();location.href='qr-studio.html'">进入制作 →</button>
         </div>
       </div>

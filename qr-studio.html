@@ -39,7 +39,8 @@ a{color:inherit;text-decoration:none}
 .nav-refresh:hover{color:var(--accent);border-color:rgba(201,163,124,.45);background:rgba(201,163,124,.08)}
 .nav-refresh svg{transition:transform .2s}
 .nav-refresh:hover svg{transform:rotate(180deg)}
-@media(max-width:768px){.nav-links{display:none}.nav-refresh span{display:none}}
+.nav-cta,.nav-refresh{white-space:nowrap;flex:none}
+@media(max-width:768px){.nav-links{display:none}.nav-refresh span{display:none}.nav-cta{padding:6px 12px;font-size:12.5px}}
 
 /* LAYOUT */
 .head{padding:34px 0 8px}
@@ -47,7 +48,7 @@ a{color:inherit;text-decoration:none}
 .head h1 em{font-style:normal;color:var(--accent)}
 .head p{color:var(--muted);font-size:14px;margin-top:6px;max-width:640px}
 .workspace{display:grid;grid-template-columns:378px 1fr;gap:20px;align-items:start;padding:20px 0 50px}
-@media(max-width:940px){.workspace{grid-template-columns:1fr}.col-stage{order:1}.col-panel{order:2}}
+@media(max-width:940px){.workspace{display:flex;flex-direction:column;gap:12px}.col-stage{order:1}.col-panel{order:2}}
 
 /* PANELS */
 .panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px 18px;
@@ -100,6 +101,12 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 .uptile .meta span{color:var(--muted);font-size:11.5px}
 .link-btn{font-size:11.5px;color:var(--accent);text-decoration:underline;text-underline-offset:2px;padding:2px 0}
 .link-btn:hover{color:#d4b08c}
+/* 多二维码条目 */
+.qr-item{border:1px solid #2a2a35;border-radius:9px;background:#18181f;padding:10px 11px;margin-bottom:9px}
+.qr-item .qr-item-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}
+.qr-item .qr-item-head label{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.3px}
+.qr-item textarea{min-height:42px}
+.qr-item input[type=text]{margin-top:7px;padding:7px 10px}
 .btn-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .btn{border:1px solid #3a3a45;background:#21212a;color:var(--text);border-radius:8px;padding:10px 0;font-size:12.5px;
   font-weight:600;transition:.15s;display:flex;align-items:center;justify-content:center;gap:6px}
@@ -115,12 +122,34 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
 
 /* STAGE */
 .col-stage{position:sticky;top:84px}
-@media(max-width:940px){.col-stage{position:static}}
 .stage{background:radial-gradient(circle at center,#1a1a22 0,#070708 100%);border:1px solid var(--border);
   border-radius:var(--radius);padding:30px 16px;display:flex;align-items:center;justify-content:center;min-height:520px}
 #qrCanvas{max-width:100%;height:auto;border-radius:14px;box-shadow:0 24px 64px rgba(0,0,0,.6)}
 .stage-note{margin-top:14px;font-size:11.5px;color:var(--muted);text-align:center}
 .stage-note b{color:var(--accent);font-weight:600}
+/* 手机端：同 dual-studio 线上版 —— 画布带棋盘格边框常驻导航下方，参数区在其下滚动 */
+@media(max-width:940px){
+  .head{display:none}
+  .workspace{gap:0;padding-top:0;align-items:stretch}   /* 纵向 flex 下必须 stretch，否则画布条按内容收缩不铺满 */
+  .col-stage{position:sticky;top:64px;z-index:50;order:1;flex:none;
+    display:flex;justify-content:center;align-items:center;
+    margin:0 -24px;                       /* 抵消 wrap 的左右内边距：整条铺满屏幕宽 */
+    background:rgba(13,13,16,.97);border-bottom:1px solid var(--border);
+    box-shadow:0 10px 24px rgba(0,0,0,.5);padding:8px 10px}
+  .stage{min-height:0;padding:6px;display:inline-block;
+    background:repeating-conic-gradient(#18181e 0% 25%,#1e1e26 0% 50%) 50%/20px 20px;
+    border:1px solid var(--border);border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  #qrCanvas{max-height:40vh;width:auto;border-radius:8px;box-shadow:none}
+  .stage-note{display:none}
+  .col-panel{order:2}
+  .panel{border:none;border-top:1px solid var(--border);border-radius:0;
+    background:transparent;margin-bottom:0;padding:16px 0}
+  .panel:hover{border-color:var(--border)}
+}
+@media(max-width:560px){
+  .col-stage{padding:6px 8px}
+  .stage{padding:6px}
+}
 
 .scan-state{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);background:#15151a;
   border:1px solid var(--border);border-radius:9px;padding:9px 11px;margin-bottom:12px}
@@ -165,34 +194,34 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
     <!-- 左：参数 -->
     <div class="col-panel">
       <section class="panel">
-        <h2><span class="dot"></span>二维码内容 <span class="opt">必填</span></h2>
-        <div class="field">
-          <label>网址 / 文本</label>
-          <textarea id="fContent" placeholder="输入网址或任意文本，二维码实时生成"></textarea>
-          <div class="hint" id="hContent"></div>
+        <h2><span class="dot"></span>二维码 <span class="opt" id="qrCountOpt"></span></h2>
+        <div id="qrList"></div>
+        <div class="btn-grid" style="margin-top:2px">
+          <button class="btn ghost" id="btnAddQr">＋ 添加二维码</button>
+          <label class="uptile" for="qrFile" style="padding:8px 10px">
+            <div class="thumb" id="qrThumb" style="width:26px;height:26px">🖼</div>
+            <div class="meta"><b style="font-size:11.5px">识别图片</b></div>
+          </label>
         </div>
-        <label class="uptile" for="qrFile">
-          <div class="thumb" id="qrThumb">🖼</div>
-          <div class="meta"><b>上传二维码图片</b><span>自动识别内容并填入</span></div>
-        </label>
         <input type="file" id="qrFile" accept="image/*" hidden>
         <div class="hint" id="hScan"></div>
       </section>
 
       <section class="panel">
         <h2><span class="dot"></span>名片信息</h2>
-        <div class="field">
-          <label>署名 / 昵称</label>
-          <input type="text" id="fName" maxlength="16" placeholder="署名">
+        <div class="row">
+          <div class="field">
+            <label>署名 / 昵称</label>
+            <input type="text" id="fName" maxlength="16" placeholder="署名">
+          </div>
+          <div class="field">
+            <label>头像</label>
+            <label class="uptile" for="avFile" style="padding:6px 9px">
+              <div class="thumb" id="avThumb" style="width:24px;height:24px;border-radius:6px">👤</div>
+              <div class="meta"><b style="font-size:11.5px">上传</b></div>
+            </label>
+          </div>
         </div>
-        <div class="field">
-          <label>二维码下方标签</label>
-          <input type="text" id="fLabel" maxlength="12" placeholder="WeChat">
-        </div>
-        <label class="uptile" for="avFile">
-          <div class="thumb" id="avThumb">👤</div>
-          <div class="meta"><b>上传头像</b><span>圆形裁切，建议正方形图</span></div>
-        </label>
         <input type="file" id="avFile" accept="image/*" hidden>
       </section>
 
@@ -245,7 +274,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;bac
           <button class="btn primary" id="btnPng">下载 PNG（高清）</button>
           <button class="btn ghost" id="btnCopy">复制图片</button>
         </div>
-        <div class="hint">导出 3 倍高清，含完整名片与二维码；导出后仍可正常扫描。</div>
+        <div class="hint">导出 4 倍高清，含完整名片与二维码；导出后仍可正常扫描。</div>
       </section>
     </div>
 
@@ -297,46 +326,58 @@ function qrResultText(r){
 
 /* ============ 状态 ============ */
 var KEY="qr-studio-v1";
+var QR_MAX=3;
 var DEF={
-  content:"https://github.com",name:"署名",label:"WeChat",
+  qrs:[{content:"https://github.com",label:"WeChat"}],name:"署名",
   style:"square",fg:"#17181c",card:"#ffffff",bg:"#f4f4f6",size:140,bgPat:"dots"
 };
 var S=Object.assign({},DEF);
 try{var saved=JSON.parse(localStorage.getItem(KEY)||"{}");Object.assign(S,saved)}catch(e){}
+// 旧版单码数据迁移
+if(!Array.isArray(S.qrs)){
+  S.qrs=[{content:S.content||DEF.qrs[0].content,label:S.label||DEF.qrs[0].label}];
+}
+S.qrs=S.qrs.filter(function(q){return q&&typeof q==="object"});
+if(!S.qrs.length)S.qrs=[{content:"",label:""}];
+if(S.qrs.length>QR_MAX)S.qrs.length=QR_MAX;
+delete S.content;delete S.label;
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 
 /* ============ 矩阵 ============ */
-var matrix=null,rowCount=0,qrErr="";
+var mats=[];   // [{m,n,text,err}] 与 S.qrs 一一对应
 function makeMatrix(text){
-  try{
-    var q=qrcode(0,"H");
-    q.addData(text);
-    q.make();
-    rowCount=q.getModuleCount();
-    var m=[];
-    for(var r=0;r<rowCount;r++){m.push([]);for(var c=0;c<rowCount;c++)m[r].push(q.isDark(r,c))}
-    return m;
-  }catch(e){qrErr=e.message||String(e);return null}
+  var q=qrcode(0,"H");
+  q.addData(text);
+  q.make();
+  var n=q.getModuleCount();
+  var m=[];
+  for(var r=0;r<n;r++){m.push([]);for(var c=0;c<n;c++)m[r].push(q.isDark(r,c))}
+  return {m:m,n:n};
 }
-function eyeList(){return [[0,0],[0,rowCount-7],[rowCount-7,0]]}
-function inEye(r,c,m){
-  var E=eyeList();
+function buildAllQRs(){
+  mats=[];
+  for(var i=0;i<S.qrs.length;i++){
+    var t=(S.qrs[i].content||"").trim();
+    if(!t){mats.push({m:null,n:0,text:"",err:""});continue}
+    try{
+      var o=makeMatrix(t);
+      mats.push({m:o.m,n:o.n,text:t,err:""});
+    }catch(e){mats.push({m:null,n:0,text:t,err:e.message||String(e)})}
+  }
+}
+function eyeList(n){return [[0,0],[0,n-7],[n-7,0]]}
+function inEye(r,c,n){
+  var E=eyeList(n);
   for(var i=0;i<3;i++){
     var er=E[i][0],ec=E[i][1];
     if(r>=er&&r<er+7&&c>=ec&&c<ec+7)return i;
   }
   return -1;
 }
-function buildQR(text){
-  qrErr="";
-  if(!text||!text.trim()){matrix=null;rowCount=0;return false}
-  matrix=makeMatrix(text.trim());
-  return !!matrix;
-}
 
 /* ============ 模块绘制 ============ */
 function drawModules(ctx,m,n,px,cell,quiet,fg,bg){
-  var EYE=eyeList();
+  var EYE=eyeList(n);
   var style=S.style;
   var rad=S.style==="rounded"?cell*0.32:0;
   ctx.fillStyle=bg;ctx.fillRect(0,0,px,px);
@@ -351,7 +392,7 @@ function drawModules(ctx,m,n,px,cell,quiet,fg,bg){
   }
   for(var r=0;r<n;r++)for(var c=0;c<n;c++){
     if(!m[r][c])continue;
-    if(style!=="square"&&inEye(r,c,m)>=0)continue;
+    if(style!=="square"&&inEye(r,c,n)>=0)continue;
     var x=x0+c*cell,y=y0+r*cell;
     if(style==="dots"){
       ctx.beginPath();ctx.arc(x+cell/2,y+cell/2,cell*0.5,0,Math.PI*2);ctx.fill();
@@ -388,111 +429,124 @@ function qrBoxSize(){return S.size}
 
 /* 布局计算 */
 function layout(){
+  var n=Math.max(1,S.qrs.length);
   var qs=qrBoxSize();
+  if(n===2)qs=Math.min(qs,150);
+  if(n===3)qs=Math.min(qs,100);
+  var gap=n>1?12:0;
+  var rowW=n*qs+(n-1)*gap;
   var H=266+qs+46;
-  return {qs:qs,H:H,avatarCy:78,avatarR:54,nameY:164,
-    payY:210,qrY:266,qrX:(W-qs)/2};
+  return {qs:qs,n:n,gap:gap,rowW:rowW,H:H,avatarCy:78,avatarR:54,nameY:164,
+    payY:210,qrY:266,qrRowX:(W-rowW)/2};
 }
 
 /* 背景图案：none / dots 波点 / stripe 斜纹 / grid 网格 / checker 棋盘 */
-function drawBgPattern(L){
+function drawBgPattern(g,L){
   var p=S.bgPat||"none";
   if(p==="none")return;
-  ctx.save();
+  g.save();
   if(p==="dots"){
-    ctx.fillStyle="rgba(20,20,25,.05)";
+    g.fillStyle="rgba(20,20,25,.05)";
     var step=20,r=2.2;
     for(var y=step/2,row=0;y<L.H;y+=step,row++){
       var off=(row%2)?step/2:0;
       for(var x=off+step/2;x<W;x+=step){
-        ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();
+        g.beginPath();g.arc(x,y,r,0,Math.PI*2);g.fill();
       }
     }
   }else if(p==="stripe"){
-    ctx.strokeStyle="rgba(20,20,25,.03)";ctx.lineWidth=1;
-    for(var i=-L.H;i<W;i+=14){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i+L.H,L.H);ctx.stroke()}
+    g.strokeStyle="rgba(20,20,25,.03)";g.lineWidth=1;
+    for(var i=-L.H;i<W;i+=14){g.beginPath();g.moveTo(i,0);g.lineTo(i+L.H,L.H);g.stroke()}
   }else if(p==="grid"){
-    ctx.strokeStyle="rgba(20,20,25,.04)";ctx.lineWidth=1;
-    for(var gx=0;gx<=W;gx+=22){ctx.beginPath();ctx.moveTo(gx+.5,0);ctx.lineTo(gx+.5,L.H);ctx.stroke()}
-    for(var gy=0;gy<=L.H;gy+=22){ctx.beginPath();ctx.moveTo(0,gy+.5);ctx.lineTo(W,gy+.5);ctx.stroke()}
+    g.strokeStyle="rgba(20,20,25,.04)";g.lineWidth=1;
+    for(var gx=0;gx<=W;gx+=22){g.beginPath();g.moveTo(gx+.5,0);g.lineTo(gx+.5,L.H);g.stroke()}
+    for(var gy=0;gy<=L.H;gy+=22){g.beginPath();g.moveTo(0,gy+.5);g.lineTo(W,gy+.5);g.stroke()}
   }else if(p==="checker"){
-    ctx.fillStyle="rgba(20,20,25,.028)";
+    g.fillStyle="rgba(20,20,25,.028)";
     var cs=24;
     for(var cy=0,r2=0;cy<L.H;cy+=cs,r2++){
-      for(var cx=(r2%2)*cs;cx<W;cx+=cs*2){ctx.fillRect(cx,cy,cs,cs)}
+      for(var cx=(r2%2)*cs;cx<W;cx+=cs*2){g.fillRect(cx,cy,cs,cs)}
     }
   }
-  ctx.restore();
+  g.restore();
 }
 
-function render(){
-  if(!buildQR(S.content)){matrix=null}
-  var L=layout();
-  cv.width=W;cv.height=L.H;
-  ctx.clearRect(0,0,W,L.H);
+/* 名片绘制：在给定 ctx 上以 scale 倍率矢量重绘（预览 1x / 导出 3x 均清晰） */
+function paint(g,scale,L){
+  g.save();
+  g.setTransform(scale,0,0,scale,0,0);
 
   // 页面底色 + 背景图案
-  ctx.fillStyle=S.bg;ctx.fillRect(0,0,W,L.H);
-  drawBgPattern(L);
+  g.fillStyle=S.bg;g.fillRect(0,0,W,L.H);
+  drawBgPattern(g,L);
 
   // ---- 头像 ----
-  ctx.save();
-  ctx.beginPath();ctx.arc(W/2,L.avatarCy,L.avatarR,0,Math.PI*2);ctx.closePath();ctx.clip();
+  g.save();
+  g.beginPath();g.arc(W/2,L.avatarCy,L.avatarR,0,Math.PI*2);g.closePath();g.clip();
   if(avatarImg){
     var ar=avatarImg.width/avatarImg.height;
     var dw=L.avatarR*2,dh=L.avatarR*2;
     if(ar>1){dw=dh*ar}else{dh=dw/ar}
-    ctx.drawImage(avatarImg,W/2-dw/2,L.avatarCy-dh/2,dw,dh);
+    g.drawImage(avatarImg,W/2-dw/2,L.avatarCy-dh/2,dw,dh);
   }else{
-    // 默认占位：浅灰底 + 简笔人形
-    ctx.fillStyle="#e6e6eb";ctx.fillRect(W/2-L.avatarR,L.avatarCy-L.avatarR,L.avatarR*2,L.avatarR*2);
-    ctx.fillStyle="#a9a9b2";
-    ctx.beginPath();ctx.arc(W/2,L.avatarCy-12,15,0,Math.PI*2);ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(W/2-26,L.avatarCy+34);
-    ctx.quadraticCurveTo(W/2-26,L.avatarCy+6,W/2,L.avatarCy+6);
-    ctx.quadraticCurveTo(W/2+26,L.avatarCy+6,W/2+26,L.avatarCy+34);
-    ctx.closePath();ctx.fill();
+    g.fillStyle="#e6e6eb";g.fillRect(W/2-L.avatarR,L.avatarCy-L.avatarR,L.avatarR*2,L.avatarR*2);
+    g.fillStyle="#a9a9b2";
+    g.beginPath();g.arc(W/2,L.avatarCy-12,15,0,Math.PI*2);g.fill();
+    g.beginPath();
+    g.moveTo(W/2-26,L.avatarCy+34);
+    g.quadraticCurveTo(W/2-26,L.avatarCy+6,W/2,L.avatarCy+6);
+    g.quadraticCurveTo(W/2+26,L.avatarCy+6,W/2+26,L.avatarCy+34);
+    g.closePath();g.fill();
   }
-  ctx.restore();
-  ctx.strokeStyle="rgba(255,255,255,.9)";ctx.lineWidth=3;
-  ctx.beginPath();ctx.arc(W/2,L.avatarCy,L.avatarR+1.5,0,Math.PI*2);ctx.stroke();
+  g.restore();
+  g.strokeStyle="rgba(255,255,255,.9)";g.lineWidth=3;
+  g.beginPath();g.arc(W/2,L.avatarCy,L.avatarR+1.5,0,Math.PI*2);g.stroke();
 
   // 署名
-  ctx.fillStyle="#17181c";
-  ctx.font="700 19px -apple-system,'PingFang SC',sans-serif";
-  ctx.textAlign="center";ctx.textBaseline="middle";
-  ctx.fillText(S.name||"署名",W/2,L.nameY);
+  g.fillStyle="#17181c";
+  g.font="700 19px -apple-system,'PingFang SC',sans-serif";
+  g.textAlign="center";g.textBaseline="middle";
+  g.fillText(S.name||"署名",W/2,L.nameY);
 
   // ---- Payment code 区 ----
-  drawScanIcon(ctx,20,L.payY+8);
-  ctx.fillStyle="#17181c";
-  ctx.font="600 16px -apple-system,'PingFang SC',sans-serif";
-  ctx.textAlign="left";ctx.textBaseline="middle";
-  ctx.fillText("Payment code",56,L.payY+9);
-  drawChevron(ctx,W-26,L.payY+9);
+  drawScanIcon(g,20,L.payY+8);
+  g.fillStyle="#17181c";
+  g.font="600 16px -apple-system,'PingFang SC',sans-serif";
+  g.textAlign="left";g.textBaseline="middle";
+  g.fillText("Payment code",56,L.payY+9);
+  drawChevron(g,W-26,L.payY+9);
 
-  // 二维码卡片
-  if(matrix){
-    var qs=L.qs;
-    var dpr=3;
-    var qc=document.createElement("canvas");
-    var cell=qs/(rowCount+QUIET*2);
-    qc.width=Math.round(qs*dpr);qc.height=Math.round(qs*dpr);
-    var qg=qc.getContext("2d");qg.setTransform(dpr,0,0,dpr,0,0);
-    drawModules(qg,matrix,rowCount,qs,cell,QUIET,S.fg,S.card);
-    ctx.drawImage(qc,L.qrX,L.qrY,qs,qs);
-  }else{
-    ctx.fillStyle="#dcdce2";ctx.fillRect(L.qrX,L.qrY,qs,qs);
-    ctx.fillStyle="#9a9aa3";ctx.font="13px sans-serif";ctx.textAlign="center";ctx.textBaseline="middle";
-    ctx.fillText("输入内容生成二维码",W/2,L.qrY+qs/2);
+  // ---- 二维码（1~3 个横排） ----
+  for(var i=0;i<L.n;i++){
+    var item=mats[i]||{m:null,n:0};
+    var qx=L.qrRowX+i*(L.qs+L.gap);
+    if(item.m){
+      var cell=L.qs/(item.n+QUIET*2);
+      g.save();g.translate(qx,L.qrY);
+      drawModules(g,item.m,item.n,L.qs,cell,QUIET,S.fg,S.card);
+      g.restore();
+    }
+    // 占位
+    if(!item.m){
+      g.fillStyle="#dcdce2";g.fillRect(qx,L.qrY,L.qs,L.qs);
+      g.fillStyle="#9a9aa3";g.font="11px sans-serif";g.textAlign="center";g.textBaseline="middle";
+      g.fillText("二维码 "+(i+1),qx+L.qs/2,L.qrY+L.qs/2);
+    }
+    // 标签
+    g.fillStyle="#9a9aa0";
+    g.font="400 12px -apple-system,'PingFang SC',sans-serif";
+    g.textAlign="center";g.textBaseline="top";
+    g.fillText((S.qrs[i]&&S.qrs[i].label)||"",qx+L.qs/2,L.qrY+L.qs+12);
   }
-  // 标签
-  ctx.fillStyle="#9a9aa0";
-  ctx.font="400 13px -apple-system,'PingFang SC',sans-serif";
-  ctx.textAlign="center";ctx.textBaseline="top";
-  ctx.fillText(S.label||"",W/2,L.qrY+qs+16);
+  g.restore();
+}
 
+function render(){
+  buildAllQRs();
+  var L=layout();
+  cv.width=W;cv.height=L.H;
+  ctx.clearRect(0,0,W,L.H);
+  paint(ctx,1,L);
   $("noteSize").textContent=W+"×"+L.H;
   verifyScan();
 }
@@ -523,21 +577,31 @@ function verifyScan(){
   clearTimeout(verifyT);
   verifyT=setTimeout(function(){
     var st=$("scanState"),tx=$("scanText");
-    if(!matrix||!S.content.trim()){st.className="scan-state";tx.textContent="内容为空，暂无可校验";return}
+    var filled=mats.filter(function(x){return x.m});
+    if(!filled.length){st.className="scan-state";tx.textContent="内容为空，暂无可校验";return}
     try{
-      var L=layout(),qs=L.qs,pad=8;
-      var c=document.createElement("canvas");
-      var sz=Math.round((qs+pad*2)*3);
-      c.width=sz;c.height=sz;
-      var g=c.getContext("2d");
-      g.fillStyle="#ffffff";g.fillRect(0,0,sz,sz);
-      g.imageSmoothingEnabled=false;
-      g.drawImage(cv,L.qrX-pad,L.qrY-pad,qs+pad*2,qs+pad*2,0,0,sz,sz);
-      var d=g.getImageData(0,0,sz,sz);
-      var r=jsQR(d.data,sz,sz,{inversionAttempts:"attemptBoth"});
-      var txt=qrResultText(r);
-      if(txt===S.content.trim()){st.className="scan-state pass";tx.textContent="自检通过：本机已成功解码，可正常扫描"}
-      else{st.className="scan-state warn";tx.textContent="自检未通过，建议增大二维码尺寸"}
+      var L=layout(),pad=8,ok=0;
+      for(var i=0;i<L.n;i++){
+        var item=mats[i];if(!item||!item.m)continue;
+        var qs=L.qs;
+        var qx=L.qrRowX+i*(L.qs+L.gap);
+        var c=document.createElement("canvas");
+        var sz=Math.round((qs+pad*2)*3);
+        c.width=sz;c.height=sz;
+        var g=c.getContext("2d");
+        g.fillStyle="#ffffff";g.fillRect(0,0,sz,sz);
+        g.imageSmoothingEnabled=false;
+        g.drawImage(cv,qx-pad,L.qrY-pad,qs+pad*2,qs+pad*2,0,0,sz,sz);
+        var d=g.getImageData(0,0,sz,sz);
+        var r=jsQR(d.data,sz,sz,{inversionAttempts:"attemptBoth"});
+        if(qrResultText(r)===item.text)ok++;
+      }
+      if(ok===filled.length){
+        st.className="scan-state pass";
+        tx.textContent=filled.length>1
+          ? "自检通过："+filled.length+" 个二维码本机均已成功解码"
+          : "自检通过：本机已成功解码，可正常扫描";
+      }else{st.className="scan-state warn";tx.textContent="自检 "+ok+"/"+filled.length+" 通过，建议增大二维码尺寸"}
     }catch(e){st.className="scan-state";tx.textContent="校验异常，导出后请自行扫码确认"}
   },220);
 }
@@ -550,32 +614,36 @@ function download(blob,name){
   setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},800);
 }
 function exportPNGHi(){
-  if(!matrix){toast("请先输入二维码内容");return}
-  var L=layout(),scale=3;
+  if(!mats.some(function(x){return x.m})){toast("请先输入二维码内容");return}
+  var L=layout(),scale=4;
   var big=document.createElement("canvas");
   big.width=W*scale;big.height=L.H*scale;
   var bg=big.getContext("2d");
-  // 底图放大后，二维码区域单独按 3x 矢量重绘，保证锐利可扫
-  bg.drawImage(cv,0,0,W,L.H,0,0,big.width,big.height);
-  if(matrix){
-    var qs=L.qs,dpr=3;
-    var qc=document.createElement("canvas");
-    qc.width=Math.round(qs*scale*dpr);qc.height=qc.width;
-    var qg=qc.getContext("2d");
-    qg.setTransform(scale*dpr,0,0,scale*dpr,0,0);
-    var cell=qs/(rowCount+QUIET*2);
-    drawModules(qg,matrix,rowCount,qs,cell,QUIET,S.fg,S.card);
-    bg.clearRect(L.qrX*scale,L.qrY*scale,qs*scale,qs*scale);
-    bg.drawImage(qc,L.qrX*scale,L.qrY*scale,qs*scale,qs*scale);
-  }
-  big.toBlob(function(b){download(b,"qr-card-hi.png");toast("已下载 3 倍高清 PNG")},"image/png");
+  // 全矢量重绘：文字/头像/背景/二维码均按 4x 原生绘制，导出清晰可扫
+  paint(bg,scale,L);
+  big.toBlob(function(b){download(b,"qr-card-hi.png");toast("已下载 4 倍高清 PNG")},"image/png");
 }
 
 /* ============ DOM 同步 ============ */
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+function renderQrList(){
+  var html="";
+  for(var i=0;i<S.qrs.length;i++){
+    var q=S.qrs[i];
+    html+='<div class="qr-item" data-i="'+i+'">'+
+      '<div class="qr-item-head"><label>二维码 '+(i+1)+'</label>'+
+      (S.qrs.length>1?'<button class="link-btn" data-del="'+i+'">删除</button>':'')+
+      '</div>'+
+      '<textarea data-f="content" data-i="'+i+'" placeholder="网址 / 文本">'+esc(q.content||"")+'</textarea>'+
+      '<input type="text" data-f="label" data-i="'+i+'" maxlength="12" placeholder="标签（如 WeChat）" value="'+esc(q.label||"")+'">'+
+      '</div>';
+  }
+  $("qrList").innerHTML=html;
+  $("qrCountOpt").textContent=S.qrs.length+"/"+QR_MAX;
+  $("btnAddQr").disabled=S.qrs.length>=QR_MAX;
+}
 function syncDom(){
-  $("fContent").value=S.content;
   $("fName").value=S.name;
-  $("fLabel").value=S.label;
   $("fFg").value=S.fg;$("vFg").textContent=S.fg;
   $("fCard").value=S.card;$("vCard").textContent=S.card;
   $("fBg").value=S.bg;$("vBg").textContent=S.bg;
@@ -590,11 +658,36 @@ function syncDom(){
 var renderT=0;
 function schedule(){clearTimeout(renderT);renderT=setTimeout(function(){render();persist()},60)}
 
-function bindText(id,key){
-  $(id).addEventListener("input",function(){S[key]=this.value;schedule()});
-}
-bindText("fContent","content");bindText("fName","name");
-bindText("fLabel","label");
+/* 多二维码列表：事件委托 */
+var activeQr=0;
+$("qrList").addEventListener("input",function(e){
+  var t=e.target,f=t.dataset.f;
+  if(!f)return;
+  var i=+t.dataset.i;
+  S.qrs[i][f]=t.value;schedule();
+});
+$("qrList").addEventListener("focusin",function(e){
+  var t=e.target;
+  if(t.dataset&&t.dataset.i!==undefined)activeQr=+t.dataset.i;
+});
+$("qrList").addEventListener("click",function(e){
+  var b=e.target.closest("[data-del]");if(!b)return;
+  var i=+b.dataset.del;
+  S.qrs.splice(i,1);
+  if(!S.qrs.length)S.qrs=[{content:"",label:""}];
+  activeQr=Math.min(activeQr,S.qrs.length-1);
+  renderQrList();schedule();
+});
+$("btnAddQr").addEventListener("click",function(){
+  if(S.qrs.length>=QR_MAX)return;
+  S.qrs.push({content:"",label:""});
+  activeQr=S.qrs.length-1;
+  renderQrList();schedule();
+  var tas=$("qrList").querySelectorAll(".qr-item textarea");
+  if(tas.length)tas[tas.length-1].focus();
+});
+
+$("fName").addEventListener("input",function(){S.name=this.value;schedule()});
 
 function bindColor(id,key,vid){
   $(id).addEventListener("input",function(){S[key]=this.value;$(vid).textContent=this.value;schedule()});
@@ -641,7 +734,7 @@ function decodeImage(file){
         }
         var txt=qrResultText(r);
         if(txt){
-          S.content=txt;syncDom();schedule();
+          S.qrs[activeQr].content=txt;renderQrList();schedule();
           $("hScan").className="hint ok";$("hScan").textContent="已识别二维码内容并填入，可继续调整样式";
           toast("识别成功");
         }else{
@@ -674,7 +767,7 @@ $("avFile").addEventListener("change",function(){
 /* 导出 */
 $("btnPng").addEventListener("click",exportPNGHi);
 $("btnCopy").addEventListener("click",function(){
-  if(!matrix){toast("请先输入二维码内容");return}
+  if(!mats.some(function(x){return x&&x.m})){toast("请先输入二维码内容");return}
   try{
     cv.toBlob(function(b){
       if(navigator.clipboard&&window.ClipboardItem){
@@ -688,6 +781,7 @@ $("btnCopy").addEventListener("click",function(){
 
 /* 启动 */
 syncDom();
+renderQrList();
 render();
 </script>
 </body>
