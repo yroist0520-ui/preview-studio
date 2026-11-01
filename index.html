@@ -696,19 +696,55 @@ input[type=file]{font-size:11px}
           <span class="tpl-sec-note">按需购买，非强制消费</span>
         </div>
         <div class="tpl-grid">
-          <div class="paid-placeholder">
-            <div class="pp-svg">
-              <svg viewBox="0 0 80 80" width="72" height="72" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect x="8" y="10" width="64" height="60" rx="8" stroke="#5a5a66" stroke-width="1.5" stroke-dasharray="4 3"/>
-                <circle cx="40" cy="38" r="11" stroke="#6a6a77" stroke-width="1.5"/>
-                <rect x="35" y="46" width="10" height="8" rx="2" fill="#4a4a55"/>
-                <rect x="32" y="26" width="16" height="4" rx="2" fill="#5a5a66"/>
-                <circle cx="62" cy="60" r="8" fill="#3a3a44" stroke="#5a5a66" stroke-width="1.2"/>
+          <div class="tpl-card" data-tpl="ticket" onclick="selectTemplate('ticket')">
+            <div class="tpl-thumb" style="background:#0d0d10">
+              <svg viewBox="0 0 200 200" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="tg1" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#5a7a9a"/><stop offset="100%" stop-color="#2a3a4a"/>
+                  </linearGradient>
+                  <linearGradient id="tg2" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#e74c3c"/><stop offset="100%" stop-color="#c0392b"/>
+                  </linearGradient>
+                </defs>
+                <!-- 左后海报 -->
+                <g transform="translate(38,78) rotate(-14)">
+                  <rect x="0" y="0" width="44" height="110" rx="4" fill="url(#tg1)"/>
+                  <rect x="4" y="6" width="36" height="60" fill="#2c3e50" opacity=".6"/>
+                  <rect x="6" y="74" width="32" height="4" rx="1" fill="#ecf0f1" opacity=".7"/>
+                  <rect x="6" y="82" width="24" height="3" rx="1" fill="#ecf0f1" opacity=".5"/>
+                </g>
+                <!-- 右后海报 -->
+                <g transform="translate(118,76) rotate(12)">
+                  <rect x="0" y="0" width="44" height="110" rx="4" fill="#3498db"/>
+                  <rect x="4" y="6" width="36" height="60" fill="#1f618d" opacity=".55"/>
+                  <rect x="6" y="74" width="32" height="4" rx="1" fill="#f9e79f" opacity=".85"/>
+                  <rect x="6" y="82" width="22" height="3" rx="1" fill="#f9e79f" opacity=".6"/>
+                </g>
+                <!-- 中央票根：上半部 -->
+                <g>
+                  <rect x="66" y="28" width="68" height="86" rx="6" fill="#ffffff"/>
+                  <rect x="72" y="34" width="56" height="60" rx="3" fill="#2c3e50"/>
+                  <rect x="74" y="97" width="52" height="3" rx="1" fill="#c0392b"/>
+                  <!-- 打孔凹口 -->
+                  <circle cx="100" cy="34" r="4" fill="#0d0d10"/>
+                  <circle cx="100" cy="114" r="4" fill="#0d0d10"/>
+                  <!-- 撕线 -->
+                  <path d="M66 114 Q70 111 74 114 Q78 117 82 114 Q86 111 90 114 Q94 117 98 114 Q102 111 106 114 Q110 117 114 114 Q118 111 122 114 Q126 117 130 114"
+                        stroke="#bdc3c7" stroke-width="1.5" fill="none" stroke-dasharray="2 2"/>
+                </g>
+                <!-- 中央票根：下半部（合在上面） -->
+                <rect x="66" y="114" width="68" height="26" rx="0 0 6 6" fill="#ffffff"/>
+                <text x="100" y="128" text-anchor="middle" fill="#c0392b" font-size="6" font-family="serif" font-weight="700">Love Letter</text>
+                <text x="100" y="138" text-anchor="middle" fill="#7f8c8d" font-size="4" font-family="sans-serif">情 书</text>
+                <!-- 票根阴影 -->
+                <rect x="66" y="28" width="68" height="112" rx="6" fill="none" stroke="#000" stroke-opacity=".15" stroke-width="1"/>
               </svg>
             </div>
-            <h3>付费模板 01</h3>
-            <p>开发中…</p>
-            <span class="pp-tag">即将上线</span>
+            <h3>票根风预览</h3>
+            <p>左右海报 + 中央票根 · 可撕下半部</p>
+            <span class="pp-tag">Pro</span>
+            <span class="tpl-enter">进入制作 →</span>
           </div>
           <div class="paid-placeholder">
             <div class="pp-svg">
@@ -751,7 +787,7 @@ input[type=file]{font-size:11px}
           <button class="back-btn" onclick="backToTemplates()">← 返回模板选择</button>
           <span class="tpl-name" id="tplName"></span>
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis home">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis home ticket">
         <h3 class="tool-h">① 预设存档</h3>
         <p class="preset-tip">仅保存于「<b id="presetTplName">普通作品预览</b>」工作区，与其他模板互不干扰；每个槽位左侧存档、右侧载入。</p>
         <div class="preset-grid" id="presetGrid"></div>
@@ -761,7 +797,7 @@ input[type=file]{font-size:11px}
         <div class="hint">预设只记录参数，自定义纹理图与头像需重新上传。</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis home">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis home ticket">
         <h3 class="tool-h" style="margin-top:14px">② 分享预设</h3>
         <button class="primary" onclick="sharePreset()" style="margin-bottom:6px">🔗 生成短链接</button>
         <label>导入预设（粘贴链接或短码）</label>
@@ -773,7 +809,7 @@ input[type=file]{font-size:11px}
         <div class="hint" id="shareHint">生成短链接复制给别人，打开即自动应用；也可手动粘贴导入。</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis home magazine">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis home magazine ticket">
         <h3 class="tool-h">③ 画布尺寸</h3>
         <select id="size">
           <optgroup label="手机锁屏尺寸">
@@ -2158,7 +2194,7 @@ love
         <div id="hmPostList"></div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis home magazine">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis home magazine ticket">
         <h3 class="tool-h" style="margin-top:14px">⑬ 全屏水印</h3>
         <div class="checkbox-row"><input type="checkbox" id="wmEnable" onchange="requestDraw()"><span>启用全屏水印</span></div>
         <input type="file" id="wmUpload" accept="image/*">
@@ -2189,7 +2225,7 @@ love
         <div class="hint">水印图会以所选混合模式叠加在作品图上</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="home">
+        <div class="tpl-sec" data-tpl="home ticket">
         <h3 class="tool-h" style="margin-top:14px">文字水印</h3>
         <div class="checkbox-row"><input type="checkbox" id="wmTextUse" onchange="requestDraw()"><span>使用文字水印（代替上方水印图片）</span></div>
         <label>水印文字</label>
@@ -2225,10 +2261,81 @@ love
         <div class="hint" id="pickerHint" style="display:none;color:#f4c842">吸管模式已开启：点击右侧画布任意位置吸取颜色</div>
 
         </div>
-        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis home magazine collage">
+        <div class="tpl-sec" data-tpl="normal lock manuscript polaroid profile frame axis home magazine collage ticket">
         <h3 class="tool-h">⑮ 导出</h3>
         <button class="primary" onclick="exportPNG()">导出 PNG</button>
         <div class="hint" style="margin-top:10px">提示：预设只保存参数，自定义纹理图和头像需重新上传。</div>
+        </div>
+
+        <!-- ============ 票根风预览 · 专属面板 ============ -->
+        <div class="tpl-sec" data-tpl="ticket">
+        <h3 class="tool-h" style="margin-top:14px">④ 三张图片</h3>
+        <input type="file" id="tkMainUpload" accept="image/*" onchange="tkFile('main',this)">
+        <button onclick="document.getElementById('tkMainUpload').click()" style="margin:4px 0">🖼 中央主海报（必填）</button>
+        <div class="row" style="margin-top:8px">
+          <input type="file" id="tkLeftUpload" accept="image/*" onchange="tkFile('left',this)" style="font-size:10px;flex:1;margin:0">
+          <button class="small" onclick="document.getElementById('tkLeftUpload').click()">左后海报</button>
+        </div>
+        <div class="row" style="margin-top:4px">
+          <input type="file" id="tkRightUpload" accept="image/*" onchange="tkFile('right',this)" style="font-size:10px;flex:1;margin:0">
+          <button class="small" onclick="document.getElementById('tkRightUpload').click()">右后海报</button>
+        </div>
+        <div class="hint" style="margin-top:6px">未上传左右海报时会显示自动生成的占位色块，上传主海报即可导出完整效果。</div>
+        </div>
+
+        <div class="tpl-sec" data-tpl="ticket">
+        <h3 class="tool-h">⑤ 票根外观</h3>
+        <div class="row-2">
+          <div><label>票根主体颜色</label><input type="color" id="tkColor" value="#ffffff" oninput="tkSet('color',this.value)"></div>
+          <div><label>打孔颜色</label><input type="color" id="tkHoleColor" value="#0d0d10" oninput="tkSet('holeColor',this.value)"></div>
+        </div>
+        <div class="row-2">
+          <div><label>撕线颜色</label><input type="color" id="tkTearColor" value="#cccccc" oninput="tkSet('tearColor',this.value)"></div>
+          <div><label>撕线样式</label>
+            <select id="tkTearStyle" onchange="tkSet('tearStyle',this.value)">
+              <option value="zigzag">锯齿波浪</option>
+              <option value="dash">虚线</option>
+              <option value="none">不要撕线</option>
+            </select>
+          </div>
+        </div>
+        <div class="row-2">
+          <div><label>下半票根</label>
+            <select id="tkTorn" onchange="tkSet('torn',this.value)">
+              <option value="closed">合上（完整一张）</option>
+              <option value="torn">撕下来（斜挂）</option>
+            </select>
+          </div>
+          <div><label>斜挂角度: <span id="tkTornAngleVal">40</span>°</label><input type="range" id="tkTornAngle" min="10" max="75" value="40" oninput="document.getElementById('tkTornAngleVal').textContent=this.value;tkSet('tornAngle',this.value)"></div>
+        </div>
+        <div class="hint">撕下来时，下半票根会以撕线为铰链向下斜挂，未完全脱离。</div>
+        </div>
+
+        <div class="tpl-sec" data-tpl="ticket">
+        <h3 class="tool-h">⑥ 背景与层叠</h3>
+        <div class="row-2">
+          <div><label>画布背景色</label><input type="color" id="tkBg" value="#0d0d10" oninput="tkSet('bg',this.value)"></div>
+          <div><label>背景亮度: <span id="tkBgDimVal">0</span>%</label><input type="range" id="tkBgDim" min="0" max="60" value="0" oninput="document.getElementById('tkBgDimVal').textContent=this.value;tkSet('bgDim',this.value)"></div>
+        </div>
+        <label>左侧海报旋转: <span id="tkLeftRotVal">-12</span>°</label>
+        <input type="range" id="tkLeftRot" min="-30" max="0" value="-12" oninput="document.getElementById('tkLeftRotVal').textContent=this.value;tkSet('leftRot',this.value)">
+        <label>右侧海报旋转: <span id="tkRightRotVal">12</span>°</label>
+        <input type="range" id="tkRightRot" min="0" max="30" value="12" oninput="document.getElementById('tkRightRotVal').textContent=this.value;tkSet('rightRot',this.value)">
+        <div class="row-2">
+          <div><label>左右海报前后偏移: <span id="tkBackXVal">28</span>%</label><input type="range" id="tkBackX" min="10" max="50" value="28" oninput="document.getElementById('tkBackXVal').textContent=this.value;tkSet('backX',this.value)"></div>
+          <div><label>投影强度: <span id="tkShadowVal">30</span></label><input type="range" id="tkShadow" min="0" max="80" value="30" oninput="document.getElementById('tkShadowVal').textContent=this.value;tkSet('shadow',this.value)"></div>
+        </div>
+        </div>
+
+        <div class="tpl-sec" data-tpl="ticket">
+        <h3 class="tool-h">⑦ 文字编辑</h3>
+        <div class="row">
+          <button class="primary small" onclick="tkSelect('tkTitle')">主标题</button>
+          <button class="primary small" onclick="tkSelect('tkSubtitle')">副标题</button>
+          <button onclick="tkSelect(null)">取消选中</button>
+        </div>
+        <div class="hint" id="tkSelInfo">点击画布上的文字可快速选中</div>
+        <div id="tkCtxBox"></div>
         </div>
       </aside>
 
@@ -4953,6 +5060,9 @@ function dragTargetFor(id){
     if(hmSel!==id)hmSelect(id);
     return {xId:id+"X",yId:id+"Y",xVal:id+"XVal",yVal:id+"YVal"};
   }
+  if(id&&id.indexOf("tk")===0){
+    return tkDragTargetFor(id);
+  }
   if(id==="lockTime"&&typeof clkMode==="function"){
     const cm=clkMode();
     if(cm==="compact")return {xId:"clkCmpX",yId:"clkCmpY",xVal:"clkCmpXVal",yVal:"clkCmpYVal"};
@@ -6045,6 +6155,485 @@ function hmDelPost(i){
   requestDraw();
 }
 
+// ============ 票根风预览模板（Ticket Stub） ============
+let tkState=null; let tkSel=null;
+const TK_MEDIA={main:"",left:"",right:""};
+const tkImgCache={};
+const TK_SYS="'PingFang SC','Microsoft YaHei',sans-serif";
+const TK_FONTS=[
+  ["'Playfair Display',Georgia,serif","Playfair Display（衬线）"],
+  ["'Great Vibes',cursive","Great Vibes（手写）"],
+  ["'Georgia','Times New Roman',serif","Georgia / Times"],
+  ["'Helvetica Neue',Helvetica,Arial,sans-serif","Helvetica"],
+  ["'PingFang SC','Microsoft YaHei',sans-serif","苹方 / 微软雅黑"],
+  ["'Noto Serif SC',serif","思源宋体"],
+  ["'ZCOOL XiaoWei',serif","站酷小薇（宋体）"],
+  ["'KaiTi','Kaiti SC','STKaiti',serif","楷体"]
+];
+const TK_FB=[
+  ["#2e4a6b","#1a2a3e"],
+  ["#1f618d","#aed6f1"]
+];
+function tkText(o){return Object.assign({text:"",font:TK_SYS,size:"3",weight:"400",color:"#333",ls:"0",lh:"1.5",align:"center",x:"50",y:"85",w:"40"},o||{});}
+function tkDefaults(){return{
+  color:"#ffffff",holeColor:"#0d0d10",tearColor:"#cccccc",tearStyle:"zigzag",
+  torn:"closed",tornAngle:"40",
+  bg:"#0d0d10",bgDim:"0",
+  leftRot:"-15",rightRot:"15",backX:"35",shadow:"35",
+  title:tkText({text:"Love Letter",font:"'Playfair Display',Georgia,serif",size:"3.8",weight:"700",color:"#e74c3c",align:"center",x:"50",y:"85",w:"55",ls:"0"}),
+  subtitle:tkText({text:"情 书",font:"'PingFang SC','Microsoft YaHei',sans-serif",size:"2.4",weight:"400",color:"#888888",align:"center",x:"50",y:"90",w:"30",ls:"0"})
+};}
+function tkMerge(base,over){
+  if(over===undefined||over===null)return base;
+  if(base&&typeof base==="object"){
+    const out={};
+    Object.keys(base).forEach(k=>out[k]=(base[k]&&typeof base[k]==="object")?tkMerge(base[k],over[k]):(over[k]!==undefined&&over[k]!==null?over[k]:base[k]));
+    Object.keys(over).forEach(k=>{if(!(k in out))out[k]=over[k];});
+    return out;
+  }
+  return over!==undefined?over:base;
+}
+function tkEnsureState(){if(!tkState)tkState=tkDefaults();}
+function tkSnapshot(){return JSON.parse(JSON.stringify(tkState||tkDefaults()));}
+function tkMediaSnapshot(){return{main:TK_MEDIA.main||"",left:TK_MEDIA.left||"",right:TK_MEDIA.right||""};}
+function tkRestore(s){tkState=tkMerge(tkDefaults(),s||{});tkEnsureState();tkSyncDom();tkRenderCtx();}
+function tkRestoreMedia(m){TK_MEDIA.main=(m&&m.main)||"";TK_MEDIA.left=(m&&m.left)||"";TK_MEDIA.right=(m&&m.right)||"";tkEnsureState();requestDraw();}
+function tkPersistMedia(){try{idbPut("ps-ticket",new Blob([JSON.stringify(tkMediaSnapshot())],{type:"application/json"}));}catch(e){}}
+function tkClearMedia(){TK_MEDIA.main="";TK_MEDIA.left="";TK_MEDIA.right="";tkState=tkDefaults();tkEnsureState();try{idbPut("ps-ticket",new Blob(["{}"],{type:"application/json"}));}catch(e){}tkSyncDom();tkRenderCtx();}
+function tkReady(im){return !!(im&&im.complete&&im.naturalWidth);}
+function tkImg(src){
+  if(!src)return null;
+  if(tkImgCache[src])return tkImgCache[src];
+  const im=new Image();
+  im.onload=function(){requestDraw();};
+  im.src=src;
+  tkImgCache[src]=im;
+  return im;
+}
+function tkSelect(key){
+  if(tkSel===key){tkSel=null;}else{tkSel=key;}
+  const el=document.getElementById("tkSelInfo");
+  if(el)el.textContent=tkSel?(tkSel==="tkTitle"?"已选中：主标题":"已选中：副标题"):"当前未选中文字：点击画布文字或用按钮选中";
+  tkRenderCtx();requestDraw();
+}
+function tkSyncSel(){
+  if(!tkSel||!tkState)return;
+  const key=tkSel==="tkTitle"?"title":"subtitle";
+  const obj=tkState[key];
+  const gx=document.getElementById(tkSel+"X");
+  const gy=document.getElementById(tkSel+"Y");
+  if(gx&&gx.value!=="")obj.x=gx.value;
+  if(gy&&gy.value!=="")obj.y=gy.value;
+}
+function tkSet(prop,val){tkEnsureState();tkState[prop]=String(val);requestDraw();}
+function tkSetTextProp(prop,val){
+  if(!tkSel||!tkState)return;
+  const key=tkSel==="tkTitle"?"title":"subtitle";
+  tkState[key][prop]=String(val);
+  requestDraw();
+}
+function tkSyncDom(){
+  if(!tkState)return;
+  const sf=function(id,val){const el=document.getElementById(id);if(el){el.value=val;const sp=document.getElementById(id+"Val");if(sp)sp.textContent=val;}};
+  sf("tkColor",tkState.color);sf("tkHoleColor",tkState.holeColor);
+  sf("tkTearColor",tkState.tearColor);sf("tkTearStyle",tkState.tearStyle);
+  sf("tkTorn",tkState.torn);sf("tkTornAngle",tkState.tornAngle);
+  sf("tkBg",tkState.bg);sf("tkBgDim",tkState.bgDim);
+  sf("tkLeftRot",tkState.leftRot);sf("tkRightRot",tkState.rightRot);
+  sf("tkBackX",tkState.backX);sf("tkShadow",tkState.shadow);
+}
+function tkFile(kind,input){
+  const f=input.files&&input.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=function(){
+    if(kind==="main")TK_MEDIA.main=rd.result;
+    else if(kind==="left")TK_MEDIA.left=rd.result;
+    else if(kind==="right")TK_MEDIA.right=rd.result;
+    tkPersistMedia();requestDraw();try{input.value="";}catch(e){}
+  };
+  rd.readAsDataURL(f);
+}
+function tkFontOpts(v){
+  let h="";
+  TK_FONTS.forEach(function(o){h+='<option value="'+o[0]+'"'+(v===o[0]?" selected":"")+'>'+o[1]+'</option>';});
+  if(customFonts.length){
+    h+='<optgroup label="自定义字体">';
+    customFonts.forEach(function(f){h+='<option value="'+f.fam+'"'+(v===f.fam?" selected":"")+'>'+f.name+'</option>';});
+    h+='</optgroup>';
+  }
+  if(v&&!TK_FONTS.some(function(o){return o[0]===v;}))h+='<option value="'+v+'" selected>'+v+'</option>';
+  return h;
+}
+function tkRenderCtx(){
+  const box=document.getElementById("tkCtxBox");
+  if(!box)return;
+  if(!tkSel||(tkSel!=="tkTitle"&&tkSel!=="tkSubtitle")){
+    box.innerHTML='<div class="hint" style="margin-top:4px">点击画布上的文字，或用上方按钮选中后在此调整。</div>';
+    return;
+  }
+  const key=tkSel==="tkTitle"?"title":"subtitle";
+  const el=tkState[key];
+  const lbl=key==="title"?"主标题":"副标题";
+  const tk=tkSel;
+  let h='<div class="hint" style="margin-top:6px">当前编辑：<b>'+lbl+'</b></div>';
+  h+='<label>文字内容</label>';
+  h+='<input type="text" id="'+tk+'" value="'+String(el.text||"").replace(/"/g,'&quot;')+'" oninput="tkSetTextProp(\'text\',this.value)" style="margin-bottom:4px">';
+  h+='<div class="row-2">';
+  h+='<div><label>字体</label><select id="'+tk+'Font" onchange="tkSetTextProp(\'font\',this.value)">'+tkFontOpts(el.font)+'</select></div>';
+  h+='<div><label>颜色</label><input type="color" id="'+tk+'Color" value="'+el.color+'" oninput="tkSetTextProp(\'color\',this.value)"></div>';
+  h+='</div>';
+  h+='<div class="row-2">';
+  h+='<div><label>字号: <span id="'+tk+'SizeVal">'+el.size+'</span>%</label><input type="range" id="'+tk+'Size" min="1" max="10" step="0.1" value="'+el.size+'" oninput="tkSetTextProp(\'size\',this.value);document.getElementById(\''+tk+'SizeVal\').textContent=this.value"></div>';
+  h+='<div><label>粗细</label><select id="'+tk+'Weight" onchange="tkSetTextProp(\'weight\',this.value)">';
+  ["300","400","500","600","700","900"].forEach(function(w){h+='<option value="'+w+'"'+(el.weight===w?" selected":"")+'>'+(w==="300"?"细":w==="400"?"常":w==="500"?"中":w==="600"?"半粗":w==="700"?"粗":"特粗")+'</option>';});
+  h+='</select></div>';
+  h+='</div>';
+  h+='<div class="row-2">';
+  h+='<div><label>对齐</label><select id="'+tk+'Align" onchange="tkSetTextProp(\'align\',this.value)">';
+  [["left","居左"],["center","居中"],["right","居右"]].forEach(function(a){h+='<option value="'+a[0]+'"'+(el.align===a[0]?" selected":"")+'>'+a[1]+'</option>';});
+  h+='</select></div>';
+  h+='<div><label>字距: <span id="'+tk+'LsVal">'+el.ls+'</span></label><input type="range" id="'+tk+'Ls" min="0" max="20" value="'+el.ls+'" oninput="tkSetTextProp(\'ls\',this.value);document.getElementById(\''+tk+'LsVal\').textContent=this.value"></div>';
+  h+='</div>';
+  h+='<div class="row-2">';
+  h+='<div><label>位置 X: <span id="'+tk+'XVal">'+el.x+'</span>%</label><input type="range" id="'+tk+'X" min="0" max="100" step="0.5" value="'+el.x+'" oninput="tkSetTextProp(\'x\',this.value);document.getElementById(\''+tk+'XVal\').textContent=this.value"></div>';
+  h+='<div><label>位置 Y: <span id="'+tk+'YVal">'+el.y+'</span>%</label><input type="range" id="'+tk+'Y" min="0" max="100" step="0.5" value="'+el.y+'" oninput="tkSetTextProp(\'y\',this.value);document.getElementById(\''+tk+'YVal\').textContent=this.value"></div>';
+  h+='</div>';
+  h+='<label>宽度: <span id="'+tk+'WVal">'+el.w+'</span>%</label><input type="range" id="'+tk+'W" min="10" max="90" step="0.5" value="'+el.w+'" oninput="tkSetTextProp(\'w\',this.value);document.getElementById(\''+tk+'WVal\').textContent=this.value">';
+  box.innerHTML=h;
+}
+
+// ---- 核心渲染 ----
+function tkDraw(){
+  tkEnsureState();
+  tkSyncSel();
+  const W=c.width, H=c.height;
+  const st=tkState;
+  const shadow=Math.max(0,Math.min(1,(parseFloat(st.shadow)||30)/100));
+  // 以短边为基准 —— 任意比例画布都能自适应
+  const S=Math.min(W,H);
+
+  // 1) 画布背景
+  ctx.save();
+  ctx.fillStyle=st.bg;
+  ctx.fillRect(0,0,W,H);
+  if((parseFloat(st.bgDim)||0)>0){
+    const g=ctx.createRadialGradient(W/2,H/2,S*0.3,W/2,H/2,Math.max(W,H)*0.75);
+    g.addColorStop(0,"rgba(0,0,0,0)");
+    g.addColorStop(1,"rgba(0,0,0,"+(parseFloat(st.bgDim)||0)/100+")");
+    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  }
+  ctx.restore();
+
+  // —— 几何（以 S 为基准，100% 自适应） ——
+  // 中央白色票根（完整一张卡，上下打孔凹口）
+  const ticketCX=W/2;
+  const ticketW=S*0.58;
+  const ticketH=ticketW*1.62;                    // 竖长海报比例 1.62:1
+  const ticketTopY=Math.max(H*0.05,(H-ticketH)/2);
+  const ticketBotY=ticketTopY+ticketH;
+  const rr=Math.min(ticketW*0.028,12);            // 圆角很小
+  // 打孔：向下挖的半圆凹口（顶 / 底各一个）
+  const holeR=ticketW*0.06;
+  // 撕线位置（在海报底部和文字区之间）
+  const footH=ticketH*0.14;                       // 底部文字区高度（含撕线）
+  const tearY=ticketBotY-footH;                   // 撕线 y
+  // 主海报区：从顶边（跳过打孔）到撕线（跳过一点撕线间距）
+  const posterTopY=ticketTopY+holeR*0.9;           // 海报上缘（顶孔下沿）
+  const posterBotY=tearY-holeR*0.5;               // 海报下缘（撕线上方一点）
+  const posterPad=ticketW*0.025;                  // 细白边
+  const posterX=ticketCX-ticketW/2+posterPad;
+  const posterY=posterTopY+posterPad*0.5;
+  const posterW=ticketW-posterPad*2;
+  const posterH=(posterBotY-posterTopY)-posterPad;
+
+  // 左右后海报（体积大，靠在票根后）
+  const backOffsetX=W*((parseFloat(st.backX)||35)/100);
+  const backW=ticketW*0.52;
+  const backH=ticketH*0.95;
+
+  // —— 2) 左右后面海报 ——
+  function drawBackCard(kind,rotDeg,side){
+    const cx=side==="left"?(ticketCX-backOffsetX):(ticketCX+backOffsetX);
+    const cy=(ticketTopY+ticketBotY)/2;
+    const rad=rotDeg*Math.PI/180;
+    ctx.save();
+    ctx.translate(cx,cy);
+    ctx.rotate(rad);
+    // 投影层（厚一点，参考图里后层有明显阴影）
+    if(shadow>0){
+      ctx.save();
+      ctx.shadowColor="rgba(0,0,0,"+Math.min(0.9,shadow*0.8)+")";
+      ctx.shadowBlur=S*0.055;
+      ctx.shadowOffsetY=S*0.015;
+      ctx.fillStyle="#1a1a22";
+      rrPath(-backW/2,-backH/2,backW,backH,rr);
+      ctx.fill();
+      ctx.restore();
+    }
+    ctx.fillStyle="#2a2a34";
+    rrPath(-backW/2,-backH/2,backW,backH,rr);
+    ctx.fill();
+    const im=tkImg(kind==="left"?TK_MEDIA.left:TK_MEDIA.right);
+    if(tkReady(im)){
+      ctx.save();
+      rrPath(-backW/2,-backH/2,backW,backH,rr);
+      ctx.clip();
+      const iw=im.naturalWidth,ih=im.naturalHeight;
+      const s=Math.max(backW/iw,backH/ih);
+      const dw=iw*s,dh=ih*s;
+      ctx.drawImage(im,-dw/2,-dh/2,dw,dh);
+      ctx.restore();
+    }else{
+      ctx.save();
+      rrPath(-backW/2,-backH/2,backW,backH,rr);
+      ctx.clip();
+      const fb=TK_FB[kind==="left"?0:1];
+      const g=ctx.createLinearGradient(-backW/2,-backH/2,backW/2,backH/2);
+      g.addColorStop(0,fb[0]);g.addColorStop(1,fb[1]);
+      ctx.fillStyle=g;ctx.fillRect(-backW/2,-backH/2,backW,backH);
+      ctx.fillStyle="rgba(255,255,255,0.22)";
+      ctx.font=backW*0.05+"px "+TK_SYS;
+      ctx.textAlign="center";ctx.textBaseline="middle";
+      ctx.fillText(kind==="left"?"＋ 左海报":"＋ 右海报",0,0);
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+  drawBackCard("left",parseFloat(st.leftRot)||-15,"left");
+  drawBackCard("right",parseFloat(st.rightRot)||15,"right");
+
+  // —— 3) 中央白色票根卡 ——
+  const torn=(st.torn==="torn");
+
+  if(!torn){
+    // CLOSED：一整张白色卡，投影一次、上下都有打孔
+    ctx.save();
+    if(shadow>0){
+      ctx.shadowColor="rgba(0,0,0,"+Math.min(0.95,shadow*1.3)+")";
+      ctx.shadowBlur=S*0.08;
+      ctx.shadowOffsetY=S*0.025;
+    }
+    ctx.fillStyle=st.color;
+    rrPath(ticketCX-ticketW/2,ticketTopY,ticketW,ticketH,rr);
+    ctx.fill();
+    ctx.restore();
+    // 顶打孔（半圆向下挖）
+    ctx.save();
+    ctx.fillStyle=st.holeColor;
+    ctx.beginPath();ctx.arc(ticketCX,ticketTopY,holeR,0,Math.PI,false);ctx.fill();
+    ctx.restore();
+    // 底打孔（半圆向上挖）
+    ctx.save();
+    ctx.fillStyle=st.holeColor;
+    ctx.beginPath();ctx.arc(ticketCX,ticketBotY,holeR,Math.PI,0,false);ctx.fill();
+    ctx.restore();
+  }else{
+    // TORN：上半部独立 —— 底打孔不在上半部（跟着被撕掉的下半部走）
+    ctx.save();
+    if(shadow>0){
+      ctx.shadowColor="rgba(0,0,0,"+Math.min(0.95,shadow*1.3)+")";
+      ctx.shadowBlur=S*0.08;
+      ctx.shadowOffsetY=S*0.025;
+    }
+    ctx.fillStyle=st.color;
+    rrPath(ticketCX-ticketW/2,ticketTopY,ticketW,tearY-ticketTopY+rr,rr);
+    ctx.fill();
+    ctx.restore();
+    // 顶打孔
+    ctx.save();
+    ctx.fillStyle=st.holeColor;
+    ctx.beginPath();ctx.arc(ticketCX,ticketTopY,holeR,0,Math.PI,false);ctx.fill();
+    ctx.restore();
+  }
+
+  // —— 4) 主海报图（贴在白色内部，几乎满铺） ——
+  const mainIm=tkImg(TK_MEDIA.main);
+  ctx.save();
+  // 海报区是白色内部的矩形，有圆角
+  rrPath(posterX,posterY,posterW,posterH,Math.max(0,rr*0.75));
+  ctx.clip();
+  if(tkReady(mainIm)){
+    const iw=mainIm.naturalWidth,ih=mainIm.naturalHeight;
+    const s=Math.max(posterW/iw,posterH/ih);
+    const dw=iw*s,dh=ih*s;
+    ctx.drawImage(mainIm,posterX+posterW/2-dw/2,posterY+posterH/2-dh/2,dw,dh);
+  }else{
+    const g=ctx.createLinearGradient(posterX,posterY,posterX+posterW,posterY+posterH);
+    g.addColorStop(0,"#3a3a48");g.addColorStop(1,"#1a1a22");
+    ctx.fillStyle=g;ctx.fillRect(posterX,posterY,posterW,posterH);
+    ctx.fillStyle="rgba(255,255,255,0.22)";
+    ctx.font=posterW*0.06+"px "+TK_SYS;
+    ctx.textAlign="center";ctx.textBaseline="middle";
+    ctx.fillText("＋ 上传主海报",posterX+posterW/2,posterY+posterH/2);
+  }
+  ctx.restore();
+
+  // 水印裁剪覆盖主海报图区域
+  wmClip={ox:0,oy:0,rot:0,x:posterX,y:posterY,w:posterW,h:posterH,r:Math.max(0,rr*0.75)};
+
+  // —— 5) 撕线（锯齿 / 虚线 / 无） ——
+  // —— 6) 底部（closed：正常；torn：下半块整块撕下来） ——
+  const tornRad=torn?-(parseFloat(st.tornAngle)||40)*Math.PI/180:0;
+  // 撕下来时下半块除了旋转还往下"掉"一点
+  const tornDrop=torn?S*0.022:0;
+
+  // —— 撕线在上半部下沿（不管 torn / closed，上半部都有撕线上沿） ——
+  if(st.tearStyle==="zigzag"){
+    ctx.save();
+    ctx.strokeStyle=st.tearColor;
+    ctx.lineWidth=Math.max(1,S*0.0014);
+    ctx.beginPath();
+    const zs=ticketW*0.038;
+    let up=true;
+    ctx.moveTo(ticketCX-ticketW/2+rr,tearY);
+    for(let x=ticketCX-ticketW/2+rr;x<ticketCX+ticketW/2-rr;x+=zs){
+      const px=x+zs/2;
+      ctx.lineTo(px,tearY+(up?-zs*0.55:zs*0.55));
+      up=!up;
+    }
+    ctx.lineTo(ticketCX+ticketW/2-rr,tearY);
+    ctx.stroke();
+    ctx.restore();
+  }else if(st.tearStyle==="dash"){
+    ctx.save();
+    ctx.strokeStyle=st.tearColor;
+    ctx.lineWidth=Math.max(1,S*0.0012);
+    ctx.setLineDash([S*0.0045,S*0.003]);
+    ctx.beginPath();
+    ctx.moveTo(ticketCX-ticketW/2+rr,tearY);
+    ctx.lineTo(ticketCX+ticketW/2-rr,tearY);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function tkPaintTextLocal(el,localX,localY,localW){
+    if(!el||!el.text)return;
+    const fs=W*(parseFloat(el.size)||3)/100;
+    const bw=W*(parseFloat(el.w)||40)/100;
+    const w=Math.min(bw,localW?localW:Infinity);
+    const ls=(parseFloat(el.ls)||0)*fs;
+    ctx.save();
+    ctx.font=(el.weight||"400")+" "+fs+"px "+(el.font||TK_SYS);
+    ctx.fillStyle=el.color||"#333";
+    ctx.textBaseline="middle";
+    const chars=Array.from(el.text);
+    const ws=chars.map(function(ch){return ctx.measureText(ch).width;});
+    let totalW=ls*(chars.length-1);
+    ws.forEach(function(w2){totalW+=w2;});
+    let x0;ctx.textAlign="left";
+    if(el.align==="center")x0=localX-totalW/2;
+    else if(el.align==="right")x0=localX-totalW;
+    else x0=localX-w/2;
+    chars.forEach(function(ch,i){ctx.fillText(ch,x0,localY);x0+=ws[i]+ls;});
+    ctx.restore();
+  }
+
+  // 画"下半块矩形"（局部坐标系：0,0 = tearY 中心，方向 = 全局 x 向右 / 全局 y 向下）
+  function drawTornFoot(){
+    // 下半块主体（顶边 = 撕线锯齿底，底边 = 圆角 + 底打孔）
+    ctx.save();
+    if(shadow>0){
+      ctx.shadowColor="rgba(0,0,0,"+Math.min(0.9,shadow*1.0)+")";
+      ctx.shadowBlur=S*0.045;
+      ctx.shadowOffsetY=S*0.008;
+    }
+    ctx.fillStyle=st.color;
+    ctx.beginPath();
+    // 顶边沿撕线锯齿底走（让撕下来的边缘有真实的锯齿状）
+    if(st.tearStyle==="zigzag"){
+      const zs=ticketW*0.038;
+      let up=false;                          // 锯齿底部（上半部的锯齿顶是 up=true，下半部的底就是 up=false）
+      ctx.moveTo(-ticketW/2+rr,0);
+      for(let x=-ticketW/2+rr;x<ticketW/2-rr;x+=zs){
+        const px=x+zs/2;
+        ctx.lineTo(px,0+(up?-zs*0.55:zs*0.55));
+        up=!up;
+      }
+      ctx.lineTo(ticketW/2-rr,0);
+    }else if(st.tearStyle==="dash"){
+      ctx.moveTo(-ticketW/2+rr,0);
+      ctx.lineTo(ticketW/2-rr,0);
+    }else{
+      ctx.moveTo(-ticketW/2,0);
+      ctx.lineTo(ticketW/2,0);
+    }
+    // 往下画到底边，带圆角
+    ctx.lineTo(ticketW/2,footH-rr);
+    ctx.quadraticCurveTo(ticketW/2,footH,ticketW/2-rr,footH);
+    ctx.lineTo(-ticketW/2+rr,footH);
+    ctx.quadraticCurveTo(-ticketW/2,footH,-ticketW/2,footH-rr);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    // 底打孔（半圆向上挖，在底边）
+    ctx.save();
+    ctx.fillStyle=st.holeColor;
+    ctx.beginPath();
+    ctx.arc(0,footH,holeR,Math.PI,0,false);
+    ctx.closePath();ctx.fill();
+    ctx.restore();
+    // 文字（相对 tearY 的局部 y 偏移）
+    tkPaintTextLocal(st.title,W*(parseFloat(st.title.x)||50)/100,
+                     H*(parseFloat(st.title.y)||85)/100-tearY,
+                     W*(parseFloat(st.title.w)||50)/100);
+    tkPaintTextLocal(st.subtitle,W*(parseFloat(st.subtitle.x)||50)/100,
+                     H*(parseFloat(st.subtitle.y)||90)/100-tearY,
+                     W*(parseFloat(st.subtitle.w)||30)/100);
+  }
+
+  if(!torn){
+    // CLOSED：下半块正常贴着（不旋转不掉落）
+    ctx.save();
+    ctx.translate(0,0);
+    drawTornFoot();
+    ctx.restore();
+  }else{
+    // TORN：下半块整块以 tearY 为铰链，旋转 + 往下掉一点
+    ctx.save();
+    ctx.translate(ticketCX,tearY+tornDrop);
+    ctx.rotate(tornRad);
+    // 再把局部原点平移一点，让块旋转后自然往下"挂着"
+    ctx.translate(0,S*0.003);
+    drawTornFoot();
+    ctx.restore();
+  }
+
+  // —— 7) 热区注册（torn 模式也在全局坐标粗略注册） ——
+  function tkHit(key,el){
+    if(!el||!el.text)return;
+    const fs=W*(parseFloat(el.size)||3)/100;
+    const cx=W*(parseFloat(el.x)||50)/100;
+    const cy=H*(parseFloat(el.y)||85)/100;
+    const bw=Math.max(W*(parseFloat(el.w)||40)/100,fs*0.4);
+    pushTextHit(key,cx,cy,bw,fs*1.3);
+    if(tkSel===key){
+      ctx.save();
+      ctx.strokeStyle="#3b82f6";
+      ctx.lineWidth=Math.max(1.5,S*0.002);
+      ctx.setLineDash([S*0.0055,S*0.0035]);
+      ctx.strokeRect(cx-bw/2-2,cy-fs*0.65-2,bw+4,fs*1.3+4);
+      ctx.restore();
+    }
+  }
+  if(!torn){
+    tkHit("tkTitle",st.title);
+    tkHit("tkSubtitle",st.subtitle);
+  }else{
+    tkHit("tkTitle",st.title);
+    tkHit("tkSubtitle",st.subtitle);
+  }
+
+  // 点选背景取消选中
+  pushTextHit("tkNone",W/2,H/2,W,H);
+}
+
+function tkDragTargetFor(id){
+  if(!id||id.indexOf("tk")!==0)return null;
+  if(id==="tkNone"){if(tkSel!==null)tkSelect(null);return null;}
+  if(tkSel!==id)tkSelect(id);
+  return {xId:id+"X",yId:id+"Y",xVal:id+"XVal",yVal:id+"YVal"};
+}
+
 // ============ 杂志手账模板（Editorial Journal） ============
 // 三段式纵向长图：顶部诗句封面 → 中部米白双页线圈手账 → 底部英文主题页
 const MJ_DEF={
@@ -6578,6 +7167,13 @@ function draw(){
   // 相框风模板：独立渲染管线
   if(typeof currentTemplate!=="undefined"&&currentTemplate==="frame"){
     drawFrame();
+    drawWatermark();
+    scheduleAutosave();
+    return;
+  }
+  // 票根风预览：独立渲染管线
+  if(typeof currentTemplate!=="undefined"&&currentTemplate==="ticket"){
+    tkDraw();
     drawWatermark();
     scheduleAutosave();
     return;
@@ -8615,7 +9211,8 @@ function getSettings(){
     mjYTop:document.getElementById("mjYTop").value,
     mjYBot:document.getElementById("mjYBot").value,
     mjAlign:document.getElementById("mjAlign").value,
-    home:hmSnapshot()
+    home:hmSnapshot(),
+    ticket:tkSnapshot()
   };
 }
 function applySettings(s){
@@ -9019,6 +9616,9 @@ function applySettings(s){
   // 个人主页预览：状态与图片素材一并恢复
   if(s.home)hmRestore(s.home);
   if(s.homeImg)hmRestoreMedia(s.homeImg);
+  // 票根风预览
+  if(s.ticket)tkRestore(s.ticket);
+  if(s.ticketImg)tkRestoreMedia(s.ticketImg);
   resizeCanvas();
 }
 function presetKey(){
@@ -9053,6 +9653,7 @@ function savePreset(n){
   presets[n]=getSettings();
   // 个人主页预览：预设槽保存在本机 localStorage，容量足够时图片素材一起存入以便完整恢复
   if(currentTemplate==="home"&&typeof hmMediaSnapshot==="function")presets[n].homeImg=hmMediaSnapshot();
+  if(currentTemplate==="ticket"&&typeof tkMediaSnapshot==="function")presets[n].ticketImg=tkMediaSnapshot();
   try{
     writePresets(presets);
   }catch(err){
@@ -9087,6 +9688,7 @@ function resetAll(){
   document.getElementById("axUpload").value="";
   if(typeof axSyncCount==="function")axSyncCount();
   if(typeof hmClearMedia==="function")hmClearMedia();
+  if(typeof tkClearMedia==="function")tkClearMedia();
   requestDraw();
 }
 
@@ -9117,7 +9719,7 @@ function renumberSections(){
 
 // ============ 模板选择首页 / 工作区 ============
 let currentTemplate="normal";
-const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscript:"字稿风预览",polaroid:"拍立得预览",profile:"个人主页",home:"个人主页预览",frame:"相框风预览",axis:"作品展示轴",collage:"自由拼图",magazine:"杂志手账"};
+const TPL_NAMES={normal:"普通作品预览",lock:"锁屏排版预览",manuscript:"字稿风预览",polaroid:"拍立得预览",profile:"个人主页",home:"个人主页预览",frame:"相框风预览",axis:"作品展示轴",collage:"自由拼图",magazine:"杂志手账",ticket:"票根风预览"};
 // 每个模板的工作区图片互相独立：切走时存档当前模板的图片，切回时恢复，首次进入未存档则为空
 const tplImages={};
 function selectTemplate(type){
@@ -9233,6 +9835,13 @@ function applyTemplatePreset(type){
     set("size","1500,1500");
     set("featherMode","none");
     set("bgBlur","0");
+  }else if(type==="ticket"){
+    chk("msMode",false);
+    chk("lockScreen",false);
+    // 票根风：尺寸自适应用户选择（正方形 / 竖版 / 横版都能正确布局）
+    set("featherMode","none");
+    set("bgBlur","0");
+    tkEnsureState();tkSyncDom();tkRenderCtx();requestDraw();
   }else if(type==="axis"){
     chk("msMode",false);
     chk("lockScreen",false);
@@ -9855,6 +10464,18 @@ idbGet("ps-home").then(blob=>{
     try{
       const m=JSON.parse(rd.result);
       if(m&&typeof m==="object"){hmRestoreMedia(m);requestDraw();}
+    }catch(e){}
+  };
+  rd.readAsText(blob);
+});
+// 票根风预览：恢复三张贴图（JSON 快照存于 ps-ticket 键）
+idbGet("ps-ticket").then(blob=>{
+  if(!blob)return;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const m=JSON.parse(rd.result);
+      if(m&&typeof m==="object"){tkRestoreMedia(m);if(typeof tkSyncDom==="function")tkSyncDom();if(typeof tkRenderCtx==="function")tkRenderCtx();requestDraw();}
     }catch(e){}
   };
   rd.readAsText(blob);
