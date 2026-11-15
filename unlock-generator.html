@@ -78,8 +78,9 @@ button.ghost:hover{background:#3a3a45}
 
     <div class="note">
       <b>说明：</b>解锁码在用户首次输入时开始计时（日卡 24h、月卡 30 天、年卡 365 天），永卡永久有效。每个码绑定激活设备，一台设备激活一次。<br><br>
-      <b>PS 码</b>解锁网站整站，<b>TK 码</b>只解锁「票根风预览」模板——两套密钥独立，互不通用。<br><br>
-      本生成器与主站共用同一密钥算法，请勿公开此页面链接。
+      <b>PS 码</b>解锁网站整站（djb2 签名），<b>TK 码</b>只解锁「票根风预览」模板（FNV-1a 签名）——两套密钥 + 两套算法完全独立，互相无法解锁。<br><br>
+      旧版已发出的 PS 码（4 段 / 5 段）继续有效，无需重新生成。<br><br>
+      本生成器与主站共用同一密钥与算法，请勿公开此页面链接。
     </div>
 
     <a class="back" href="./">← 返回 Preview Studio</a>
@@ -89,16 +90,25 @@ button.ghost:hover{background:#3a3a45}
 <script>
 // 两套独立密钥：PS = 网站整站；TK = 票根模板（与主站 index.html 中的一一对应）
 const SECRETS={
-  SITE:{prefix:"PS",secret:"PREVIEW-STUDIO-2026-SECRET-KEY",label:"网站"},
-  TICKET:{prefix:"TK",secret:"TICKET-TEMPLATE-2026-SECRET-KEY",label:"票根"}
+  SITE:{prefix:"PS",secret:"PREVIEW-STUDIO-2026-SECRET-KEY",label:"网站",algo:"djb2"},
+  TICKET:{prefix:"TK",secret:"TICKET-TEMPLATE-2026-SECRET-KEY",label:"票根",algo:"fnv1a"}
 };
 const TYPE_LABEL={DAY:"日卡",MONTH:"月卡",YEAR:"年卡",FOREVER:"永卡"};
 
-// 与主站一致的 djb2 哈希
+// ① djb2 —— 网站 PS 码专用（与主站 unlockHash 完全一致，历史 PS 码继续有效）
 function hash(str){
   let h=5381;
   for(let i=0;i<str.length;i++){h=((h<<5)+h)^str.charCodeAt(i);}
   return (h>>>0).toString(36);
+}
+// ② FNV-1a —— 票根 TK 码专用（与主站 ticketHash 完全一致）
+function ticketHash(str){
+  let h=0x811c9dc5;
+  for(let i=0;i<str.length;i++){
+    h^=str.charCodeAt(i);
+    h=Math.imul(h,0x01000193)>>>0;
+  }
+  return h.toString(36);
 }
 function randomStr(n){
   const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -109,7 +119,9 @@ function randomStr(n){
 function generateCode(type){
   const sc=SECRETS[currentScope];
   const random=randomStr(8);
-  const checksum=hash(type+random+sc.secret).slice(0,8).toUpperCase();
+  // 按解锁对象选择哈希算法：两套架构不同，不可互相解锁
+  const h=(sc.algo==="fnv1a"?ticketHash:hash)(type+random+sc.secret);
+  const checksum=h.slice(0,8).toUpperCase();
   return sc.prefix+"-"+type+"-"+random+"-"+checksum;
 }
 

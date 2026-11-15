@@ -378,11 +378,11 @@ input[type=file]{font-size:11px}
 
 <div class="lock-overlay" id="lockOverlay" style="display:none">
   <div class="lock-card">
-    <div class="lock-icon">🔒</div>
-    <h2>解锁「票根风预览」</h2>
-    <p>输入解锁码后即可使用票根模板（其他模板免费使用）</p>
-    <input type="text" id="unlockInput" placeholder="TK-XXXX-XXXX-XXXX" autocomplete="off" onkeydown="if(event.key==='Enter')tkUnlockNow()">
-    <button class="primary" onclick="tkUnlockNow()">解锁</button>
+    <div class="lock-icon" id="lockIcon">🔒</div>
+    <h2 id="lockTitle">解锁 Preview Studio</h2>
+    <p id="lockDesc">输入网站解锁码（PS-）后即可使用全部模板</p>
+    <input type="text" id="unlockInput" placeholder="请输入解锁码" autocomplete="off" onkeydown="if(event.key==='Enter')submitUnlock()">
+    <button class="primary" id="lockBtn" onclick="submitUnlock()">解锁</button>
     <div class="lock-msg" id="unlockMsg"></div>
     <div class="lock-types">
       <span class="lock-type-chip">日卡 24h</span>
@@ -392,7 +392,7 @@ input[type=file]{font-size:11px}
     </div>
     <div class="lock-info" id="unlockInfo" style="display:none"></div>
     <div class="lock-footer">解锁状态绑定本设备（一机一用），刷新无需重复输入</div>
-    <a href="javascript:void(0)" onclick="tkPendingEnter=false;document.getElementById('lockOverlay').style.display='none'" style="display:block;margin-top:12px;font-size:12px;color:#666">稍后再说，返回模板页</a>
+    <a id="lockLater" href="javascript:void(0)" onclick="lockLaterClick()" style="display:block;margin-top:12px;font-size:12px;color:#666">稍后再说，返回模板页</a>
   </div>
 </div>
 
@@ -2378,7 +2378,10 @@ love
 </section>
 
 <script>
-// ============ 解锁码系统 ============
+// ============ 解锁码系统（两套彼此独立的锁）============
+// ① 网站锁 SITE：PS-码，解锁整站免费/普通模板；存储 ps-unlock-v2（沿用旧 key，旧码继续有效）
+// ② 票根锁 TICKET：TK-码，只解锁「票根风预览」；存储 ps-ticket-unlock-v1
+// 两套锁使用不同密钥 + 不同哈希算法 + 不同存储 key，任一码都无法解锁另一套。
 const UNLOCK_KEY="ps-unlock-v2";
 const UNLOCK_SECRET="PREVIEW-STUDIO-2026-SECRET-KEY";
 const UNLOCK_API=""; // 本地验证模式（后端已停用）
@@ -2397,10 +2400,19 @@ const CARD_TYPES={
   FOREVER:{label:"永卡",ms:0}
 };
 function unlockHash(str){
-  // djb2 哈希（与生成端一致）
+  // djb2 哈希（网站 PS 码校验，与旧版完全一致 → 历史 PS 码继续可用）
   let h=5381;
   for(let i=0;i<str.length;i++){h=((h<<5)+h)^str.charCodeAt(i);}
   return (h>>>0).toString(36);
+}
+function ticketHash(str){
+  // FNV-1a 哈希（票根 TK 码专用，与 PS 的 djb2 算法不同 → 两套码架构隔离）
+  let h=0x811c9dc5;
+  for(let i=0;i<str.length;i++){
+    h^=str.charCodeAt(i);
+    h=Math.imul(h,0x01000193)>>>0;
+  }
+  return h.toString(36);
 }
 // 设备指纹：canvas 指纹 + 浏览器特征，用于"一机一用"的设备绑定
 function getDeviceFingerprint(){
@@ -2432,39 +2444,57 @@ function getDeviceFingerprint(){
     return "fp-unknown";
   }
 }
-function checkUnlocked(){
+// —— 读取/判定一套锁的本地状态（key 不同，互不干扰）——
+function readLockState(key){
   try{
-    const raw=localStorage.getItem(UNLOCK_KEY);
-    if(!raw) return false;
+    const raw=localStorage.getItem(key);
+    if(!raw)return null;
     const u=JSON.parse(raw);
-    // 设备绑定校验：解锁状态被复制到其他设备时会因指纹不匹配而失效
-    if(u.deviceId && u.deviceId!==getDeviceFingerprint()) return false;
-    if(u.type==="FOREVER") return true;
-    return Date.now() < u.expiresAt;
-  }catch(e){return false;}
+    if(u.deviceId&&u.deviceId!==getDeviceFingerprint())return null;
+    if(u.type==="FOREVER")return u;
+    return Date.now()<u.expiresAt?u:null;
+  }catch(e){return null;}
 }
-function showLockOverlay(){
-  document.getElementById("lockOverlay").style.display="flex";
-  if(tkCheckUnlocked()){
-    document.getElementById("lockOverlay").style.display="none";
-  }
+// ① 网站锁
+function checkUnlocked(){return !!readLockState(UNLOCK_KEY);}
+// ② 票根锁
+const TK_UNLOCK_KEY="ps-ticket-unlock-v1";
+const TK_SECRET="TICKET-TEMPLATE-2026-SECRET-KEY";
+function tkCheckUnlocked(){return !!readLockState(TK_UNLOCK_KEY);}
+
+// —— 解锁弹窗：按 scope 切换文案与校验函数（site / ticket）——
+let lockScope="site";
+function showLockOverlay(scope){
+  lockScope=scope==="ticket"?"ticket":"site";
+  const ov=document.getElementById("lockOverlay");
+  const isT=lockScope==="ticket";
+  document.getElementById("lockIcon").textContent="🔒";
+  document.getElementById("lockTitle").textContent=isT?"解锁「票根风预览」":"解锁 Preview Studio";
+  document.getElementById("lockDesc").textContent=isT
+    ?"输入票根模板解锁码（TK-）后即可使用该模板"
+    :"输入网站解锁码（PS-）后即可使用全部模板";
+  const inp=document.getElementById("unlockInput");
+  inp.placeholder=isT?"TK-类型-随机码-校验码":"PS-类型-随机码-校验码";
+  inp.value="";
+  document.getElementById("unlockMsg").textContent="";
+  document.getElementById("unlockMsg").className="lock-msg";
+  document.getElementById("unlockInfo").style.display="none";
+  document.getElementById("lockLater").style.display=isT?"block":"none";
+  ov.style.display="flex";
+  setTimeout(()=>{try{inp.focus();}catch(e){}},60);
+}
+function lockLaterClick(){
+  // 票根锁允许「稍后再说」回到模板页；网站锁是硬门槛，不允许跳过
+  tkPendingEnter=false;
+  document.getElementById("lockOverlay").style.display="none";
+}
+function submitUnlock(){
+  if(lockScope==="ticket")return tkUnlockNow();
+  return unlockNow();
 }
 // 票根上锁：点票根卡片时若未解锁，置此标记；解锁成功后自动进入模板
 let tkPendingEnter=false;
 
-// ===== 票根模板独立解锁码（TK-，与网站 PS- 码互不通用）=====
-const TK_UNLOCK_KEY="ps-ticket-unlock-v1";
-const TK_SECRET="TICKET-TEMPLATE-2026-SECRET-KEY";
-function tkCheckUnlocked(){
-  try{
-    const raw=localStorage.getItem(TK_UNLOCK_KEY);
-    if(!raw)return false;
-    const u=JSON.parse(raw);
-    if(u.deviceId&&u.deviceId!==getDeviceFingerprint())return false;
-    if(u.type==="FOREVER")return true;
-    return Date.now()<u.expiresAt;
-  }catch(e){return false;}
-}
 function tkUnlockNow(){
   const input=document.getElementById("unlockInput");
   const msg=document.getElementById("unlockMsg");
@@ -2473,13 +2503,19 @@ function tkUnlockNow(){
   if(!code){msg.className="lock-msg err";msg.textContent="请输入解锁码";return;}
   const parts=code.split("-");
   if(parts.length!==4||parts[0]!=="TK"){
-    msg.className="lock-msg err";msg.textContent="格式错误，应为 TK-类型-随机码-校验码（PS- 码是网站解锁码，不适用于票根）";return;
+    msg.className="lock-msg err";
+    msg.textContent=parts[0]==="PS"
+      ?"这是网站解锁码（PS-），无法解锁票根模板，请使用 TK- 开头的票根解锁码"
+      :"格式错误，应为 TK-类型-随机码-校验码";
+    return;
   }
   const type=parts[1],random=parts[2],checksum=parts[3];
   const card=CARD_TYPES[type];
   if(!card){msg.className="lock-msg err";msg.textContent="未知的卡类型："+type;return;}
-  const expect=unlockHash(type+random+TK_SECRET).slice(0,8).toUpperCase();
-  if(expect!==checksum){msg.className="lock-msg err";msg.textContent="解锁码无效（校验失败）";return;}
+  const expect=ticketHash(type+random+TK_SECRET).slice(0,8).toUpperCase();
+  // 兼容早期用 djb2 生成的 TK 码（当时票根码与网站码同算法），保证已发出的码不失效
+  const legacy=unlockHash(type+random+TK_SECRET).slice(0,8).toUpperCase();
+  if(expect!==checksum&&legacy!==checksum){msg.className="lock-msg err";msg.textContent="解锁码无效（校验失败）";return;}
   const expiresAt=type==="FOREVER"?0:Date.now()+card.ms;
   localStorage.setItem(TK_UNLOCK_KEY,JSON.stringify({type,expiresAt,activatedAt:Date.now(),code,deviceId:getDeviceFingerprint()}));
   msg.className="lock-msg ok";
@@ -2497,14 +2533,24 @@ function unlockNow(){
   msg.className="lock-msg";
   if(!code){msg.className="lock-msg err";msg.textContent="请输入解锁码";return;}
   const parts=code.split("-");
-  if(parts.length!==4 || parts[0]!=="PS"){
-    msg.className="lock-msg err";msg.textContent="格式错误，应为 PS-类型-随机码-校验码";return;
+  // 兼容历史两种 PS 码：4 段（PS-类型-随机-校验）与 5 段（PS-工作区-类型-随机-校验）
+  let type,random,checksum,ws="";
+  if(parts.length===5&&parts[0]==="PS"){
+    ws=parts[1];type=parts[2];random=parts[3];checksum=parts[4];
+  }else if(parts.length===4&&parts[0]==="PS"){
+    type=parts[1];random=parts[2];checksum=parts[3];
+  }else{
+    msg.className="lock-msg err";
+    msg.textContent=parts[0]==="TK"
+      ?"这是票根模板解锁码（TK-），无法解锁网站，请使用 PS- 开头的网站解锁码"
+      :"格式错误，应为 PS-类型-随机码-校验码";
+    return;
   }
-  const type=parts[1], random=parts[2], checksum=parts[3];
   const card=CARD_TYPES[type];
   if(!card){msg.className="lock-msg err";msg.textContent="未知的卡类型："+type;return;}
-  // 校验签名
-  const expect=unlockHash(type+random+UNLOCK_SECRET).slice(0,8).toUpperCase();
+  // 校验签名：4 段沿用旧算法（历史码有效）；5 段把工作区并入签名
+  const signed=ws?ws+type+random+UNLOCK_SECRET:type+random+UNLOCK_SECRET;
+  const expect=unlockHash(signed).slice(0,8).toUpperCase();
   if(expect!==checksum){msg.className="lock-msg err";msg.textContent="解锁码无效（校验失败）";return;}
   const now=Date.now();
   const expiresAt=type==="FOREVER"?0:now+card.ms;
@@ -2514,11 +2560,7 @@ function unlockNow(){
     msg.className="lock-msg ok";
     msg.textContent="✅ 解锁成功（已绑定本设备）！"+(type==="FOREVER"?"（永久）":"");
     updateBadge();
-    setTimeout(()=>{
-      document.getElementById("lockOverlay").style.display="none";
-      // 从票根卡片进来的：解锁成功后自动进入票根模板
-      if(tkPendingEnter){tkPendingEnter=false;selectTemplate("ticket");}
-    },600);
+    setTimeout(()=>{document.getElementById("lockOverlay").style.display="none";},600);
   };
   // 有后端：在线激活（统计次数 + 下架校验）；无后端：本地验证
   if(UNLOCK_API){
@@ -2537,43 +2579,46 @@ function unlockNow(){
 }
 function updateBadge(){
   const badge=document.getElementById("unlockBadge");
-  const unlocked=tkCheckUnlocked();
-  if(unlocked){
-    const u=JSON.parse(localStorage.getItem(TK_UNLOCK_KEY)||"{}");
-    const label=(CARD_TYPES[u.type]?CARD_TYPES[u.type].label:u.type)||"已解锁";
-    badge.textContent="🔓 票根 · "+label;
+  const tags=[];
+  const su=readLockState(UNLOCK_KEY);
+  if(su)tags.push("网站 · "+((CARD_TYPES[su.type]&&CARD_TYPES[su.type].label)||su.type));
+  const tu=readLockState(TK_UNLOCK_KEY);
+  if(tu)tags.push("票根 · "+((CARD_TYPES[tu.type]&&CARD_TYPES[tu.type].label)||tu.type));
+  if(tags.length){
+    badge.textContent="🔓 "+tags.join(" ｜ ");
     badge.style.display="inline-block";
   }else{
     badge.style.display="none";
   }
-  // 票根卡片锁定态同步
+  // 票根卡片锁定态同步（只看票根锁，与网站锁无关）
   const tag=document.getElementById("tkLockTag"),enter=document.getElementById("tkLockEnter");
   if(tag&&enter){
-    if(unlocked){tag.textContent="Pro · 已解锁";enter.textContent="进入制作 →";}
+    if(tu){tag.textContent="Pro · 已解锁";enter.textContent="进入制作 →";}
     else{tag.textContent="🔒 需解锁码";enter.textContent="输入解锁码 →";}
   }
 }
 function relock(){
-  if(!confirm("退出当前解锁？票根模板将重新上锁，需重新输入解锁码。"))return;
+  if(!confirm("退出解锁？网站解锁与票根解锁将一并清除，需重新输入解锁码。"))return;
+  localStorage.removeItem(UNLOCK_KEY);
   localStorage.removeItem(TK_UNLOCK_KEY);
   updateBadge();
-  // 当前在票根工作区：退回模板选择页
   if(typeof currentTemplate!=="undefined"&&currentTemplate==="ticket"&&typeof backToTemplates==="function")backToTemplates();
-  showLockOverlay();
+  showLockOverlay("site");
 }
-// 页面加载时：不再整站上锁（免费模板直接用）；仅刷新解锁徽章与票根剩余时长
+// 页面加载：网站锁未解锁 → 整站拦截；票根锁仅刷新徽章
 (function(){
   updateBadge();
-  if(tkCheckUnlocked()){
+  if(!checkUnlocked()){
+    showLockOverlay("site");
+    return;
+  }
+  const su=readLockState(UNLOCK_KEY);
+  if(su&&su.type&&su.type!=="FOREVER"){
     try{
-      const u=JSON.parse(localStorage.getItem(TK_UNLOCK_KEY)||"{}");
-      if(u.type&&u.type!=="FOREVER"){
-        const info=document.getElementById("unlockInfo");
-        const remain=Math.max(0,u.expiresAt-Date.now());
-        const days=Math.ceil(remain/86400000);
-        info.style.display="block";
-        info.innerHTML="当前：<b>"+(CARD_TYPES[u.type]?CARD_TYPES[u.type].label:u.type)+"</b> · 剩余约 "+days+" 天<br>右上角可点「🔓」徽章退出解锁更换。";
-      }
+      const info=document.getElementById("unlockInfo");
+      const remain=Math.max(0,su.expiresAt-Date.now());
+      info.style.display="block";
+      info.innerHTML="网站解锁：<b>"+((CARD_TYPES[su.type]&&CARD_TYPES[su.type].label)||su.type)+"</b> · 剩余约 "+Math.ceil(remain/86400000)+" 天";
     }catch(e){}
   }
 })();
@@ -9973,7 +10018,7 @@ function selectTemplate(type){
   // 付费模板上锁：票根需 TK- 解锁码（与网站 PS- 码不通用）；未解锁时弹解锁框，解锁成功后自动进入
   if(type==="ticket"&&!tkCheckUnlocked()){
     tkPendingEnter=true;
-    showLockOverlay();
+    showLockOverlay("ticket");
     return;
   }
   if(currentTemplate&&currentTemplate!==type){
