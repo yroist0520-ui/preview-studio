@@ -2,14 +2,17 @@
 // v3 修复：v2 用 caches.match(req) 匹配时，带 ?v=xxx 的请求 miss 后仍可能命中旧
 // 不带 query 的缓存条目（浏览器实现差异），导致陈旧的 HTML/资源被返回。
 // 现在 HTML 一律 ignoreSearch 干净重取；同时清理所有旧版本缓存。
-const CACHE="ps-v3";
+const CACHE="ps-v4";
 // 只预缓存永远不变的静态资源（字体 CSS、图标）
 const PRECACHE=[
   "./fonts.css",
+  "./favicon.svg",
+  "./manifest.webmanifest",
   "./icons/apple-touch-icon.png",
   "./icons/apple-touch-icon-1024.png",
   "./icons/icon-192.png",
-  "./icons/icon-512.png"
+  "./icons/icon-512.png",
+  "./icons/icon-maskable-512.png"
 ];
 
 self.addEventListener("install",e=>{

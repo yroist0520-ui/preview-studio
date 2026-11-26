@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,viewport-fit=cover">
 <title>Preview Studio · 作品预览图生成器</title>
 <!-- ===== 版本自检：GitHub Pages 的 HTML 有 10 分钟强缓存（max-age=600），
      老页面刷新后仍可能吃本地缓存。加载 4 秒后用随机参数回源拉一次最新 HTML，
@@ -58,13 +58,14 @@ window.PS_BUILD="81948e5";
 <!-- Sortable.js 用于拼图缩略图拖动排序 -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <!-- ===== PWA / iOS 添加到主屏幕配置 ===== -->
-<meta name="theme-color" content="#0d0d10">
+<meta name="theme-color" content="#1A1A1C">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Preview">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="./manifest.webmanifest">
-<link rel="icon" type="image/png" href="./icons/icon-192.png">
+<link rel="icon" type="image/svg+xml" href="./favicon.svg">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="1024x1024" href="./icons/apple-touch-icon-1024.png">
 <script>
@@ -81,8 +82,9 @@ if('serviceWorker' in navigator){
   --text:#e8e8ee;--muted:#8b8b95;--accent:#c9a37c;--accent-soft:#3a5a8a;
   --radius:14px;--max:1280px;
 }
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:'Inter',"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6;overflow-x:hidden}
+html{scroll-behavior:smooth;height:100%}
+body{background:var(--bg);color:var(--text);font-family:'Inter',"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6;overflow-x:hidden;height:100%}
+button{touch-action:manipulation}
 a{color:inherit;text-decoration:none}
 img{max-width:100%;display:block}
 .container{max-width:var(--max);margin:0 auto;padding:0 24px}
