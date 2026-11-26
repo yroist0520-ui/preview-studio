@@ -1,8 +1,7 @@
-// Preview Studio · Service Worker v3
-// v3 修复：v2 用 caches.match(req) 匹配时，带 ?v=xxx 的请求 miss 后仍可能命中旧
-// 不带 query 的缓存条目（浏览器实现差异），导致陈旧的 HTML/资源被返回。
-// 现在 HTML 一律 ignoreSearch 干净重取；同时清理所有旧版本缓存。
-const CACHE="ps-v4";
+// Preview Studio · Service Worker v5
+// v5 修复：图标重新生成后，旧 SW 缓存仍按 ps-v4 命中旧图标（iPad 主屏显示黑块）。
+// 缓存名必须随图标更新一起提升，才能让已有客户端重新预缓存。
+const CACHE="ps-v5";
 // 只预缓存永远不变的静态资源（字体 CSS、图标）
 const PRECACHE=[
   "./fonts.css",
