@@ -1177,13 +1177,13 @@ It's always not too late to love life</textarea>
         <div class="cg-tpl-scroll" id="cgTplScroll"></div>
         <div class="po-group">画布比例</div>
         <select id="cgRatio" onchange="cgRatioChanged()">
-          <option value="1080,1080">1:1 正方形 1080</option>
-          <option value="1500,1500">1:1 正方形 1500</option>
-          <option value="1200,1600">3:4 竖版</option>
-          <option value="1600,1200">4:3 横版</option>
-          <option value="1080,1920">9:16 手机竖屏</option>
-          <option value="1920,1080">16:9 横版</option>
-          <option value="2048,2048">1:1 高清 2048</option>
+          <option value="2160,2160">1:1 正方形 2160</option>
+          <option value="3000,3000">1:1 正方形 3000</option>
+          <option value="2400,3200">3:4 竖版 2400×3200</option>
+          <option value="3200,2400">4:3 横版 3200×2400</option>
+          <option value="2160,3840">9:16 手机竖屏 2160×3840</option>
+          <option value="3840,2160">16:9 横版 3840×2160</option>
+          <option value="4000,4000">1:1 高清 4000</option>
         </select>
         <div class="po-group">外观</div>
         <label>填充方式（默认完整显示，不裁剪）</label>
@@ -1191,12 +1191,12 @@ It's always not too late to love life</textarea>
           <option value="contain" selected>完整显示（contain，不裁剪）</option>
           <option value="cover">铺满裁切（cover）</option>
         </select>
-        <label>图片间距: <span id="cgGapVal">8</span></label>
-        <input type="range" id="cgGap" min="0" max="40" value="8" oninput="document.getElementById('cgGapVal').textContent=this.value;requestDraw()">
-        <label>外边距: <span id="cgMarginVal">12</span></label>
-        <input type="range" id="cgMargin" min="0" max="60" value="12" oninput="document.getElementById('cgMarginVal').textContent=this.value;requestDraw()">
-        <label>图片圆角: <span id="cgRadiusVal">4</span></label>
-        <input type="range" id="cgRadius" min="0" max="40" value="4" oninput="document.getElementById('cgRadiusVal').textContent=this.value;requestDraw()">
+        <label>图片间距: <span id="cgGapVal">16</span></label>
+        <input type="range" id="cgGap" min="0" max="80" value="16" oninput="document.getElementById('cgGapVal').textContent=this.value;requestDraw()">
+        <label>外边距: <span id="cgMarginVal">24</span></label>
+        <input type="range" id="cgMargin" min="0" max="120" value="24" oninput="document.getElementById('cgMarginVal').textContent=this.value;requestDraw()">
+        <label>图片圆角: <span id="cgRadiusVal">8</span></label>
+        <input type="range" id="cgRadius" min="0" max="80" value="8" oninput="document.getElementById('cgRadiusVal').textContent=this.value;requestDraw()">
         <div class="po-group">背景</div>
         <label>背景样式</label>
         <select id="cgBgType" onchange="cgBgModeChanged();requestDraw()">
@@ -3405,8 +3405,8 @@ document.getElementById("axUpload").onchange=e=>{
 // ========== 自由拼图（Collage）完整引擎 ==========
 let cgImages=[];      // [{img:Image|null, url:string, loaded:boolean, x:number,y:number,scale:number,rotation:number,borderShape:string,borderColor:string}]
 let cgFillMode='contain';   // 'cover' 铺满裁切 | 'contain' 完整显示留白
-let cgGap=8, cgMargin=12, cgRadius=4;
-let cgRatio=[1500,1500];
+let cgGap=16, cgMargin=24, cgRadius=8;
+let cgRatio=[3000,3000];
 let cgBgType='solid', cgBg='#ffffff', cgBg2='#f0f4f8', cgBgDir='h';
 let currentCgTpl=0;
 let cgSelectedIdx=-1;  // 当前选中的图片索引
