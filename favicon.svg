@@ -1,13 +1,27 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- 满幅不透明背景：iOS 会自己切圆角，SVG 内不要再画圆角，否则边缘出现白角/错位 -->
-  <rect width="512" height="512" fill="#1A1A1C"/>
-  <rect x="112" y="112" width="288" height="288" rx="28"
-        fill="none" stroke="#FFFFFF" stroke-width="20"/>
-  <circle cx="300" cy="196" r="26" fill="#FFFFFF"/>
-  <path d="M142 336 L214 258 L264 308 L310 262 L370 336"
-        fill="none" stroke="#FFFFFF" stroke-width="18"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!--
+    iOS 主屏图标规范：
+    1) 不要自己画圆角/背景圆角，系统会二次裁切；
+    2) 图形内容控制在中间 80% 安全区内，避免被裁；
+    3) 主体必须严格水平/垂直居中，否则叠加系统遮罩后看起来"错位"。
+    画框：视觉中心 512,512；外框 256~768（占 50%），留足留白。
+  -->
+  <rect width="1024" height="1024" fill="#1A1A1C"/>
+
+  <!-- 画框：x/y 从 288 到 736 = 448 宽，正好居中（512±224） -->
+  <rect x="288" y="288" width="448" height="448" rx="40"
+        fill="none" stroke="#FFFFFF" stroke-width="32"/>
+
+  <!-- 太阳/月亮：位于画框右上内部，视觉平衡 -->
+  <circle cx="596" cy="424" r="40" fill="#FFFFFF"/>
+
+  <!-- 山峦：底部基线 y=648，两峰对称 -->
+  <path d="M336 640 L432 520 L520 616 L600 528 L688 640"
+        fill="none" stroke="#FFFFFF" stroke-width="28"
         stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M142 350 H370"
-        fill="none" stroke="#FFFFFF" stroke-width="12"
-        stroke-linecap="round" opacity="0.55"/>
+
+  <!-- 地平线：与山峦底部对齐 -->
+  <path d="M336 664 H688"
+        fill="none" stroke="#FFFFFF" stroke-width="20"
+        stroke-linecap="round" opacity="0.5"/>
 </svg>

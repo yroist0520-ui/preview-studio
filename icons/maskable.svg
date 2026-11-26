@@ -1,13 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <!-- maskable 版本：主体缩小到 60% 中心安全区，背景铺满无圆角裁切 -->
-  <rect width="512" height="512" fill="#1A1A1C"/>
-  <rect x="156" y="156" width="200" height="200" rx="22"
-        fill="none" stroke="#FFFFFF" stroke-width="16"/>
-  <circle cx="300" cy="232" r="18" fill="#FFFFFF"/>
-  <path d="M176 322 L224 268 L258 300 L288 266 L336 322"
-        fill="none" stroke="#FFFFFF" stroke-width="14"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!--
+    maskable 版本：Android 自适应图标规范要求主体在中心直径 40% 圆内，
+    即「安全区」为画布 80% 的正方形（此处 1024 的 80% = 819，即 102~922）。
+    本图主体收在 256~768（50%），远小于安全区，任何系统遮罩都不会裁到。
+  -->
+  <rect width="1024" height="1024" fill="#1A1A1C"/>
+  <rect x="320" y="320" width="384" height="384" rx="34"
+        fill="none" stroke="#FFFFFF" stroke-width="28"/>
+  <circle cx="584" cy="438" r="34" fill="#FFFFFF"/>
+  <path d="M360 620 L444 516 L520 596 L588 520 L664 620"
+        fill="none" stroke="#FFFFFF" stroke-width="24"
         stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M176 332 H336"
-        fill="none" stroke="#FFFFFF" stroke-width="10"
-        stroke-linecap="round" opacity="0.55"/>
+  <path d="M360 642 H664"
+        fill="none" stroke="#FFFFFF" stroke-width="18"
+        stroke-linecap="round" opacity="0.5"/>
 </svg>
