@@ -57,6 +57,23 @@ window.PS_BUILD="c3c98fe";
 <link href="fonts.css" rel="stylesheet">
 <!-- Sortable.js 用于拼图缩略图拖动排序 -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<!-- ===== PWA / iOS 添加到主屏幕配置 =====
+<meta name="theme-color" content="#0d0d10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Preview">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="1024x1024" href="./icons/apple-touch-icon-1024.png">
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('./sw.js').catch(function(){});
+  });
+}
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
