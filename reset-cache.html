@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Preview Studio · 缓存修复</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0d0d10;color:#e8e8ee;font-family:'Inter',"PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;line-height:1.6}
+.card{background:#1a1a22;border:1px solid #26262f;border-radius:16px;padding:32px;max-width:520px;width:100%;text-align:center}
+h1{font-size:20px;margin-bottom:8px}
+p{color:#8b8b95;font-size:13px;margin-bottom:20px}
+#log{text-align:left;font-family:'SF Mono',Menlo,monospace;font-size:12px;background:#121218;border:1px solid #26262f;border-radius:8px;padding:14px;min-height:120px;white-space:pre-wrap;word-break:break-all}
+.ok{color:#6fd18a}
+.err{color:#e06c6c}
+button{margin-top:18px;width:100%;padding:14px;background:#c9a37c;color:#1a1a1a;font-weight:700;font-size:15px;border:none;border-radius:10px;cursor:pointer}
+button:hover{background:#d4b08c}
+button:disabled{opacity:.5;cursor:default}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>🔧 缓存修复工具</h1>
+  <p>清掉本站的 Service Worker 与全部本地缓存，然后重新加载最新版本。</p>
+  <div id="log">准备中…</div>
+  <button id="btn" disabled>处理中…</button>
+</div>
+<script>
+(function(){
+  var log=document.getElementById("log"),btn=document.getElementById("btn");
+  function line(t,cls){
+    var d=document.createElement("div");
+    if(cls)d.className=cls;
+    d.textContent=t;
+    log.appendChild(d);
+  }
+  log.innerHTML="";
+  line("开始清理…");
+
+  var steps=[];
+  // 1. 注销所有 Service Worker
+  steps.push(function(){
+    if(!("serviceWorker" in navigator)){line("· 无 Service Worker", "ok");return Promise.resolve();}
+    return navigator.serviceWorker.getRegistrations().then(function(rs){
+      if(!rs.length){line("· 无已注册的 SW","ok");return;}
+      return Promise.all(rs.map(function(r){return r.unregister();})).then(function(){
+        line("· 已注销 "+rs.length+" 个 Service Worker","ok");
+      });
+    });
+  });
+  // 2. 删除 Cache Storage
+  steps.push(function(){
+    if(!("caches" in window)){line("· 无 Cache Storage","ok");return Promise.resolve();}
+    return caches.keys().then(function(keys){
+      if(!keys.length){line("· 无缓存条目","ok");return;}
+      return Promise.all(keys.map(function(k){return caches.delete(k);})).then(function(){
+        line("· 已删除缓存: "+keys.join(", "),"ok");
+      });
+    });
+  });
+  // 3. 清除 sessionStorage 版本提示标记
+  steps.push(function(){
+    try{sessionStorage.clear();line("· 已清 sessionStorage","ok");}catch(e){}
+    return Promise.resolve();
+  });
+  // 4. 提示手动清 localStorage 的可选项（解锁状态会丢，所以只提示不清）
+  steps.push(function(){
+    line("· localStorage 保留（解锁状态不丢）","ok");
+    return Promise.resolve();
+  });
+
+  var i=0;
+  function next(){
+    if(i>=steps.length){
+      line("");
+      line("✅ 清理完成，即将跳转最新页面…","ok");
+      btn.disabled=false;
+      btn.textContent="打开最新版 Preview Studio";
+      btn.onclick=go;
+      setTimeout(go,1500);
+      return;
+    }
+    var st=steps[i++];
+    Promise.resolve(st()).then(next).catch(function(err){
+      line("× 出错: "+err,"err");
+      next();
+    });
+  }
+
+  function go(){
+    location.replace("./index.html?v="+Date.now());
+  }
+
+  next();
+})();
+</script>
+</body>
+</html>
